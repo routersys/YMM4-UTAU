@@ -16,8 +16,7 @@ internal sealed record NotationToken(
     NotationTokenKind Kind,
     string Text,
     int? Tone = null,
-    double? LengthMilliseconds = null,
-    double? LengthWholeNotes = null);
+    int? LengthTicks = null);
 
 internal static class NotationScanner
 {
@@ -107,56 +106,58 @@ internal static class NotationScanner
         var tonePart = (separator < 0 ? content : content[..separator]).Trim();
         var lengthPart = separator < 0 ? string.Empty : content[(separator + 1)..].Trim();
 
-        double? lengthMilliseconds = null;
-        double? lengthWholeNotes = null;
-        if (lengthPart.Length > 0 && !TryParseLength(lengthPart, out lengthMilliseconds, out lengthWholeNotes))
+        int? lengthTicks = null;
+        if (lengthPart.Length > 0 && !TryParseLength(lengthPart, out lengthTicks))
             return false;
 
         if (tonePart.Length == 0)
         {
-            token = new NotationToken(NotationTokenKind.Directive, content, null, lengthMilliseconds, lengthWholeNotes);
+            token = new NotationToken(NotationTokenKind.Directive, content, null, lengthTicks);
             return true;
         }
 
         if (string.Equals(tonePart, "R", StringComparison.OrdinalIgnoreCase) || tonePart == "-")
         {
-            token = new NotationToken(NotationTokenKind.Rest, tonePart, null, lengthMilliseconds, lengthWholeNotes);
+            token = new NotationToken(NotationTokenKind.Rest, tonePart, null, lengthTicks);
             return true;
         }
 
         if (!MusicalTone.TryParse(tonePart, out var tone))
             return false;
 
-        token = new NotationToken(NotationTokenKind.Directive, content, tone.NoteNumber, lengthMilliseconds, lengthWholeNotes);
+        token = new NotationToken(NotationTokenKind.Directive, content, tone.NoteNumber, lengthTicks);
         return true;
     }
 
-    static bool TryParseLength(string text, out double? milliseconds, out double? wholeNotes)
+    static bool TryParseLength(string text, out int? ticks)
     {
-        milliseconds = null;
-        wholeNotes = null;
+        ticks = null;
 
         var slash = text.IndexOf('/');
         if (slash > 0)
         {
             if (!double.TryParse(text[..slash], NumberStyles.Float, CultureInfo.InvariantCulture, out var numerator)
                 || !double.TryParse(text[(slash + 1)..], NumberStyles.Float, CultureInfo.InvariantCulture, out var denominator)
-                || denominator <= 0.0
-                || numerator <= 0.0
                 || !double.IsFinite(numerator)
-                || !double.IsFinite(denominator))
+                || !double.IsFinite(denominator)
+                || numerator <= 0.0
+                || denominator <= 0.0)
                 return false;
 
-            wholeNotes = numerator / denominator;
+            var value = TimeBase.FromWholeNotes(numerator / denominator);
+            if (value < UTAUNote.MinimumLengthTicks || value > UTAUNote.MaximumLengthTicks)
+                return false;
+
+            ticks = value;
             return true;
         }
 
-        if (!double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var value)
-            || !double.IsFinite(value)
-            || value <= 0.0)
+        if (!int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed)
+            || parsed < UTAUNote.MinimumLengthTicks
+            || parsed > UTAUNote.MaximumLengthTicks)
             return false;
 
-        milliseconds = value;
+        ticks = parsed;
         return true;
     }
 }

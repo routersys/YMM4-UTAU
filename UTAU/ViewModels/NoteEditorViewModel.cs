@@ -10,33 +10,40 @@ namespace UTAU.ViewModels;
 
 internal sealed class NoteEditorViewModel : Bindable, IDisposable
 {
-    public const double MinimumPixelsPerMillisecond = 0.05;
-    public const double MaximumPixelsPerMillisecond = 2.0;
-    public const double ZoomStep = 1.5;
-    public const double DefaultSemitoneHeight = 14.0;
+    public const double MinimumPixelsPerTick = 0.01;
+    public const double MaximumPixelsPerTick = 0.6;
+    public const double DefaultPixelsPerTick = 0.08;
+    public const double MinimumSemitoneHeight = 8.0;
+    public const double MaximumSemitoneHeight = 32.0;
+    public const double DefaultSemitoneHeight = 16.0;
+    public const double ZoomStep = 1.25;
     public const int MinimumVisibleSemitones = 25;
-    public const double PitchCurveIntervalMilliseconds = 10.0;
-    public const double TimeGridIntervalMilliseconds = 500.0;
+    public const int PitchCurveIntervalTicks = 10;
 
     readonly ObservableCollection<UTAUNote> source;
-    double pixelsPerMillisecond = 0.25;
+    double pixelsPerTick = DefaultPixelsPerTick;
     double semitoneHeight = DefaultSemitoneHeight;
     int minimumTone = 48;
     int maximumTone = 72;
+    NoteDivision snapDivision = new(16);
     NoteViewModel? selectedNote;
+    PitchPoint? selectedPitchPoint;
     PointCollection pitchCurve = [];
 
     public NoteEditorViewModel(ObservableCollection<UTAUNote> notes)
     {
         source = notes;
         Notes = [.. notes.Select(x => new NoteViewModel(x, this))];
-        ZoomInCommand = new ActionCommand(_ => PixelsPerMillisecond < MaximumPixelsPerMillisecond, _ => Zoom(ZoomStep));
-        ZoomOutCommand = new ActionCommand(_ => PixelsPerMillisecond > MinimumPixelsPerMillisecond, _ => Zoom(1.0 / ZoomStep));
+        ZoomInCommand = new ActionCommand(_ => pixelsPerTick < MaximumPixelsPerTick, _ => ZoomHorizontally(ZoomStep));
+        ZoomOutCommand = new ActionCommand(_ => pixelsPerTick > MinimumPixelsPerTick, _ => ZoomHorizontally(1.0 / ZoomStep));
+        ZoomVerticalInCommand = new ActionCommand(_ => semitoneHeight < MaximumSemitoneHeight, _ => ZoomVertically(ZoomStep));
+        ZoomVerticalOutCommand = new ActionCommand(_ => semitoneHeight > MinimumSemitoneHeight, _ => ZoomVertically(1.0 / ZoomStep));
         InsertRestCommand = new ActionCommand(_ => SelectedNote is not null, _ => InsertRest());
         RemoveNoteCommand = new ActionCommand(_ => SelectedNote is not null && Notes.Count > 1, _ => RemoveSelected());
         AddPitchPointCommand = new ActionCommand(_ => SelectedNote is not null, _ => AddPitchPoint());
         RemovePitchPointCommand = new ActionCommand(_ => SelectedPitchPoint is not null, _ => RemovePitchPoint());
         ResetPitchCommand = new ActionCommand(_ => SelectedNote is not null, _ => ResetPitch());
+        SelectToneCommand = new ActionCommand(_ => SelectedNote is not null, ApplyTone);
         InvalidateLayout();
         SelectedNote = Notes.FirstOrDefault();
     }
@@ -46,6 +53,10 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public ICommand ZoomInCommand { get; }
 
     public ICommand ZoomOutCommand { get; }
+
+    public ICommand ZoomVerticalInCommand { get; }
+
+    public ICommand ZoomVerticalOutCommand { get; }
 
     public ICommand InsertRestCommand { get; }
 
@@ -57,12 +68,26 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     public ICommand ResetPitchCommand { get; }
 
-    public PitchPoint? SelectedPitchPoint { get; set => Set(ref field, value); }
+    public ICommand SelectToneCommand { get; }
 
-    public double PixelsPerMillisecond
+    public IReadOnlyList<NoteDivision> SnapDivisions => NoteDivision.All;
+
+    public NoteDivision SnapDivision
     {
-        get => pixelsPerMillisecond;
-        private set => Set(ref pixelsPerMillisecond, value);
+        get => snapDivision;
+        set => Set(ref snapDivision, value);
+    }
+
+    public PitchPoint? SelectedPitchPoint
+    {
+        get => selectedPitchPoint;
+        set => Set(ref selectedPitchPoint, value);
+    }
+
+    public double PixelsPerTick
+    {
+        get => pixelsPerTick;
+        private set => Set(ref pixelsPerTick, value);
     }
 
     public double SemitoneHeight
@@ -109,24 +134,32 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         private set => Set(ref pitchCurve, value);
     }
 
-    public double CanvasWidth => Math.Max(TotalMilliseconds * PixelsPerMillisecond, 1.0);
+    public double CanvasWidth => Math.Max(TotalTicks * PixelsPerTick, 1.0);
 
     public double CanvasHeight => (MaximumTone - MinimumTone + 1) * SemitoneHeight;
 
-    public double TotalMilliseconds => Notes.Sum(x => x.Note.LengthMilliseconds);
+    public int TotalTicks => Notes.Sum(x => x.Note.LengthTicks);
 
     public IReadOnlyList<KeyRowViewModel> Keyboard { get; private set; } = [];
 
     public IReadOnlyList<GridLineViewModel> TimeGridLines { get; private set; } = [];
 
+    public static IReadOnlyList<PitchShapeItem> PitchShapes { get; } =
+    [
+        new(Texts.PitchShapeSCurve, PitchPointShape.SCurve),
+        new(Texts.PitchShapeLinear, PitchPointShape.Linear),
+        new(Texts.PitchShapeRCurve, PitchPointShape.RCurve),
+        new(Texts.PitchShapeJCurve, PitchPointShape.JCurve),
+    ];
+
     public void InvalidateLayout()
     {
         UpdateToneRange();
-        var position = 0.0;
+        var position = 0;
         foreach (var note in Notes)
         {
-            note.StartMilliseconds = position;
-            position += note.Note.LengthMilliseconds;
+            note.StartTicks = position;
+            position += note.Note.LengthTicks;
             note.RaiseLayoutChanged();
         }
 
@@ -136,7 +169,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         OnPropertyChanged(nameof(TimeGridLines));
         OnPropertyChanged(nameof(CanvasWidth));
         OnPropertyChanged(nameof(CanvasHeight));
-        OnPropertyChanged(nameof(TotalMilliseconds));
+        OnPropertyChanged(nameof(TotalTicks));
         UpdatePitchCurve();
     }
 
@@ -145,7 +178,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         switch (propertyName)
         {
             case nameof(UTAUNote.Tone):
-            case nameof(UTAUNote.LengthMilliseconds):
+            case nameof(UTAUNote.LengthTicks):
                 InvalidateLayout();
                 break;
             default:
@@ -157,20 +190,20 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public void UpdatePitchCurve()
     {
         var points = new PointCollection();
-        var position = 0.0;
+        var position = 0;
 
         foreach (var note in Notes)
         {
-            var length = note.Note.LengthMilliseconds;
+            var length = note.Note.LengthTicks;
             if (note.IsRest)
             {
                 position += length;
                 continue;
             }
 
-            for (var elapsed = 0.0; elapsed <= length; elapsed += PitchCurveIntervalMilliseconds)
+            for (var elapsed = 0; elapsed <= length; elapsed += PitchCurveIntervalTicks)
             {
-                var cents = note.Note.EvaluatePitchOffsetCents(elapsed);
+                var cents = note.Note.EvaluatePitchOffsetCents(elapsed, length);
                 points.Add(ToCanvasPoint(position + elapsed, note.Note.Tone + cents / 100.0));
             }
 
@@ -181,47 +214,26 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         PitchCurve = points;
     }
 
-    public Point ToCanvasPoint(double milliseconds, double tone)
-        => new(
-            milliseconds * PixelsPerMillisecond,
-            (MaximumTone - tone + 0.5) * SemitoneHeight);
+    public Point ToCanvasPoint(double ticks, double tone)
+        => new(ticks * PixelsPerTick, (MaximumTone - tone + 0.5) * SemitoneHeight);
 
     public int ToneFromCanvasY(double y)
-        => Math.Clamp((int)Math.Round(MaximumTone - y / SemitoneHeight + 0.5), MinimumTone, MaximumTone);
+        => Math.Clamp((int)Math.Round(MaximumTone - y / SemitoneHeight + 0.5), 0, 127);
 
-    public double MillisecondsFromCanvasX(double x) => x / PixelsPerMillisecond;
+    public int TicksFromCanvasX(double x) => (int)Math.Round(x / PixelsPerTick);
 
-    IReadOnlyList<KeyRowViewModel> BuildKeyboard()
+    public int SnapLength(int ticks)
+        => Math.Clamp(SnapDivision.Snap(ticks), UTAUNote.MinimumLengthTicks, UTAUNote.MaximumLengthTicks);
+
+    public void ZoomHorizontally(double factor)
     {
-        var width = CanvasWidth;
-        return ComboBoxItems
-            .CreateTones(MinimumTone, MaximumTone)
-            .Reverse()
-            .Select(x => new KeyRowViewModel(x.Name, x.IsAccidental, SemitoneHeight, width))
-            .ToArray();
+        PixelsPerTick = Math.Clamp(PixelsPerTick * factor, MinimumPixelsPerTick, MaximumPixelsPerTick);
+        InvalidateLayout();
     }
 
-    IReadOnlyList<GridLineViewModel> BuildTimeGridLines()
+    public void ZoomVertically(double factor)
     {
-        var lines = new List<GridLineViewModel>();
-        var total = TotalMilliseconds;
-        var height = CanvasHeight;
-        for (var milliseconds = TimeGridIntervalMilliseconds; milliseconds < total; milliseconds += TimeGridIntervalMilliseconds)
-            lines.Add(new GridLineViewModel(milliseconds * PixelsPerMillisecond, height));
-        return lines;
-    }
-
-    public static IReadOnlyList<PitchShapeItem> PitchShapes { get; } =
-    [
-        new(Texts.PitchShapeSCurve, PitchPointShape.SCurve),
-        new(Texts.PitchShapeLinear, PitchPointShape.Linear),
-        new(Texts.PitchShapeRCurve, PitchPointShape.RCurve),
-        new(Texts.PitchShapeJCurve, PitchPointShape.JCurve),
-    ];
-
-    public void Zoom(double factor)
-    {
-        PixelsPerMillisecond = Math.Clamp(PixelsPerMillisecond * factor, MinimumPixelsPerMillisecond, MaximumPixelsPerMillisecond);
+        SemitoneHeight = Math.Clamp(SemitoneHeight * factor, MinimumSemitoneHeight, MaximumSemitoneHeight);
         InvalidateLayout();
     }
 
@@ -232,14 +244,44 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         Notes.Clear();
     }
 
+    IReadOnlyList<KeyRowViewModel> BuildKeyboard()
+    {
+        var width = CanvasWidth;
+        var height = SemitoneHeight;
+        var rows = new List<KeyRowViewModel>(MaximumTone - MinimumTone + 1);
+        for (var noteNumber = MaximumTone; noteNumber >= MinimumTone; noteNumber--)
+        {
+            var name = new MusicalTone(noteNumber).Name;
+            rows.Add(new KeyRowViewModel(name, name.Contains('#'), noteNumber, height, width));
+        }
+        return rows;
+    }
+
+    IReadOnlyList<GridLineViewModel> BuildTimeGridLines()
+    {
+        var lines = new List<GridLineViewModel>();
+        var total = TotalTicks;
+        var height = CanvasHeight;
+        for (var ticks = TimeBase.TicksPerQuarterNote; ticks < total; ticks += TimeBase.TicksPerQuarterNote)
+            lines.Add(new GridLineViewModel(ticks * PixelsPerTick, height, ticks % TimeBase.TicksPerWholeNote == 0));
+        return lines;
+    }
+
     void UpdateToneRange()
     {
         var lowest = Notes.Count == 0 ? MusicalTone.MiddleC.NoteNumber : Notes.Min(x => x.Note.Tone);
         var highest = Notes.Count == 0 ? MusicalTone.MiddleC.NoteNumber : Notes.Max(x => x.Note.Tone);
-        var center = (lowest + highest) / 2;
         var span = Math.Max(highest - lowest + 12, MinimumVisibleSemitones);
-        MinimumTone = Math.Clamp(center - span / 2, 0, 115);
-        MaximumTone = Math.Clamp(MinimumTone + span, MinimumTone + MinimumVisibleSemitones, 127);
+        var center = (lowest + highest) / 2;
+        MinimumTone = Math.Clamp(center - span / 2, 0, 127 - span);
+        MaximumTone = MinimumTone + span;
+    }
+
+    void ApplyTone(object? parameter)
+    {
+        if (SelectedNote is not { } selected || parameter is not KeyRowViewModel row)
+            return;
+        selected.Tone = row.NoteNumber;
     }
 
     void InsertRest()
@@ -252,7 +294,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         {
             Lyric = UTAUNote.RestLyric,
             Tone = selected.Note.Tone,
-            LengthMilliseconds = UTAUNote.DefaultLengthMilliseconds,
+            LengthTicks = SnapDivision.IsFree ? UTAUNote.DefaultLengthTicks : SnapDivision.Ticks,
         };
         source.Insert(index + 1, rest);
         Notes.Insert(index + 1, new NoteViewModel(rest, this));
@@ -278,8 +320,8 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
             return;
 
         var points = selected.Note.PitchPoints;
-        var milliseconds = points.Count == 0 ? 0.0 : points[^1].Milliseconds + selected.Note.LengthMilliseconds / 4.0;
-        var point = new PitchPoint(Math.Min(milliseconds, selected.Note.LengthMilliseconds), points.Count == 0 ? 0.0 : points[^1].Cents);
+        var milliseconds = points.Count == 0 ? 0.0 : points[^1].Milliseconds + 100.0;
+        var point = new PitchPoint(milliseconds, points.Count == 0 ? 0.0 : points[^1].Cents);
         points.Add(point);
         SelectedPitchPoint = point;
         UpdatePitchCurve();

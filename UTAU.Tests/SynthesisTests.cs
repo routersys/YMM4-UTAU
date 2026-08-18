@@ -373,7 +373,7 @@ public sealed class VibratoAndPitchTests
     [Fact]
     public void PortamentoHoldsTheFirstAndLastValueOutsideTheControlPoints()
     {
-        var note = new UTAUNote { LengthMilliseconds = 400.0 };
+        var note = new UTAUNote();
         note.PitchPoints.Add(new PitchPoint(100.0, -200.0, PitchPointShape.Linear));
         note.PitchPoints.Add(new PitchPoint(300.0, 0.0, PitchPointShape.Linear));
 

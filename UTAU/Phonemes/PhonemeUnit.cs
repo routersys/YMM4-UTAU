@@ -8,6 +8,7 @@ internal sealed record PhonemeUnit(
     OtoEntry? Entry,
     string Alias,
     double NoteStartMilliseconds,
+    double NoteLengthMilliseconds,
     double StartMilliseconds,
     double LengthMilliseconds,
     int Tone)

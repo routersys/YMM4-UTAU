@@ -75,7 +75,8 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
     void Render(string normalized, UTAUVoicePronounce pronounce, UTAUVoiceParameter parameter, string filePath)
     {
         var notes = pronounce.Notes.ToArray();
-        var units = Phonemizer.Phonemize(bank, notes, parameter.Color, PhonemizeOptions.Create(parameter.Speed));
+        var timeBase = new TimeBase(parameter.Tempo, parameter.Speed);
+        var units = Phonemizer.Phonemize(bank, notes, parameter.Color, PhonemizeOptions.Default, timeBase);
         ThrowIfUnresolved(units);
 
         var settings = new RenderSettings(
@@ -94,7 +95,7 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
 
         WaveIo.Write(filePath, result.Samples, result.SampleRate);
         pronounce.SourceText = normalized;
-        pronounce.LipSyncFrames = BuildLipSyncFrames(notes, result.OffsetMilliseconds);
+        pronounce.LipSyncFrames = BuildLipSyncFrames(notes, timeBase, result.OffsetMilliseconds);
     }
 
     static void ThrowIfUnresolved(IReadOnlyList<PhonemeUnit> units)
@@ -113,7 +114,7 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
         throw new InvalidOperationException(string.Format(Texts.AliasNotFoundMessage, listed));
     }
 
-    static LipSyncFrame[] BuildLipSyncFrames(IReadOnlyList<UTAUNote> notes, double offsetMilliseconds)
+    static LipSyncFrame[] BuildLipSyncFrames(IReadOnlyList<UTAUNote> notes, TimeBase timeBase, double offsetMilliseconds)
     {
         var frames = new List<LabFrame>(notes.Count);
         var position = 0.0;
@@ -121,7 +122,7 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
         foreach (var note in notes)
         {
             var start = position - offsetMilliseconds;
-            position += note.LengthMilliseconds;
+            position += timeBase.ToMilliseconds(note.LengthTicks);
             var end = position - offsetMilliseconds;
             if (end <= 0.0)
                 continue;

@@ -28,6 +28,7 @@ internal sealed class UtauRenderer(RenderSettings settings, AnalysisCache cache)
         double ConsonantEnd);
 
     const long MaximumFrameElements = 1L << 27;
+    const double FrameCountEpsilon = 1e-9;
 
     readonly Dictionary<string, AudioSample> loadedSamples = new(StringComparer.OrdinalIgnoreCase);
 
@@ -47,7 +48,7 @@ internal sealed class UtauRenderer(RenderSettings settings, AnalysisCache cache)
 
         var offset = timings.Min(x => x.AudioStartMilliseconds);
         var totalMilliseconds = timings.Max(x => x.AudioEndMilliseconds) - offset;
-        var frameCount = Math.Max((int)Math.Ceiling(totalMilliseconds / framePeriod) + 1, 2);
+        var frameCount = Math.Max((int)Math.Ceiling(totalMilliseconds / framePeriod - FrameCountEpsilon) + 1, 2);
         if ((long)frameCount * spectrumSize > MaximumFrameElements)
             throw new InvalidOperationException(Texts.TextTooLongMessage);
 
@@ -152,7 +153,7 @@ internal sealed class UtauRenderer(RenderSettings settings, AnalysisCache cache)
             if (sourceF0 <= 0.0)
                 continue;
 
-            var cents = note.EvaluatePitchOffsetCents(absolute - unit.NoteStartMilliseconds);
+            var cents = note.EvaluatePitchOffsetCents(absolute - unit.NoteStartMilliseconds, unit.NoteLengthMilliseconds);
             var targetF0 = MusicalTone.FrequencyOf(unit.Tone + cents / 100.0);
             var ratio = source.MeanF0 > 0.0 ? sourceF0 / source.MeanF0 : 1.0;
             var value = targetF0 * Math.Pow(ratio, modulation);

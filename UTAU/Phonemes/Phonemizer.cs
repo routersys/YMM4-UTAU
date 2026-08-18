@@ -9,11 +9,7 @@ internal readonly record struct PhonemizeOptions(double TransitionTailMillisecon
     public const double BaseEndingMilliseconds = 120.0;
     public const double MinimumTransitionMilliseconds = 20.0;
 
-    public static PhonemizeOptions Create(double speed)
-    {
-        var scale = 1.0 / Math.Clamp(speed, 0.1, 10.0);
-        return new PhonemizeOptions(BaseTransitionTailMilliseconds * scale, BaseEndingMilliseconds * scale);
-    }
+    public static PhonemizeOptions Default => new(BaseTransitionTailMilliseconds, BaseEndingMilliseconds);
 }
 
 internal static class Phonemizer
@@ -22,7 +18,8 @@ internal static class Phonemizer
         VoiceBank bank,
         IReadOnlyList<UTAUNote> notes,
         string? color,
-        PhonemizeOptions options)
+        PhonemizeOptions options,
+        TimeBase timeBase)
     {
         ArgumentNullException.ThrowIfNull(bank);
         ArgumentNullException.ThrowIfNull(notes);
@@ -35,17 +32,18 @@ internal static class Phonemizer
         {
             var note = notes[i];
             var start = position;
-            position += note.LengthMilliseconds;
+            var length = timeBase.ToMilliseconds(note.LengthTicks);
+            position += length;
 
             if (note.IsRest)
             {
-                units.Add(new PhonemeUnit(note, null, UTAUNote.RestLyric, start, start, note.LengthMilliseconds, note.Tone));
+                units.Add(new PhonemeUnit(note, null, UTAUNote.RestLyric, start, length, start, length, note.Tone));
                 previousVowel = KanaRomanization.StartVowel;
                 continue;
             }
 
             var entry = AliasResolver.Resolve(bank, note.Lyric, previousVowel, note.Tone, color, out var alias);
-            units.Add(new PhonemeUnit(note, entry, alias, start, start, note.LengthMilliseconds, note.Tone));
+            units.Add(new PhonemeUnit(note, entry, alias, start, length, start, length, note.Tone));
 
             var vowel = KanaRomanization.GetVowel(note.Lyric);
             previousVowel = entry is null || vowel is null ? KanaRomanization.StartVowel : vowel;
@@ -89,6 +87,7 @@ internal static class Phonemizer
                 entry,
                 alias,
                 current.NoteStartMilliseconds,
+                current.NoteLengthMilliseconds,
                 current.EndMilliseconds - length,
                 length,
                 current.Tone));
@@ -114,6 +113,7 @@ internal static class Phonemizer
             entry,
             alias,
             last.NoteStartMilliseconds,
+            last.NoteLengthMilliseconds,
             last.EndMilliseconds,
             options.EndingMilliseconds,
             last.Tone));

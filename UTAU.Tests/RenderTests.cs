@@ -112,10 +112,10 @@ public sealed class UtauRendererTests : IDisposable
 
     public void Dispose() => TestVoiceBank.DeleteDirectory(directory);
 
-    RenderResult Render(VoiceBank bank, string text, RenderSettings? settings = null, double speed = 1.0)
+    RenderResult Render(VoiceBank bank, string text, RenderSettings? settings = null, double tempo = 120.0, double speed = 1.0)
     {
-        var notes = NoteSequenceBuilder.Build(text, NoteBuildOptions.Create(60, speed, 120.0));
-        var units = Phonemizer.Phonemize(bank, notes, null, PhonemizeOptions.Create(speed));
+        var notes = NoteSequenceBuilder.Build(text, NoteBuildOptions.Create(60));
+        var units = Phonemizer.Phonemize(bank, notes, null, PhonemizeOptions.Default, new TimeBase(tempo, speed));
         using var arena = new WorldArena();
         return new UtauRenderer(settings ?? RenderSettings.Default with { Estimator = F0Estimator.Dio }, cache).Render(units, arena);
     }
@@ -162,8 +162,8 @@ public sealed class UtauRendererTests : IDisposable
     public void RenderedPitchFollowsTheRequestedTone()
     {
         var bank = TestVoiceBank.CreateSingleKanaBank(directory);
-        var low = Render(bank, "<!C3:600>あ");
-        var high = Render(bank, "<!C5:600>あ");
+        var low = Render(bank, "<!C3:1/2>あ");
+        var high = Render(bank, "<!C5:1/2>あ");
 
         Assert.Equal(new MusicalTone(48).Frequency, MeasureFundamental(low), new MusicalTone(48).Frequency * 0.02);
         Assert.Equal(new MusicalTone(72).Frequency, MeasureFundamental(high), new MusicalTone(72).Frequency * 0.02);
@@ -173,8 +173,8 @@ public sealed class UtauRendererTests : IDisposable
     public void LongerNotesProduceLongerAudio()
     {
         var bank = TestVoiceBank.CreateSingleKanaBank(directory);
-        var shortResult = Render(bank, "<!C4:200>あ");
-        var longResult = Render(bank, "<!C4:1200>あ");
+        var shortResult = Render(bank, "<!C4:1/8>あ");
+        var longResult = Render(bank, "<!C4:1/1>あ");
 
         Assert.True(longResult.Samples.Length > shortResult.Samples.Length * 4);
         Assert.True(Peak(longResult.Samples) > 0.01);
@@ -184,7 +184,7 @@ public sealed class UtauRendererTests : IDisposable
     public void SustainedNotesStayAudibleBeyondTheSourceLength()
     {
         var bank = TestVoiceBank.CreateSingleKanaBank(directory);
-        var result = Render(bank, "<!C4:3000>あ");
+        var result = Render(bank, "<!C4:2/1>あ");
         var tail = result.Samples.Skip(result.Samples.Length * 3 / 4).ToArray();
 
         Assert.True(Peak(tail) > 0.01, $"tail peak={Peak(tail)}");
@@ -194,8 +194,8 @@ public sealed class UtauRendererTests : IDisposable
     public void VolumeScalesTheOutputLinearly()
     {
         var bank = TestVoiceBank.CreateSingleKanaBank(directory);
-        var full = Render(bank, "<!C4:400>あ");
-        var half = Render(bank, "<!C4:400>あ", RenderSettings.Default with { Estimator = F0Estimator.Dio, Volume = 50.0 });
+        var full = Render(bank, "<!C4:1/4>あ");
+        var half = Render(bank, "<!C4:1/4>あ", RenderSettings.Default with { Estimator = F0Estimator.Dio, Volume = 50.0 });
 
         Assert.Equal(Peak(full.Samples) * 0.5, Peak(half.Samples), 2);
     }
@@ -204,8 +204,8 @@ public sealed class UtauRendererTests : IDisposable
     public void SilentVolumeProducesSilence()
     {
         var bank = TestVoiceBank.CreateSingleKanaBank(directory);
-        var full = Render(bank, "<!C4:400>あ");
-        var silent = Render(bank, "<!C4:400>あ", RenderSettings.Default with { Estimator = F0Estimator.Dio, Volume = 0.0 });
+        var full = Render(bank, "<!C4:1/4>あ");
+        var silent = Render(bank, "<!C4:1/4>あ", RenderSettings.Default with { Estimator = F0Estimator.Dio, Volume = 0.0 });
 
         Assert.True(Peak(silent.Samples) < Peak(full.Samples) * 1e-4, $"peak={Peak(silent.Samples)}");
         Assert.True(Peak(silent.Samples) < 1.0 / short.MaxValue, $"peak={Peak(silent.Samples)}");
@@ -215,7 +215,7 @@ public sealed class UtauRendererTests : IDisposable
     public void StretchModeAlsoRendersAudibleOutput()
     {
         var bank = TestVoiceBank.CreateSingleKanaBank(directory);
-        var result = Render(bank, "<!C4:1500>あ", RenderSettings.Default with { Estimator = F0Estimator.Dio, StretchMode = StretchMode.Stretch });
+        var result = Render(bank, "<!C4:1/1>あ", RenderSettings.Default with { Estimator = F0Estimator.Dio, StretchMode = StretchMode.Stretch });
 
         Assert.True(Peak(result.Samples) > 0.01);
     }
@@ -231,7 +231,7 @@ public sealed class UtauRendererTests : IDisposable
             Breathiness = 60.0,
             Brightness = 6.0,
         };
-        var result = Render(bank, "<!C4:400>あ", settings);
+        var result = Render(bank, "<!C4:1/4>あ", settings);
 
         Assert.True(Peak(result.Samples) > 0.001);
         Assert.All(result.Samples, x => Assert.True(double.IsFinite(x)));
@@ -241,9 +241,9 @@ public sealed class UtauRendererTests : IDisposable
     public void RestsProduceNearSilenceBetweenNotes()
     {
         var bank = TestVoiceBank.CreateSingleKanaBank(directory);
-        var result = Render(bank, "<!C4:300>あ<!R:600><!C4:300>か");
-        var start = (int)((300.0 - result.OffsetMilliseconds + 200.0) * result.SampleRate / 1000.0);
-        var end = (int)((900.0 - result.OffsetMilliseconds - 200.0) * result.SampleRate / 1000.0);
+        var result = Render(bank, "<!C4:1/4>あ<!R:1/2><!C4:1/4>か");
+        var start = (int)((500.0 - result.OffsetMilliseconds + 200.0) * result.SampleRate / 1000.0);
+        var end = (int)((1500.0 - result.OffsetMilliseconds - 200.0) * result.SampleRate / 1000.0);
 
         Assert.InRange(start, 0, result.Samples.Length - 1);
         Assert.InRange(end, start + 1, result.Samples.Length);

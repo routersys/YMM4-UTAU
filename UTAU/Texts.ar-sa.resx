@@ -170,9 +170,15 @@
 <data name="AboutUTAUNotation" xml:space="preserve"><value>كتابة &lt;!النغمة:الطول&gt; داخل النطق تحدد درجة وطول الكانا التي تليها. ويُكتب الطول بالميلي ثانية أو كنوتة مثل 1/4.</value></data>
 <data name="AboutUTAUNotationExample" xml:space="preserve"><value>مثال: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  وتُكتب السكتة هكذا &lt;!R:200&gt;.</value></data>
 <data name="AboutUTAUCredit" xml:space="preserve"><value>يُستخدم WorldNet، وهو نقل لمكتبة WORLD من إعداد M. Morise، في التحليل والتوليف.</value></data>
-<data name="NoteEditorHint" xml:space="preserve"><value>اسحب النوتة رأسياً لتغيير درجتها واسحب حافتها اليمنى لتغيير طولها. مفتاح Ctrl مع العجلة يقرّب، وShift مع العجلة يمرر أفقياً، وAlt يلغي المحاذاة.</value></data>
 <data name="NoteLyricDescription" xml:space="preserve"><value>يمكن أيضاً كتابة الاسم البديل من ملف oto.ini مباشرة.</value></data>
 <data name="NoteVelocityDescription" xml:space="preserve"><value>يقيس طول الحرف الساكن. القيمة 100 تحافظ على الطول الأصلي والمعامل هو 2^((100-القيمة)/100).</value></data>
 <data name="NoteFollowOtoDescription" xml:space="preserve"><value>القيمة 0 تستخدم القيمة المعلنة في ملف oto.ini.</value></data>
 <data name="NoteStartPointDescription" xml:space="preserve"><value>يزيح نقطة بدء قراءة العينة الأصلية إلى الأمام بهذا المقدار.</value></data>
+<data name="UnitTick" xml:space="preserve"><value>tick</value></data>
+<data name="NoteLengthDescription" xml:space="preserve"><value>480 نبضة تساوي نوتة ربعية. المدة الفعلية تتبع الإيقاع وسرعة النطق.</value></data>
+<data name="SnapFree" xml:space="preserve"><value>بدون محاذاة</value></data>
+<data name="SnapLabel" xml:space="preserve"><value>المحاذاة</value></data>
+<data name="ZoomVerticalIn" xml:space="preserve"><value>تكبير رأسي</value></data>
+<data name="ZoomVerticalOut" xml:space="preserve"><value>تصغير رأسي</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>اسحب النوتة رأسياً لتغيير درجتها واسحب حافتها اليمنى لتغيير طولها. والنقر على مفتاح ينقل النوتة المحددة إلى تلك الدرجة. مفتاح Ctrl مع العجلة يقرّب أفقياً، وCtrl مع Shift والعجلة يقرّب رأسياً، وShift مع العجلة يمرر أفقياً.</value></data>
 </root>

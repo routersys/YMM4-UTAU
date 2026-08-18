@@ -10,7 +10,9 @@ namespace UTAU.Notes;
 
 internal sealed class UTAUNote : UndoRedoable
 {
-    public const double DefaultLengthMilliseconds = 200.0;
+    public const int DefaultLengthTicks = TimeBase.TicksPerQuarterNote / 2;
+    public const int MinimumLengthTicks = 15;
+    public const int MaximumLengthTicks = TimeBase.TicksPerWholeNote * 16;
     public const double DefaultFadeInMilliseconds = 5.0;
     public const double DefaultFadeOutMilliseconds = 35.0;
     public const double FollowOtoValue = 0.0;
@@ -18,7 +20,7 @@ internal sealed class UTAUNote : UndoRedoable
 
     string lyric = string.Empty;
     int tone = MusicalTone.MiddleC.NoteNumber;
-    double lengthMilliseconds = DefaultLengthMilliseconds;
+    int lengthTicks = DefaultLengthTicks;
     double velocity = 100.0;
     double intensity = 100.0;
     double modulation;
@@ -31,6 +33,7 @@ internal sealed class UTAUNote : UndoRedoable
     ObservableCollection<PitchPoint> pitchPoints = [];
 
     [Display(GroupName = nameof(Texts.NoteGroupBasic), Name = nameof(Texts.NoteLyric), Description = nameof(Texts.NoteLyricDescription), ResourceType = typeof(Texts))]
+    [TextEditor]
     public string Lyric
     {
         get => lyric;
@@ -45,14 +48,14 @@ internal sealed class UTAUNote : UndoRedoable
         set => Set(ref tone, Math.Clamp(value, 0, 127));
     }
 
-    [Display(GroupName = nameof(Texts.NoteGroupBasic), Name = nameof(Texts.NoteLength), ResourceType = typeof(Texts))]
-    [TextBoxSlider("F0", "ms", 50.0, 2000.0, Delay = -1)]
-    [Range(1.0, 60000.0)]
-    [DefaultValue(DefaultLengthMilliseconds)]
-    public double LengthMilliseconds
+    [Display(GroupName = nameof(Texts.NoteGroupBasic), Name = nameof(Texts.NoteLength), Description = nameof(Texts.NoteLengthDescription), ResourceType = typeof(Texts))]
+    [TextBoxSlider("F0", nameof(Texts.UnitTick), MinimumLengthTicks, TimeBase.TicksPerWholeNote, Delay = -1, ResourceType = typeof(Texts))]
+    [Range(MinimumLengthTicks, MaximumLengthTicks)]
+    [DefaultValue(DefaultLengthTicks)]
+    public int LengthTicks
     {
-        get => lengthMilliseconds;
-        set => Set(ref lengthMilliseconds, Math.Clamp(value, 1.0, 60000.0));
+        get => lengthTicks;
+        set => Set(ref lengthTicks, Math.Clamp(value, MinimumLengthTicks, MaximumLengthTicks));
     }
 
     [Display(GroupName = nameof(Texts.NoteGroupExpression), Name = nameof(Texts.NoteVelocity), Description = nameof(Texts.NoteVelocityDescription), ResourceType = typeof(Texts))]
@@ -161,7 +164,7 @@ internal sealed class UTAUNote : UndoRedoable
         {
             Lyric = Lyric,
             Tone = Tone,
-            LengthMilliseconds = LengthMilliseconds,
+            LengthTicks = LengthTicks,
             Velocity = Velocity,
             Intensity = Intensity,
             Modulation = Modulation,
@@ -177,8 +180,8 @@ internal sealed class UTAUNote : UndoRedoable
         return clone;
     }
 
-    public double EvaluatePitchOffsetCents(double millisecondsFromNoteStart)
-        => EvaluatePortamentoCents(millisecondsFromNoteStart) + Vibrato.Evaluate(millisecondsFromNoteStart, LengthMilliseconds);
+    public double EvaluatePitchOffsetCents(double millisecondsFromNoteStart, double noteLengthMilliseconds)
+        => EvaluatePortamentoCents(millisecondsFromNoteStart) + Vibrato.Evaluate(millisecondsFromNoteStart, noteLengthMilliseconds);
 
     public double EvaluatePortamentoCents(double millisecondsFromNoteStart)
     {

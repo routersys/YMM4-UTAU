@@ -25,8 +25,8 @@ internal static class ComboBoxItems
     }
 }
 
-internal sealed record KeyRowViewModel(string Name, bool IsAccidental, double Height, double RollWidth);
+internal sealed record KeyRowViewModel(string Name, bool IsAccidental, int NoteNumber, double Height, double RollWidth);
 
-internal sealed record GridLineViewModel(double Left, double Height);
+internal sealed record GridLineViewModel(double Left, double Height, bool IsBar);
 
 internal sealed record PitchShapeItem(string Name, PitchPointShape Value);

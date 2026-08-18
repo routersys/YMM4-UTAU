@@ -170,9 +170,15 @@
 <data name="AboutUTAUNotation" xml:space="preserve"><value>発音の中に &lt;!音名:長さ&gt; と書くと、その直後のかなの音程と長さが決まります。長さはミリ秒か 1/4 のような音符で書けます。</value></data>
 <data name="AboutUTAUNotationExample" xml:space="preserve"><value>例: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  休符は &lt;!R:200&gt; と書きます。</value></data>
 <data name="AboutUTAUCredit" xml:space="preserve"><value>音声の分析と合成には M. Morise 氏の WORLD を移植した WorldNet を使用しています。</value></data>
-<data name="NoteEditorHint" xml:space="preserve"><value>ノートを上下に動かすと音程が、右端を動かすと長さが変わります。Ctrlと車輪で拡大縮小、Shiftと車輪で横移動、Altで吸着を解除します。</value></data>
 <data name="NoteLyricDescription" xml:space="preserve"><value>原音設定のエイリアスをそのまま書くこともできます。</value></data>
 <data name="NoteVelocityDescription" xml:space="preserve"><value>子音の長さの倍率です。100が原音のままで、倍率は 2^((100-値)/100) になります。</value></data>
 <data name="NoteFollowOtoDescription" xml:space="preserve"><value>0のときは原音設定の値を使います。</value></data>
 <data name="NoteStartPointDescription" xml:space="preserve"><value>原音の読み始めをこの時間だけ後ろへずらします。</value></data>
+<data name="UnitTick" xml:space="preserve"><value>tick</value></data>
+<data name="NoteLengthDescription" xml:space="preserve"><value>480ティックが四分音符です。テンポと話速から実際の長さが決まります。</value></data>
+<data name="SnapFree" xml:space="preserve"><value>吸着なし</value></data>
+<data name="SnapLabel" xml:space="preserve"><value>吸着</value></data>
+<data name="ZoomVerticalIn" xml:space="preserve"><value>縦に拡大</value></data>
+<data name="ZoomVerticalOut" xml:space="preserve"><value>縦に縮小</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>ノートを上下に動かすと音程が、右端を動かすと長さが変わります。鍵盤を押すと選択中のノートがその音程になります。Ctrlと車輪で横方向、CtrlとShiftと車輪で縦方向に拡大縮小し、Shiftと車輪で横へ移動します。</value></data>
 </root>

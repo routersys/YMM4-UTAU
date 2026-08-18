@@ -131,14 +131,16 @@ public sealed class PhonemizerTests : IDisposable
 
     public void Dispose() => TestVoiceBank.DeleteDirectory(directory);
 
+    static readonly TimeBase Base = TimeBase.Default;
+
     static IReadOnlyList<UTAUNote> Notes(string text)
-        => NoteSequenceBuilder.Build(text, NoteBuildOptions.Create(60, 1.0, 120.0));
+        => NoteSequenceBuilder.Build(text, NoteBuildOptions.Create(60));
 
     [Fact]
     public void SingleKanaBankResolvesEveryMora()
     {
         var bank = TestVoiceBank.CreateSingleKanaBank(directory);
-        var units = Phonemizer.Phonemize(bank, Notes("あかさ"), null, PhonemizeOptions.Create(1.0));
+        var units = Phonemizer.Phonemize(bank, Notes("あかさ"), null, PhonemizeOptions.Default, Base);
 
         Assert.Equal(["あ", "か", "さ"], units.Select(x => x.Alias));
         Assert.All(units, x => Assert.False(x.IsUnresolved));
@@ -148,7 +150,7 @@ public sealed class PhonemizerTests : IDisposable
     public void ContinuousBankUsesThePreviousVowel()
     {
         var bank = TestVoiceBank.CreateVcvBank(directory);
-        var units = Phonemizer.Phonemize(bank, Notes("あか"), null, PhonemizeOptions.Create(1.0));
+        var units = Phonemizer.Phonemize(bank, Notes("あか"), null, PhonemizeOptions.Default, Base);
 
         Assert.Equal(["- あ", "a か"], units.Select(x => x.Alias));
     }
@@ -157,7 +159,7 @@ public sealed class PhonemizerTests : IDisposable
     public void RestResetsTheContinuousContext()
     {
         var bank = TestVoiceBank.CreateVcvBank(directory);
-        var units = Phonemizer.Phonemize(bank, Notes("あ、あ"), null, PhonemizeOptions.Create(1.0));
+        var units = Phonemizer.Phonemize(bank, Notes("あ、あ"), null, PhonemizeOptions.Default, Base);
 
         Assert.Equal(["- あ", UTAUNote.RestLyric, "- あ"], units.Select(x => x.Alias));
     }
@@ -166,7 +168,7 @@ public sealed class PhonemizerTests : IDisposable
     public void TransitionUnitIsInsertedForCvvcBanks()
     {
         var bank = TestVoiceBank.CreateCvvcBank(directory);
-        var units = Phonemizer.Phonemize(bank, Notes("あか"), null, PhonemizeOptions.Create(1.0));
+        var units = Phonemizer.Phonemize(bank, Notes("あか"), null, PhonemizeOptions.Default, Base);
 
         Assert.Equal(["あ", "a k", "か", "a -"], units.Select(x => x.Alias));
     }
@@ -175,7 +177,7 @@ public sealed class PhonemizerTests : IDisposable
     public void TransitionUnitTakesTimeFromTheEndOfThePreviousNote()
     {
         var bank = TestVoiceBank.CreateCvvcBank(directory);
-        var units = Phonemizer.Phonemize(bank, Notes("あか"), null, PhonemizeOptions.Create(1.0));
+        var units = Phonemizer.Phonemize(bank, Notes("あか"), null, PhonemizeOptions.Default, Base);
 
         Assert.Equal(units[0].EndMilliseconds, units[1].StartMilliseconds, 9);
         Assert.Equal(units[2].StartMilliseconds, units[1].EndMilliseconds, 9);
@@ -186,7 +188,7 @@ public sealed class PhonemizerTests : IDisposable
     public void EndingUnitIsAppendedAfterTheLastNote()
     {
         var bank = TestVoiceBank.CreateCvvcBank(directory);
-        var units = Phonemizer.Phonemize(bank, Notes("あ"), null, PhonemizeOptions.Create(1.0));
+        var units = Phonemizer.Phonemize(bank, Notes("あ"), null, PhonemizeOptions.Default, Base);
 
         Assert.Equal(["あ", "a -"], units.Select(x => x.Alias));
         Assert.Equal(units[0].EndMilliseconds, units[1].StartMilliseconds, 9);
@@ -196,7 +198,7 @@ public sealed class PhonemizerTests : IDisposable
     public void NoEndingUnitIsAppendedWhenTheTextEndsWithARest()
     {
         var bank = TestVoiceBank.CreateCvvcBank(directory);
-        var units = Phonemizer.Phonemize(bank, Notes("あ。"), null, PhonemizeOptions.Create(1.0));
+        var units = Phonemizer.Phonemize(bank, Notes("あ。"), null, PhonemizeOptions.Default, Base);
 
         Assert.DoesNotContain("a -", units.Select(x => x.Alias));
     }
@@ -205,7 +207,7 @@ public sealed class PhonemizerTests : IDisposable
     public void UnresolvedLyricsAreReportedWithoutAnEntry()
     {
         var bank = TestVoiceBank.CreateSingleKanaBank(directory);
-        var units = Phonemizer.Phonemize(bank, Notes("あぱ"), null, PhonemizeOptions.Create(1.0));
+        var units = Phonemizer.Phonemize(bank, Notes("あぱ"), null, PhonemizeOptions.Default, Base);
 
         Assert.Contains(units, x => x.IsUnresolved && x.Alias == "ぱ");
     }
@@ -214,7 +216,7 @@ public sealed class PhonemizerTests : IDisposable
     public void RestsAreSilentButNotUnresolved()
     {
         var bank = TestVoiceBank.CreateSingleKanaBank(directory);
-        var rest = Assert.Single(Phonemizer.Phonemize(bank, Notes("、"), null, PhonemizeOptions.Create(1.0)));
+        var rest = Assert.Single(Phonemizer.Phonemize(bank, Notes("、"), null, PhonemizeOptions.Default, Base));
 
         Assert.True(rest.IsSilent);
         Assert.False(rest.IsUnresolved);
@@ -225,13 +227,13 @@ public sealed class PhonemizerTests : IDisposable
     {
         var bank = TestVoiceBank.CreateSingleKanaBank(directory);
         var notes = Notes("あかさ");
-        var units = Phonemizer.Phonemize(bank, notes, null, PhonemizeOptions.Create(1.0));
+        var units = Phonemizer.Phonemize(bank, notes, null, PhonemizeOptions.Default, Base);
 
         var position = 0.0;
         for (var i = 0; i < notes.Count; i++)
         {
             Assert.Equal(position, units[i].StartMilliseconds, 9);
-            position += notes[i].LengthMilliseconds;
+            position += Base.ToMilliseconds(notes[i].LengthTicks);
         }
     }
 }
@@ -240,9 +242,9 @@ public sealed class UnitTimingBuilderTests
 {
     static PhonemeUnit CreateUnit(double start, double length, double preutterance, double overlap, string alias = "a")
     {
-        var note = new UTAUNote { Lyric = alias, LengthMilliseconds = length };
+        var note = new UTAUNote { Lyric = alias };
         var entry = new OtoEntry(@"C:\bank", "a.wav", alias, 0.0, 0.0, 0.0, preutterance, overlap);
-        return new PhonemeUnit(note, entry, alias, start, start, length, 60);
+        return new PhonemeUnit(note, entry, alias, start, length, start, length, 60);
     }
 
     [Fact]
@@ -287,7 +289,7 @@ public sealed class UnitTimingBuilderTests
     [Fact]
     public void SilentUnitsAreNotRendered()
     {
-        var rest = new PhonemeUnit(new UTAUNote { Lyric = UTAUNote.RestLyric }, null, "R", 0.0, 0.0, 100.0, 60);
+        var rest = new PhonemeUnit(new UTAUNote { Lyric = UTAUNote.RestLyric }, null, "R", 0.0, 100.0, 0.0, 100.0, 60);
         var timings = UnitTimingBuilder.Build([rest, CreateUnit(100.0, 200.0, 40.0, 20.0)]);
         Assert.Single(timings);
     }
@@ -295,7 +297,7 @@ public sealed class UnitTimingBuilderTests
     [Fact]
     public void ARestBeforeAUnitDisablesTheCrossfade()
     {
-        var rest = new PhonemeUnit(new UTAUNote { Lyric = UTAUNote.RestLyric }, null, "R", 0.0, 0.0, 100.0, 60);
+        var rest = new PhonemeUnit(new UTAUNote { Lyric = UTAUNote.RestLyric }, null, "R", 0.0, 100.0, 0.0, 100.0, 60);
         var timing = Assert.Single(UnitTimingBuilder.Build([rest, CreateUnit(100.0, 200.0, 40.0, 20.0)]));
         Assert.Equal(UTAUNote.DefaultFadeInMilliseconds, timing.FadeInMilliseconds, 9);
     }

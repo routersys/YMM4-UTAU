@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using UTAU.Notes;
 using UTAU.ViewModels;
@@ -17,14 +18,12 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         Length,
     }
 
-    const double MinimumNoteLengthMilliseconds = 10.0;
-    const double LengthSnapMilliseconds = 10.0;
-    const double WheelScrollStep = 48.0;
+    const double WheelScrollStep = 64.0;
 
     DragMode dragMode;
     NoteViewModel? dragTarget;
     Point dragOrigin;
-    double dragOriginLength;
+    int dragOriginLengthTicks;
     int dragOriginTone;
 
     public event EventHandler? BeginEdit;
@@ -60,17 +59,30 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
 
     void PopupButton_EndEdit(object sender, EventArgs e) => EndEdit?.Invoke(this, e);
 
-    void RollScroller_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        => KeyboardScroller.ScrollToVerticalOffset(e.VerticalOffset);
+    void HorizontalScroller_ScrollChanged(object sender, ScrollChangedEventArgs e)
+    {
+        HorizontalBar.Maximum = Math.Max(e.ExtentWidth - e.ViewportWidth, 0.0);
+        HorizontalBar.ViewportSize = e.ViewportWidth;
+        HorizontalBar.LargeChange = e.ViewportWidth;
+        HorizontalBar.SmallChange = WheelScrollStep;
+        HorizontalBar.Value = e.HorizontalOffset;
+    }
 
-    void RollScroller_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+    void HorizontalBar_Scroll(object sender, ScrollEventArgs e)
+        => HorizontalScroller.ScrollToHorizontalOffset(e.NewValue);
+
+    void RollCanvas_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
     {
         if (ViewModel is not { } viewModel)
             return;
 
+        var factor = e.Delta > 0 ? NoteEditorViewModel.ZoomStep : 1.0 / NoteEditorViewModel.ZoomStep;
         if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
         {
-            viewModel.Zoom(e.Delta > 0 ? NoteEditorViewModel.ZoomStep : 1.0 / NoteEditorViewModel.ZoomStep);
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+                viewModel.ZoomVertically(factor);
+            else
+                viewModel.ZoomHorizontally(factor);
             e.Handled = true;
             return;
         }
@@ -78,7 +90,16 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
             return;
 
-        RollScroller.ScrollToHorizontalOffset(RollScroller.HorizontalOffset - Math.Sign(e.Delta) * WheelScrollStep);
+        HorizontalScroller.ScrollToHorizontalOffset(HorizontalScroller.HorizontalOffset - Math.Sign(e.Delta) * WheelScrollStep);
+        e.Handled = true;
+    }
+
+    void Key_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not FrameworkElement { DataContext: KeyRowViewModel row } || ViewModel is not { } viewModel)
+            return;
+
+        viewModel.SelectToneCommand.Execute(row);
         e.Handled = true;
     }
 
@@ -107,7 +128,7 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         dragMode = mode;
         dragTarget = note;
         dragOrigin = e.GetPosition(RollCanvas);
-        dragOriginLength = note.LengthMilliseconds;
+        dragOriginLengthTicks = note.LengthTicks;
         dragOriginTone = note.Tone;
         RollCanvas.CaptureMouse();
     }
@@ -122,15 +143,11 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         {
             var delta = (int)Math.Round((dragOrigin.Y - position.Y) / viewModel.SemitoneHeight);
             dragTarget.Tone = Math.Clamp(dragOriginTone + delta, 0, 127);
+            return;
         }
-        else
-        {
-            var delta = viewModel.MillisecondsFromCanvasX(position.X - dragOrigin.X);
-            var length = Math.Max(dragOriginLength + delta, MinimumNoteLengthMilliseconds);
-            if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
-                length = Math.Max(Math.Round(length / LengthSnapMilliseconds) * LengthSnapMilliseconds, MinimumNoteLengthMilliseconds);
-            dragTarget.LengthMilliseconds = length;
-        }
+
+        var deltaTicks = viewModel.TicksFromCanvasX(position.X - dragOrigin.X);
+        dragTarget.LengthTicks = viewModel.SnapLength(dragOriginLengthTicks + deltaTicks);
     }
 
     void RollCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) => EndDrag();

@@ -8,15 +8,16 @@
              xmlns:c="clr-namespace:YukkuriMovieMaker.Controls;assembly=YukkuriMovieMaker.Controls"
              xmlns:icons="clr-namespace:YukkuriMovieMaker.Resources.Icons;assembly=YukkuriMovieMaker.Plugin"
              mc:Ignorable="d"
-             d:DesignHeight="360" d:DesignWidth="900"
+             d:DesignHeight="440" d:DesignWidth="960"
              d:DataContext="{d:DesignInstance Type={x:Type vm:NoteEditorViewModel}}">
     <UserControl.Resources>
         <SolidColorBrush x:Key="AccidentalRowBrush" Color="#26000000"/>
-        <SolidColorBrush x:Key="AccidentalKeyBrush" Color="#40000000"/>
+        <SolidColorBrush x:Key="AccidentalKeyBrush" Color="#59000000"/>
+        <SolidColorBrush x:Key="NaturalKeyBrush" Color="#14FFFFFF"/>
     </UserControl.Resources>
     <c:PopupButton Content="{x:Static root:Texts.EditNotes}"
-                   PopupWidth="960"
-                   PopupHeight="460"
+                   PopupWidth="980"
+                   PopupHeight="480"
                    ResizeMode="Both"
                    BeginEdit="PopupButton_BeginEdit"
                    EndEdit="PopupButton_EndEdit">
@@ -24,11 +25,12 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="272"/>
+                    <ColumnDefinition Width="280"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="26"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="14"/>
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal">
@@ -36,29 +38,39 @@
                             Content="{DynamicResource {x:Static icons:IconKeys.MagnifyMinusOutline}}"/>
                     <Button Width="26" Height="26" Command="{Binding ZoomInCommand}" ToolTip="{x:Static root:Texts.ZoomIn}"
                             Content="{DynamicResource {x:Static icons:IconKeys.MagnifyPlusOutline}}"/>
+                    <Button Width="26" Height="26" Command="{Binding ZoomVerticalOutCommand}" ToolTip="{x:Static root:Texts.ZoomVerticalOut}"
+                            Content="{DynamicResource {x:Static icons:IconKeys.ArrowCollapseVertical}}"/>
+                    <Button Width="26" Height="26" Command="{Binding ZoomVerticalInCommand}" ToolTip="{x:Static root:Texts.ZoomVerticalIn}"
+                            Content="{DynamicResource {x:Static icons:IconKeys.ArrowExpandVertical}}"/>
                     <Button Width="26" Height="26" Command="{Binding InsertRestCommand}" ToolTip="{x:Static root:Texts.InsertRest}"
                             Content="{DynamicResource {x:Static icons:IconKeys.Plus}}"/>
                     <Button Width="26" Height="26" Command="{Binding RemoveNoteCommand}" ToolTip="{x:Static root:Texts.RemoveNote}"
                             Content="{DynamicResource {x:Static icons:IconKeys.Delete}}"/>
-                    <TextBlock VerticalAlignment="Center" Margin="6,0,0,0" Opacity="0.7"
-                               Text="{x:Static root:Texts.NoteEditorHint}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{x:Static root:Texts.SnapLabel}" VerticalAlignment="Center" Margin="6,0,3,0"/>
+                    <ComboBox Width="88" VerticalAlignment="Center"
+                              ItemsSource="{Binding SnapDivisions}"
+                              SelectedItem="{Binding SnapDivision}"
+                              DisplayMemberPath="Name"/>
                 </StackPanel>
 
-                <Grid Grid.Row="1" Grid.Column="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="42"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <ScrollViewer x:Name="KeyboardScroller" Grid.Column="0"
-                                  VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
-                        <ItemsControl ItemsSource="{Binding Keyboard}">
+                <ScrollViewer x:Name="VerticalScroller" Grid.Row="1" Grid.Column="0"
+                              VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="42"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <ItemsControl Grid.Column="0" ItemsSource="{Binding Keyboard}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Height="{Binding Height}"
                                             BorderThickness="0,0,1,1"
-                                            BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
+                                            BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
+                                            MouseLeftButtonDown="Key_MouseLeftButtonDown"
+                                            Cursor="Hand">
                                         <Border.Style>
                                             <Style TargetType="Border">
+                                                <Setter Property="Background" Value="{StaticResource NaturalKeyBrush}"/>
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsAccidental}" Value="True">
                                                         <Setter Property="Background" Value="{StaticResource AccidentalKeyBrush}"/>
@@ -67,133 +79,138 @@
                                             </Style>
                                         </Border.Style>
                                         <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                   Margin="0,0,3,0" FontSize="9" Opacity="0.75"/>
+                                                   Margin="0,0,3,0" FontSize="9" Opacity="0.75" IsHitTestVisible="False"/>
                                     </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                    </ScrollViewer>
 
-                    <ScrollViewer x:Name="RollScroller" Grid.Column="1"
-                                  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
-                                  ScrollChanged="RollScroller_ScrollChanged"
-                                  PreviewMouseWheel="RollScroller_PreviewMouseWheel">
-                        <Canvas x:Name="RollCanvas"
-                                Width="{Binding CanvasWidth}"
-                                Height="{Binding CanvasHeight}"
-                                Background="Transparent"
-                                MouseMove="RollCanvas_MouseMove"
-                                MouseLeftButtonUp="RollCanvas_MouseLeftButtonUp"
-                                MouseLeave="RollCanvas_MouseLeave">
-                            <ItemsControl ItemsSource="{Binding Keyboard}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Height="{Binding Height}" Width="{Binding RollWidth}"
-                                                BorderThickness="0,0,0,1"
-                                                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
-                                            <Border.Style>
-                                                <Style TargetType="Border">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsAccidental}" Value="True">
-                                                            <Setter Property="Background" Value="{StaticResource AccidentalRowBrush}"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Border.Style>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-
-                            <ItemsControl ItemsSource="{Binding TimeGridLines}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <Canvas/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemContainerStyle>
-                                    <Style TargetType="ContentPresenter">
-                                        <Setter Property="Canvas.Left" Value="{Binding Left}"/>
-                                    </Style>
-                                </ItemsControl.ItemContainerStyle>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Rectangle Width="1" Height="{Binding Height}" Opacity="0.6"
-                                                   Fill="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"/>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-
-                            <ItemsControl ItemsSource="{Binding Notes}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <Canvas/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemContainerStyle>
-                                    <Style TargetType="ContentPresenter">
-                                        <Setter Property="Canvas.Left" Value="{Binding Left}"/>
-                                        <Setter Property="Canvas.Top" Value="{Binding Top}"/>
-                                        <Setter Property="Panel.ZIndex" Value="1"/>
-                                    </Style>
-                                </ItemsControl.ItemContainerStyle>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid Width="{Binding Width}" Height="{Binding Height}" Cursor="Hand"
-                                              MouseLeftButtonDown="Note_MouseLeftButtonDown"
-                                              ToolTip="{Binding ToneName}">
-                                            <Border CornerRadius="2" BorderThickness="1">
+                        <ScrollViewer x:Name="HorizontalScroller" Grid.Column="1"
+                                      HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled"
+                                      ScrollChanged="HorizontalScroller_ScrollChanged">
+                            <Canvas x:Name="RollCanvas"
+                                    Width="{Binding CanvasWidth}"
+                                    Height="{Binding CanvasHeight}"
+                                    Background="Transparent"
+                                    ToolTip="{x:Static root:Texts.NoteEditorHint}"
+                                    MouseMove="RollCanvas_MouseMove"
+                                    MouseLeftButtonUp="RollCanvas_MouseLeftButtonUp"
+                                    MouseLeave="RollCanvas_MouseLeave"
+                                    PreviewMouseWheel="RollCanvas_PreviewMouseWheel">
+                                <ItemsControl ItemsSource="{Binding Keyboard}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Height="{Binding Height}" Width="{Binding RollWidth}"
+                                                    BorderThickness="0,0,0,1"
+                                                    BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
                                                 <Border.Style>
                                                     <Style TargetType="Border">
-                                                        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
-                                                        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
-                                                        <Setter Property="Opacity" Value="0.55"/>
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsRest}" Value="True">
-                                                                <Setter Property="Background" Value="Transparent"/>
-                                                                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"/>
-                                                                <Setter Property="Opacity" Value="0.9"/>
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                                <Setter Property="Opacity" Value="1"/>
+                                                            <DataTrigger Binding="{Binding IsAccidental}" Value="True">
+                                                                <Setter Property="Background" Value="{StaticResource AccidentalRowBrush}"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Border.Style>
                                             </Border>
-                                            <TextBlock Text="{Binding Display}" FontSize="10" Margin="3,0,0,0"
-                                                       VerticalAlignment="Center" ClipToBounds="True" IsHitTestVisible="False">
-                                                <TextBlock.Style>
-                                                    <Style TargetType="TextBlock">
-                                                        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <ItemsControl ItemsSource="{Binding TimeGridLines}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemContainerStyle>
+                                        <Style TargetType="ContentPresenter">
+                                            <Setter Property="Canvas.Left" Value="{Binding Left}"/>
+                                        </Style>
+                                    </ItemsControl.ItemContainerStyle>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Rectangle Width="1" Height="{Binding Height}"
+                                                       Fill="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
+                                                <Rectangle.Style>
+                                                    <Style TargetType="Rectangle">
+                                                        <Setter Property="Opacity" Value="0.4"/>
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding IsRest}" Value="True">
-                                                                <Setter Property="Foreground" Value="{x:Null}"/>
+                                                            <DataTrigger Binding="{Binding IsBar}" Value="True">
+                                                                <Setter Property="Opacity" Value="0.9"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
-                                                </TextBlock.Style>
-                                            </TextBlock>
-                                            <Rectangle Width="5" HorizontalAlignment="Right" Fill="Transparent" Cursor="SizeWE"
-                                                       MouseLeftButtonDown="NoteResize_MouseLeftButtonDown"/>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                                                </Rectangle.Style>
+                                            </Rectangle>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
 
-                            <Polyline Points="{Binding PitchCurve}" StrokeThickness="1.5" Panel.ZIndex="2"
-                                      Stroke="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"
-                                      Opacity="0.85"
-                                      IsHitTestVisible="False"/>
-                        </Canvas>
-                    </ScrollViewer>
-                </Grid>
+                                <ItemsControl ItemsSource="{Binding Notes}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemContainerStyle>
+                                        <Style TargetType="ContentPresenter">
+                                            <Setter Property="Canvas.Left" Value="{Binding Left}"/>
+                                            <Setter Property="Canvas.Top" Value="{Binding Top}"/>
+                                            <Setter Property="Panel.ZIndex" Value="1"/>
+                                        </Style>
+                                    </ItemsControl.ItemContainerStyle>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Width="{Binding Width}" Height="{Binding Height}"
+                                                  MouseLeftButtonDown="Note_MouseLeftButtonDown"
+                                                  ToolTip="{Binding ToneName}">
+                                                <Border BorderThickness="1">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                                                            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                                                            <Setter Property="Opacity" Value="0.6"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsRest}" Value="True">
+                                                                    <Setter Property="Background" Value="Transparent"/>
+                                                                    <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"/>
+                                                                    <Setter Property="Opacity" Value="0.9"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                    <Setter Property="Opacity" Value="1"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                </Border>
+                                                <TextBlock Text="{Binding Display}" FontSize="10" Margin="3,0,0,0"
+                                                           VerticalAlignment="Center" ClipToBounds="True" IsHitTestVisible="False"
+                                                           Foreground="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
+                                                <Rectangle Width="6" HorizontalAlignment="Right" Fill="Transparent" Cursor="SizeWE"
+                                                           MouseLeftButtonDown="NoteResize_MouseLeftButtonDown"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
 
-                <Grid Grid.Row="1" Grid.Column="1" IsEnabled="{Binding HasSelection}">
+                                <Polyline Points="{Binding PitchCurve}" StrokeThickness="1.5" Panel.ZIndex="2"
+                                          Stroke="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"
+                                          Opacity="0.85"
+                                          IsHitTestVisible="False"/>
+                            </Canvas>
+                        </ScrollViewer>
+                    </Grid>
+                </ScrollViewer>
+
+                <ScrollBar x:Name="HorizontalBar" Grid.Row="2" Grid.Column="0" Orientation="Horizontal"
+                           Margin="42,0,0,0" Scroll="HorizontalBar_Scroll"/>
+
+                <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" IsEnabled="{Binding HasSelection}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="26"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="134"/>
                     </Grid.RowDefinitions>
                     <c:PropertiesEditor Grid.Row="0" Target="{Binding SelectedNote.Note}" IsScrollViewerEnabled="True"/>
                     <Grid Grid.Row="1">
@@ -213,10 +230,9 @@
                               CanUserAddRows="False"
                               CanUserDeleteRows="False"
                               CanUserReorderColumns="False"
+                              CanUserResizeRows="False"
                               SelectionMode="Single"
                               HeadersVisibility="Column"
-                              MinHeight="52"
-                              MaxHeight="140"
                               CellEditEnding="PitchGrid_CellEditEnding">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="{x:Static root:Texts.PitchPointTime}" Width="*"

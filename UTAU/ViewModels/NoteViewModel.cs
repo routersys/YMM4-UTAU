@@ -9,7 +9,7 @@ internal sealed class NoteViewModel : Bindable, IDisposable
 {
     readonly NoteEditorViewModel owner;
     bool isSelected;
-    double startMilliseconds;
+    int startTicks;
 
     public NoteViewModel(UTAUNote note, NoteEditorViewModel owner)
     {
@@ -20,10 +20,10 @@ internal sealed class NoteViewModel : Bindable, IDisposable
 
     public UTAUNote Note { get; }
 
-    public double StartMilliseconds
+    public int StartTicks
     {
-        get => startMilliseconds;
-        set => Set(ref startMilliseconds, value);
+        get => startTicks;
+        set => Set(ref startTicks, value);
     }
 
     public bool IsSelected
@@ -40,19 +40,21 @@ internal sealed class NoteViewModel : Bindable, IDisposable
         set => Note.Tone = value;
     }
 
-    public double LengthMilliseconds
+    public int LengthTicks
     {
-        get => Note.LengthMilliseconds;
-        set => Note.LengthMilliseconds = value;
+        get => Note.LengthTicks;
+        set => Note.LengthTicks = value;
     }
+
+    public int EndTicks => StartTicks + Note.LengthTicks;
 
     public string ToneName => new MusicalTone(Note.Tone).Name;
 
     public string Display => IsRest ? Texts.RestLabel : Note.Lyric;
 
-    public double Left => StartMilliseconds * owner.PixelsPerMillisecond;
+    public double Left => StartTicks * owner.PixelsPerTick;
 
-    public double Width => Math.Max(Note.LengthMilliseconds * owner.PixelsPerMillisecond - 1.0, 1.0);
+    public double Width => Math.Max(Note.LengthTicks * owner.PixelsPerTick - 1.0, 1.0);
 
     public double Top => (owner.MaximumTone - Note.Tone) * owner.SemitoneHeight;
 
@@ -80,8 +82,8 @@ internal sealed class NoteViewModel : Bindable, IDisposable
                 OnPropertyChanged(nameof(Tone));
                 OnPropertyChanged(nameof(ToneName));
                 break;
-            case nameof(UTAUNote.LengthMilliseconds):
-                OnPropertyChanged(nameof(LengthMilliseconds));
+            case nameof(UTAUNote.LengthTicks):
+                OnPropertyChanged(nameof(LengthTicks));
                 break;
         }
 

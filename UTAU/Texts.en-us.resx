@@ -170,9 +170,15 @@
 <data name="AboutUTAUNotation" xml:space="preserve"><value>Writing &lt;!note:length&gt; in the pronunciation sets the pitch and the length of the kana that follows it. The length is written in milliseconds or as a note such as 1/4.</value></data>
 <data name="AboutUTAUNotationExample" xml:space="preserve"><value>Example: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  A rest is written as &lt;!R:200&gt;.</value></data>
 <data name="AboutUTAUCredit" xml:space="preserve"><value>WorldNet, a port of WORLD by M. Morise, is used for the analysis and the synthesis.</value></data>
-<data name="NoteEditorHint" xml:space="preserve"><value>Drag a note vertically to change its pitch and drag its right edge to change its length. Ctrl with the wheel zooms, Shift with the wheel scrolls sideways and Alt releases the snapping.</value></data>
 <data name="NoteLyricDescription" xml:space="preserve"><value>The alias of the oto.ini can also be written here directly.</value></data>
 <data name="NoteVelocityDescription" xml:space="preserve"><value>Scales the length of the consonant. 100 keeps the original length and the factor is 2^((100-value)/100).</value></data>
 <data name="NoteFollowOtoDescription" xml:space="preserve"><value>A value of 0 uses the value declared in the oto.ini.</value></data>
 <data name="NoteStartPointDescription" xml:space="preserve"><value>Moves the point where the source sample starts being read forward by this amount.</value></data>
+<data name="UnitTick" xml:space="preserve"><value>tick</value></data>
+<data name="NoteLengthDescription" xml:space="preserve"><value>480 ticks is a quarter note. The real duration follows the tempo and the speaking rate.</value></data>
+<data name="SnapFree" xml:space="preserve"><value>Free</value></data>
+<data name="SnapLabel" xml:space="preserve"><value>Snap</value></data>
+<data name="ZoomVerticalIn" xml:space="preserve"><value>Zoom in vertically</value></data>
+<data name="ZoomVerticalOut" xml:space="preserve"><value>Zoom out vertically</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>Drag a note vertically to change its pitch and drag its right edge to change its length. Clicking a key moves the selected note to that pitch. Ctrl with the wheel zooms horizontally, Ctrl and Shift with the wheel zooms vertically and Shift with the wheel scrolls sideways.</value></data>
 </root>

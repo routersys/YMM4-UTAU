@@ -170,9 +170,15 @@
 <data name="AboutUTAUNotation" xml:space="preserve"><value>在發音中書寫 &lt;!音名:長度&gt; 可決定其後假名的音高與長度。長度可用毫秒或 1/4 之類的音符書寫。</value></data>
 <data name="AboutUTAUNotationExample" xml:space="preserve"><value>例：&lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み　休止符寫作 &lt;!R:200&gt;。</value></data>
 <data name="AboutUTAUCredit" xml:space="preserve"><value>語音的分析與合成使用了 M. Morise 的 WORLD 的移植版 WorldNet。</value></data>
-<data name="NoteEditorHint" xml:space="preserve"><value>上下拖曳音符可改變音高，拖曳右端可改變長度。Ctrl 加滾輪縮放，Shift 加滾輪橫向捲動，Alt 解除吸附。</value></data>
 <data name="NoteLyricDescription" xml:space="preserve"><value>也可以直接書寫原音設定的別名。</value></data>
 <data name="NoteVelocityDescription" xml:space="preserve"><value>子音長度的倍率。100 表示保持原始長度，倍率為 2^((100-值)/100)。</value></data>
 <data name="NoteFollowOtoDescription" xml:space="preserve"><value>為 0 時使用原音設定中的值。</value></data>
 <data name="NoteStartPointDescription" xml:space="preserve"><value>將原音的讀取起點向後移動此時長。</value></data>
+<data name="UnitTick" xml:space="preserve"><value>tick</value></data>
+<data name="NoteLengthDescription" xml:space="preserve"><value>480 個 tick 為四分音符。實際時長由速度與語速決定。</value></data>
+<data name="SnapFree" xml:space="preserve"><value>不吸附</value></data>
+<data name="SnapLabel" xml:space="preserve"><value>吸附</value></data>
+<data name="ZoomVerticalIn" xml:space="preserve"><value>縱向放大</value></data>
+<data name="ZoomVerticalOut" xml:space="preserve"><value>縱向縮小</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>上下拖曳音符可改變音高，拖曳右端可改變長度。點擊琴鍵可將所選音符移到該音高。Ctrl 加滾輪橫向縮放，Ctrl 加 Shift 加滾輪縱向縮放，Shift 加滾輪橫向捲動。</value></data>
 </root>

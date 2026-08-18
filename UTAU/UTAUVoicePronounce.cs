@@ -45,7 +45,7 @@ internal sealed class UTAUVoicePronounce : UndoRedoable, IVoicePronounce
 
     public static UTAUVoicePronounce FromText(string normalizedText, UTAUVoiceParameter parameter)
     {
-        var options = NoteBuildOptions.Create(parameter.BaseTone, parameter.Speed, parameter.Tempo);
+        var options = NoteBuildOptions.Create(parameter.BaseTone);
         var pronounce = new UTAUVoicePronounce { SourceText = normalizedText };
         foreach (var note in NoteSequenceBuilder.Build(normalizedText, options))
         {
