@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Threading;
 using UTAU.Notes;
 using UTAU.ViewModels;
 using YukkuriMovieMaker.Commons;
@@ -34,7 +35,11 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
 
     public event EventHandler? EndEdit;
 
-    public NoteEditor() => InitializeComponent();
+    public NoteEditor()
+    {
+        InitializeComponent();
+        Loaded += (_, _) => RequestFit();
+    }
 
     internal ObservableCollection<UTAUNote>? Notes
     {
@@ -55,7 +60,14 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
 
         editor.ViewModel?.Dispose();
         editor.DataContext = editor.Notes is null ? null : new NoteEditorViewModel(editor.Notes);
+        editor.RequestFit();
     }
+
+    void RequestFit() => Dispatcher.BeginInvoke(UpdateFit, DispatcherPriority.Loaded);
+
+    void UpdateFit() => ViewModel?.FitToViewport(HorizontalScroller.ActualWidth, VerticalScroller.ActualHeight);
+
+    void Scroller_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateFit();
 
     NoteEditorViewModel? ViewModel => DataContext as NoteEditorViewModel;
 

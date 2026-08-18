@@ -181,4 +181,5 @@
 <data name="ZoomVerticalIn" xml:space="preserve"><value>Acercar verticalmente</value></data>
 <data name="ZoomVerticalOut" xml:space="preserve"><value>Alejar verticalmente</value></data>
 <data name="NoteEditorHint" xml:space="preserve"><value>Arrastre una nota verticalmente para cambiar su tono y arrastre su borde derecho para cambiar su duración. Al pulsar una tecla la nota seleccionada pasa a ese tono. Ctrl con la rueda amplía en horizontal, Ctrl y Mayús con la rueda amplía en vertical y Mayús con la rueda desplaza en horizontal.</value></data>
+<data name="FitToWindow" xml:space="preserve"><value>Ajustar a la vista</value></data>
 </root>

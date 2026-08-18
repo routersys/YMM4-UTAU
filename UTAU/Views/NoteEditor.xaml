@@ -43,6 +43,8 @@
                             Content="{DynamicResource {x:Static icons:IconKeys.ArrowCollapseVertical}}"/>
                     <Button Width="26" Height="26" Command="{Binding ZoomVerticalInCommand}" ToolTip="{x:Static root:Texts.ZoomVerticalIn}"
                             Content="{DynamicResource {x:Static icons:IconKeys.ArrowExpandVertical}}"/>
+                    <Button Width="26" Height="26" Command="{Binding FitCommand}" ToolTip="{x:Static root:Texts.FitToWindow}"
+                            Content="{DynamicResource {x:Static icons:IconKeys.FitToScreenOutline}}"/>
                     <Button Width="26" Height="26" Command="{Binding InsertRestCommand}" ToolTip="{x:Static root:Texts.InsertRest}"
                             Content="{DynamicResource {x:Static icons:IconKeys.Plus}}"/>
                     <Button Width="26" Height="26" Command="{Binding RemoveNoteCommand}" ToolTip="{x:Static root:Texts.RemoveNote}"
@@ -56,7 +58,8 @@
                 </StackPanel>
 
                 <ScrollViewer x:Name="VerticalScroller" Grid.Row="1" Grid.Column="0"
-                              VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                              VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                              SizeChanged="Scroller_SizeChanged">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="42"/>
@@ -89,7 +92,8 @@
 
                         <ScrollViewer x:Name="HorizontalScroller" Grid.Column="1"
                                       HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled"
-                                      ScrollChanged="HorizontalScroller_ScrollChanged">
+                                      ScrollChanged="HorizontalScroller_ScrollChanged"
+                                      SizeChanged="Scroller_SizeChanged">
                             <Canvas x:Name="RollCanvas"
                                     Width="{Binding CanvasWidth}"
                                     Height="{Binding CanvasHeight}"

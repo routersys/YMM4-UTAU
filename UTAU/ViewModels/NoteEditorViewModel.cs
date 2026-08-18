@@ -19,6 +19,8 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public const double ZoomStep = 1.25;
     public const int MinimumVisibleSemitones = 25;
     public const int PitchCurveIntervalTicks = 10;
+    public const double FitMarginRatio = 0.98;
+    public const double ViewportChangeThreshold = 2.0;
 
     readonly ObservableCollection<UTAUNote> source;
     double pixelsPerTick = DefaultPixelsPerTick;
@@ -32,6 +34,9 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     double guideLeft;
     bool isGuideVisible;
     string guideText = string.Empty;
+    bool isAutoFitEnabled = true;
+    double lastFitWidth;
+    double lastFitHeight;
 
     public NoteEditorViewModel(ObservableCollection<UTAUNote> notes)
     {
@@ -47,6 +52,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         RemovePitchPointCommand = new ActionCommand(_ => SelectedPitchPoint is not null, _ => RemovePitchPoint());
         ResetPitchCommand = new ActionCommand(_ => SelectedNote is not null, _ => ResetPitch());
         SelectToneCommand = new ActionCommand(_ => SelectedNote is not null, ApplyTone);
+        FitCommand = new ActionCommand(_ => true, _ => EnableAutoFit());
         InvalidateLayout();
         SelectedNote = Notes.FirstOrDefault();
     }
@@ -72,6 +78,8 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public ICommand ResetPitchCommand { get; }
 
     public ICommand SelectToneCommand { get; }
+
+    public ICommand FitCommand { get; }
 
     public IReadOnlyList<NoteDivision> SnapDivisions => NoteDivision.All;
 
@@ -270,14 +278,51 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     public void ZoomHorizontally(double factor)
     {
+        isAutoFitEnabled = false;
         PixelsPerTick = Math.Clamp(PixelsPerTick * factor, MinimumPixelsPerTick, MaximumPixelsPerTick);
         InvalidateLayout();
     }
 
     public void ZoomVertically(double factor)
     {
+        isAutoFitEnabled = false;
         SemitoneHeight = Math.Clamp(SemitoneHeight * factor, MinimumSemitoneHeight, MaximumSemitoneHeight);
         InvalidateLayout();
+    }
+
+    public static double CalculatePixelsPerTick(double viewportWidth, int totalTicks)
+        => Math.Clamp(
+            viewportWidth * FitMarginRatio / Math.Max(totalTicks, 1),
+            MinimumPixelsPerTick,
+            MaximumPixelsPerTick);
+
+    public static double CalculateSemitoneHeight(double viewportHeight, int visibleSemitones)
+        => Math.Clamp(
+            viewportHeight * FitMarginRatio / Math.Max(visibleSemitones, 1),
+            MinimumSemitoneHeight,
+            MaximumSemitoneHeight);
+
+    public bool FitToViewport(double viewportWidth, double viewportHeight)
+    {
+        if (!isAutoFitEnabled || viewportWidth <= 0.0 || viewportHeight <= 0.0)
+            return false;
+        if (Math.Abs(viewportWidth - lastFitWidth) < ViewportChangeThreshold
+            && Math.Abs(viewportHeight - lastFitHeight) < ViewportChangeThreshold)
+            return false;
+
+        lastFitWidth = viewportWidth;
+        lastFitHeight = viewportHeight;
+        PixelsPerTick = CalculatePixelsPerTick(viewportWidth, TotalTicks);
+        SemitoneHeight = CalculateSemitoneHeight(viewportHeight, MaximumTone - MinimumTone + 1);
+        InvalidateLayout();
+        return true;
+    }
+
+    public void EnableAutoFit()
+    {
+        isAutoFitEnabled = true;
+        lastFitWidth = 0.0;
+        lastFitHeight = 0.0;
     }
 
     public void Dispose()
