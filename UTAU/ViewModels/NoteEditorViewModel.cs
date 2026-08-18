@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -29,6 +31,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     int maximumTone = 72;
     NoteDivision snapDivision = new(16);
     NoteViewModel? selectedNote;
+    ObservableCollection<PitchPoint>? observedPitchPoints;
     PitchPoint? selectedPitchPoint;
     PointCollection pitchCurve = [];
     double guideLeft;
@@ -129,6 +132,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
             Set(ref selectedNote, value);
             if (selectedNote is not null)
                 selectedNote.IsSelected = true;
+            ObservePitchPoints(selectedNote?.Note.PitchPoints);
             SelectedPitchPoint = null;
             OnPropertyChanged(nameof(HasSelection));
             OnPropertyChanged(nameof(PitchPoints));
@@ -327,10 +331,44 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     public void Dispose()
     {
+        ObservePitchPoints(null);
         foreach (var note in Notes)
             note.Dispose();
         Notes.Clear();
     }
+
+    void ObservePitchPoints(ObservableCollection<PitchPoint>? points)
+    {
+        if (ReferenceEquals(observedPitchPoints, points))
+            return;
+
+        if (observedPitchPoints is not null)
+        {
+            observedPitchPoints.CollectionChanged -= OnPitchPointsChanged;
+            foreach (var point in observedPitchPoints)
+                point.PropertyChanged -= OnPitchPointChanged;
+        }
+
+        observedPitchPoints = points;
+
+        if (observedPitchPoints is null)
+            return;
+
+        observedPitchPoints.CollectionChanged += OnPitchPointsChanged;
+        foreach (var point in observedPitchPoints)
+            point.PropertyChanged += OnPitchPointChanged;
+    }
+
+    void OnPitchPointsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        foreach (var point in e.OldItems?.OfType<PitchPoint>() ?? [])
+            point.PropertyChanged -= OnPitchPointChanged;
+        foreach (var point in e.NewItems?.OfType<PitchPoint>() ?? [])
+            point.PropertyChanged += OnPitchPointChanged;
+        UpdatePitchCurve();
+    }
+
+    void OnPitchPointChanged(object? sender, PropertyChangedEventArgs e) => UpdatePitchCurve();
 
     IReadOnlyList<KeyRowViewModel> BuildKeyboard()
     {

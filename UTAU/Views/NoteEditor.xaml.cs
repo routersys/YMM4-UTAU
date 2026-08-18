@@ -234,7 +234,4 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         RollCanvas.ReleaseMouseCapture();
         ViewModel?.InvalidateLayout();
     }
-
-    void PitchGrid_CellEditEnding(object? sender, DataGridCellEditEndingEventArgs e)
-        => Dispatcher.BeginInvoke(() => ViewModel?.UpdatePitchCurve());
 }
