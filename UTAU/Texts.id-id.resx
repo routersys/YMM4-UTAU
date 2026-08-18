@@ -182,4 +182,5 @@
 <data name="ZoomVerticalOut" xml:space="preserve"><value>Perkecil vertikal</value></data>
 <data name="NoteEditorHint" xml:space="preserve"><value>Seret not secara vertikal untuk mengubah nada dan seret tepi kanannya untuk mengubah panjangnya. Menekan tuts memindahkan not terpilih ke nada tersebut. Ctrl dengan roda memperbesar mendatar, Ctrl dan Shift dengan roda memperbesar tegak, dan Shift dengan roda menggulir mendatar.</value></data>
 <data name="FitToWindow" xml:space="preserve"><value>Sesuaikan tampilan</value></data>
+<data name="InfoTabInformation" xml:space="preserve"><value>Informasi</value></data>
 </root>

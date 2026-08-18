@@ -182,4 +182,5 @@
 <data name="ZoomVerticalOut" xml:space="preserve"><value>纵向缩小</value></data>
 <data name="NoteEditorHint" xml:space="preserve"><value>上下拖动音符可改变音高，拖动右端可改变长度。点击琴键可将所选音符移到该音高。Ctrl 加滚轮横向缩放，Ctrl 加 Shift 加滚轮纵向缩放，Shift 加滚轮横向滚动。</value></data>
 <data name="FitToWindow" xml:space="preserve"><value>适应视图</value></data>
+<data name="InfoTabInformation" xml:space="preserve"><value>信息</value></data>
 </root>

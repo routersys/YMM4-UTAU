@@ -91,45 +91,57 @@
 
                     <Grid Grid.Column="1" DataContext="{Binding SelectedBank}">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="108"/>
                             <RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Image Grid.Column="0" MaxWidth="128" MaxHeight="128" Stretch="Uniform" Source="{Binding Portrait}"/>
-                            <StackPanel Grid.Column="1" VerticalAlignment="Top">
-                                <TextBlock Text="{Binding Name}" FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
-                                <TextBlock TextWrapping="Wrap" Visibility="{Binding HasWeb, Converter={StaticResource BooleanToVisibility}}">
+                            <Image Grid.Column="0" MaxWidth="108" Stretch="Uniform" Source="{Binding Portrait}"/>
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="22"/>
+                                    <RowDefinition Height="22"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Text="{Binding Name}" FontWeight="Bold"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Row="1" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                           Visibility="{Binding HasWeb, Converter={StaticResource BooleanToVisibility}}">
                                     <Hyperlink Command="{Binding Source={x:Static ps:CommandSettings.Default}, Path=[OpenUri]}" CommandParameter="{Binding Web}">
                                         <Run Text="{Binding Web, Mode=OneWay}"/>
                                     </Hyperlink>
                                 </TextBlock>
-                            </StackPanel>
+                                <TextBlock Grid.Row="2" Text="{Binding Author}" VerticalAlignment="Top"
+                                           TextTrimming="CharacterEllipsis" Opacity="0.75"/>
+                            </Grid>
                         </Grid>
-                        <DataGrid Grid.Row="1" ItemsSource="{Binding Information}"
-                                  AutoGenerateColumns="False"
-                                  CanUserAddRows="False"
-                                  CanUserDeleteRows="False"
-                                  CanUserReorderColumns="False"
-                                  IsReadOnly="True"
-                                  SelectionMode="Single"
-                                  HeadersVisibility="Column"
-                                  MinHeight="120"
-                                  MaxHeight="260">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="{x:Static root:Texts.InfoKey}" Binding="{Binding Key}" Width="140"/>
-                                <DataGridTextColumn Header="{x:Static root:Texts.InfoValue}" Binding="{Binding Value}" Width="*"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                        <Expander Grid.Row="2" Header="{x:Static root:Texts.InfoReadme}" IsExpanded="False"
-                                  Visibility="{Binding HasReadme, Converter={StaticResource BooleanToVisibility}}">
-                            <TextBox Text="{Binding Readme, Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap"
-                                     MaxHeight="200" VerticalScrollBarVisibility="Auto" AcceptsReturn="True"/>
-                        </Expander>
+                        <TabControl Grid.Row="1" MinHeight="180" MaxHeight="260">
+                            <TabItem Header="{x:Static root:Texts.InfoTabInformation}">
+                                <DataGrid ItemsSource="{Binding Information}"
+                                          AutoGenerateColumns="False"
+                                          CanUserAddRows="False"
+                                          CanUserDeleteRows="False"
+                                          CanUserReorderColumns="False"
+                                          CanUserResizeRows="False"
+                                          IsReadOnly="True"
+                                          SelectionMode="Single"
+                                          HeadersVisibility="Column">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="{x:Static root:Texts.InfoKey}" Binding="{Binding Key}" Width="140"/>
+                                        <DataGridTextColumn Header="{x:Static root:Texts.InfoValue}" Binding="{Binding Value}" Width="*"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </TabItem>
+                            <TabItem Header="{x:Static root:Texts.InfoReadme}"
+                                     IsEnabled="{Binding HasReadme}">
+                                <TextBox Text="{Binding Readme, Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap"
+                                         VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                         AcceptsReturn="True" BorderThickness="0" Background="Transparent"/>
+                            </TabItem>
+                        </TabControl>
                     </Grid>
                 </Grid>
             </Expander>
@@ -154,7 +166,8 @@
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static root:Texts.AnalysisCacheLabel}" VerticalAlignment="Center"/>
                     <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
                         <c:TextBoxSlider Width="160" Value="{Binding Settings.AnalysisCacheMegabytes}"
-                                         StringFormat="F0" Unit="MB" DefaultValue="512" Min="64" Max="4096" Delay="-1"/>
+                                         StringFormat="F0" Unit="MB" DefaultValue="512"
+                                         DefaultMin="64" DefaultMax="4096" Min="64" Max="4096" Delay="-1"/>
                         <Button Width="26" Command="{Binding ClearCacheCommand}" ToolTip="{x:Static root:Texts.ClearCache}"
                                 Content="{DynamicResource {x:Static icons:IconKeys.Delete}}"/>
                     </StackPanel>
