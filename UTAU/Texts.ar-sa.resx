@@ -122,7 +122,6 @@
 <data name="PronounceNotes" xml:space="preserve"><value>النوتات</value></data>
 <data name="PronounceNotesDescription" xml:space="preserve"><value>يحرر تسلسل النوتات المبني من النطق.</value></data>
 <data name="EditNotes" xml:space="preserve"><value>تحرير النوتات</value></data>
-<data name="NoteEditorHint" xml:space="preserve"><value>اسحب النوتة رأسياً لتغيير درجتها واسحب حافتها اليمنى لتغيير طولها.</value></data>
 <data name="ZoomIn" xml:space="preserve"><value>تكبير</value></data>
 <data name="ZoomOut" xml:space="preserve"><value>تصغير</value></data>
 <data name="InsertRest" xml:space="preserve"><value>إدراج سكتة</value></data>
@@ -171,4 +170,9 @@
 <data name="AboutUTAUNotation" xml:space="preserve"><value>كتابة &lt;!النغمة:الطول&gt; داخل النطق تحدد درجة وطول الكانا التي تليها. ويُكتب الطول بالميلي ثانية أو كنوتة مثل 1/4.</value></data>
 <data name="AboutUTAUNotationExample" xml:space="preserve"><value>مثال: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  وتُكتب السكتة هكذا &lt;!R:200&gt;.</value></data>
 <data name="AboutUTAUCredit" xml:space="preserve"><value>يُستخدم WorldNet، وهو نقل لمكتبة WORLD من إعداد M. Morise، في التحليل والتوليف.</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>اسحب النوتة رأسياً لتغيير درجتها واسحب حافتها اليمنى لتغيير طولها. مفتاح Ctrl مع العجلة يقرّب، وShift مع العجلة يمرر أفقياً، وAlt يلغي المحاذاة.</value></data>
+<data name="NoteLyricDescription" xml:space="preserve"><value>يمكن أيضاً كتابة الاسم البديل من ملف oto.ini مباشرة.</value></data>
+<data name="NoteVelocityDescription" xml:space="preserve"><value>يقيس طول الحرف الساكن. القيمة 100 تحافظ على الطول الأصلي والمعامل هو 2^((100-القيمة)/100).</value></data>
+<data name="NoteFollowOtoDescription" xml:space="preserve"><value>القيمة 0 تستخدم القيمة المعلنة في ملف oto.ini.</value></data>
+<data name="NoteStartPointDescription" xml:space="preserve"><value>يزيح نقطة بدء قراءة العينة الأصلية إلى الأمام بهذا المقدار.</value></data>
 </root>

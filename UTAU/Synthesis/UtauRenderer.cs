@@ -17,6 +17,16 @@ internal sealed class UtauRenderer(RenderSettings settings, AnalysisCache cache)
         double ConsonantEnd,
         double MeanF0);
 
+    readonly record struct AnalysisRequest(
+        AudioSample Sample,
+        string Path,
+        long WriteTimeTicks,
+        int StartSample,
+        int EndSample,
+        double RegionStart,
+        double RegionEnd,
+        double ConsonantEnd);
+
     const long MaximumFrameElements = 1L << 27;
 
     readonly Dictionary<string, AudioSample> loadedSamples = new(StringComparer.OrdinalIgnoreCase);
@@ -52,9 +62,15 @@ internal sealed class UtauRenderer(RenderSettings settings, AnalysisCache cache)
         var warpedSpectrum = new double[spectrumSize];
         var frameAperiodicity = new double[spectrumSize];
 
-        foreach (var timing in timings)
+        var requests = timings
+            .Select(x => ResolveRequest(x.Unit, sampleRate))
+            .ToArray();
+        AnalyzeInParallel(requests);
+
+        for (var index = 0; index < timings.Count; index++)
         {
-            var source = LoadSource(timing.Unit, sampleRate, arena);
+            var timing = timings[index];
+            var source = BuildSource(requests[index], arena);
             if (source is null)
                 continue;
 
@@ -224,7 +240,7 @@ internal sealed class UtauRenderer(RenderSettings settings, AnalysisCache cache)
             : Math.Exp(Math.Log(lowF0) * (1.0 - fraction) + Math.Log(highF0) * fraction);
     }
 
-    UnitSource? LoadSource(PhonemeUnit unit, int sampleRate, WorldArena arena)
+    AnalysisRequest? ResolveRequest(PhonemeUnit unit, int sampleRate)
     {
         if (unit.Entry is not { } entry)
             return null;
@@ -247,20 +263,63 @@ internal sealed class UtauRenderer(RenderSettings settings, AnalysisCache cache)
         if (endSample - startSample < 2)
             return null;
 
-        var writeTimeTicks = GetWriteTimeTicks(entry.SamplePath);
-        var features = cache.GetOrAdd(
+        return new AnalysisRequest(
+            sample,
             entry.SamplePath,
-            writeTimeTicks,
+            GetWriteTimeTicks(entry.SamplePath),
             startSample,
             endSample,
+            regionStart,
+            regionEnd,
+            consonantEnd);
+    }
+
+    void AnalyzeInParallel(IReadOnlyList<AnalysisRequest?> requests)
+    {
+        var pending = requests
+            .OfType<AnalysisRequest>()
+            .DistinctBy(x => (x.Path, x.WriteTimeTicks, x.StartSample, x.EndSample))
+            .ToArray();
+        if (pending.Length < 2)
+            return;
+
+        Parallel.ForEach(
+            pending,
+            new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount },
+            () => new WorldArena(),
+            (request, _, arena) =>
+            {
+                Analyze(request, arena);
+                return arena;
+            },
+            arena => arena.Dispose());
+    }
+
+    WorldFeatures Analyze(AnalysisRequest request, WorldArena arena)
+        => cache.GetOrAdd(
+            request.Path,
+            request.WriteTimeTicks,
+            request.StartSample,
+            request.EndSample,
             settings.Estimator,
             () => WorldAnalyzer.Analyze(
-                new AudioSample(sample.Samples[startSample..endSample], sample.SampleRate),
+                new AudioSample(request.Sample.Samples[request.StartSample..request.EndSample], request.Sample.SampleRate),
                 settings.Estimator,
                 arena,
-                startSample * 1000.0 / sample.SampleRate));
+                request.StartSample * 1000.0 / request.Sample.SampleRate));
 
-        return new UnitSource(features, regionStart, regionEnd, consonantEnd, ComputeMeanF0(features, regionStart, regionEnd));
+    UnitSource? BuildSource(AnalysisRequest? request, WorldArena arena)
+    {
+        if (request is not { } value)
+            return null;
+
+        var features = Analyze(value, arena);
+        return new UnitSource(
+            features,
+            value.RegionStart,
+            value.RegionEnd,
+            value.ConsonantEnd,
+            ComputeMeanF0(features, value.RegionStart, value.RegionEnd));
     }
 
     static double ComputeMeanF0(WorldFeatures features, double regionStart, double regionEnd)

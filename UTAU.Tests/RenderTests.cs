@@ -289,6 +289,17 @@ public sealed class UtauRendererTests : IDisposable
     }
 
     [Fact]
+    public void ParallelAnalysisProducesTheSameOutputAsASingleSample()
+    {
+        var bank = TestVoiceBank.CreateSingleKanaBank(directory);
+        var combined = Render(bank, "あかさ");
+        cache.Clear();
+        var again = Render(bank, "あかさ");
+
+        Assert.Equal(combined.Samples, again.Samples);
+    }
+
+    [Fact]
     public void SamplesRecordedAtAnotherRateAreResampled()
     {
         var bank = TestVoiceBank.CreateSingleKanaBank(directory);

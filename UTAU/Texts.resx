@@ -122,7 +122,6 @@
 <data name="PronounceNotes" xml:space="preserve"><value>ノート</value></data>
 <data name="PronounceNotesDescription" xml:space="preserve"><value>発音から組み立てたノート列を編集します。</value></data>
 <data name="EditNotes" xml:space="preserve"><value>ノートを編集</value></data>
-<data name="NoteEditorHint" xml:space="preserve"><value>ノートを上下に動かすと音程が、右端を動かすと長さが変わります。</value></data>
 <data name="ZoomIn" xml:space="preserve"><value>拡大</value></data>
 <data name="ZoomOut" xml:space="preserve"><value>縮小</value></data>
 <data name="InsertRest" xml:space="preserve"><value>休符を挿入</value></data>
@@ -171,4 +170,9 @@
 <data name="AboutUTAUNotation" xml:space="preserve"><value>発音の中に &lt;!音名:長さ&gt; と書くと、その直後のかなの音程と長さが決まります。長さはミリ秒か 1/4 のような音符で書けます。</value></data>
 <data name="AboutUTAUNotationExample" xml:space="preserve"><value>例: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  休符は &lt;!R:200&gt; と書きます。</value></data>
 <data name="AboutUTAUCredit" xml:space="preserve"><value>音声の分析と合成には M. Morise 氏の WORLD を移植した WorldNet を使用しています。</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>ノートを上下に動かすと音程が、右端を動かすと長さが変わります。Ctrlと車輪で拡大縮小、Shiftと車輪で横移動、Altで吸着を解除します。</value></data>
+<data name="NoteLyricDescription" xml:space="preserve"><value>原音設定のエイリアスをそのまま書くこともできます。</value></data>
+<data name="NoteVelocityDescription" xml:space="preserve"><value>子音の長さの倍率です。100が原音のままで、倍率は 2^((100-値)/100) になります。</value></data>
+<data name="NoteFollowOtoDescription" xml:space="preserve"><value>0のときは原音設定の値を使います。</value></data>
+<data name="NoteStartPointDescription" xml:space="preserve"><value>原音の読み始めをこの時間だけ後ろへずらします。</value></data>
 </root>

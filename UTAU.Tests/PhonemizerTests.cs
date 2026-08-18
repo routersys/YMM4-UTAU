@@ -331,6 +331,18 @@ public sealed class UnitTimingBuilderTests
     }
 
     [Fact]
+    public void ZeroOverridesFallBackToTheOtoValues()
+    {
+        var unit = CreateUnit(100.0, 200.0, 40.0, 20.0);
+        unit.Note.PreutteranceOverride = UTAUNote.FollowOtoValue;
+        unit.Note.OverlapOverride = UTAUNote.FollowOtoValue;
+
+        Assert.Equal(40.0, unit.Preutterance, 9);
+        Assert.Equal(20.0, unit.Overlap, 9);
+        Assert.Equal(60.0, Assert.Single(UnitTimingBuilder.Build([unit])).AudioStartMilliseconds, 9);
+    }
+
+    [Fact]
     public void EmptyInputProducesNoTimings()
         => Assert.Empty(UnitTimingBuilder.Build([]));
 }

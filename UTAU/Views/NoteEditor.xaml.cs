@@ -18,6 +18,8 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
     }
 
     const double MinimumNoteLengthMilliseconds = 10.0;
+    const double LengthSnapMilliseconds = 10.0;
+    const double WheelScrollStep = 48.0;
 
     DragMode dragMode;
     NoteViewModel? dragTarget;
@@ -45,8 +47,11 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
 
     static void OnNotesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is NoteEditor editor)
-            editor.DataContext = editor.Notes is null ? null : new NoteEditorViewModel(editor.Notes);
+        if (d is not NoteEditor editor)
+            return;
+
+        editor.ViewModel?.Dispose();
+        editor.DataContext = editor.Notes is null ? null : new NoteEditorViewModel(editor.Notes);
     }
 
     NoteEditorViewModel? ViewModel => DataContext as NoteEditorViewModel;
@@ -57,6 +62,25 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
 
     void RollScroller_ScrollChanged(object sender, ScrollChangedEventArgs e)
         => KeyboardScroller.ScrollToVerticalOffset(e.VerticalOffset);
+
+    void RollScroller_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        if (ViewModel is not { } viewModel)
+            return;
+
+        if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+        {
+            viewModel.Zoom(e.Delta > 0 ? NoteEditorViewModel.ZoomStep : 1.0 / NoteEditorViewModel.ZoomStep);
+            e.Handled = true;
+            return;
+        }
+
+        if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+            return;
+
+        RollScroller.ScrollToHorizontalOffset(RollScroller.HorizontalOffset - Math.Sign(e.Delta) * WheelScrollStep);
+        e.Handled = true;
+    }
 
     void Note_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
@@ -102,7 +126,10 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         else
         {
             var delta = viewModel.MillisecondsFromCanvasX(position.X - dragOrigin.X);
-            dragTarget.LengthMilliseconds = Math.Max(dragOriginLength + delta, MinimumNoteLengthMilliseconds);
+            var length = Math.Max(dragOriginLength + delta, MinimumNoteLengthMilliseconds);
+            if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
+                length = Math.Max(Math.Round(length / LengthSnapMilliseconds) * LengthSnapMilliseconds, MinimumNoteLengthMilliseconds);
+            dragTarget.LengthMilliseconds = length;
         }
     }
 

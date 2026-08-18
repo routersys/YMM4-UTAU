@@ -8,7 +8,7 @@ using YukkuriMovieMaker.Commons;
 
 namespace UTAU.ViewModels;
 
-internal sealed class NoteEditorViewModel : Bindable
+internal sealed class NoteEditorViewModel : Bindable, IDisposable
 {
     public const double MinimumPixelsPerMillisecond = 0.05;
     public const double MaximumPixelsPerMillisecond = 2.0;
@@ -140,6 +140,20 @@ internal sealed class NoteEditorViewModel : Bindable
         UpdatePitchCurve();
     }
 
+    public void OnNoteChanged(string? propertyName)
+    {
+        switch (propertyName)
+        {
+            case nameof(UTAUNote.Tone):
+            case nameof(UTAUNote.LengthMilliseconds):
+                InvalidateLayout();
+                break;
+            default:
+                UpdatePitchCurve();
+                break;
+        }
+    }
+
     public void UpdatePitchCurve()
     {
         var points = new PointCollection();
@@ -205,10 +219,17 @@ internal sealed class NoteEditorViewModel : Bindable
         new(Texts.PitchShapeJCurve, PitchPointShape.JCurve),
     ];
 
-    void Zoom(double factor)
+    public void Zoom(double factor)
     {
         PixelsPerMillisecond = Math.Clamp(PixelsPerMillisecond * factor, MinimumPixelsPerMillisecond, MaximumPixelsPerMillisecond);
         InvalidateLayout();
+    }
+
+    public void Dispose()
+    {
+        foreach (var note in Notes)
+            note.Dispose();
+        Notes.Clear();
     }
 
     void UpdateToneRange()
@@ -245,6 +266,7 @@ internal sealed class NoteEditorViewModel : Bindable
 
         var index = Notes.IndexOf(selected);
         source.Remove(selected.Note);
+        selected.Dispose();
         Notes.RemoveAt(index);
         SelectedNote = Notes.Count == 0 ? null : Notes[Math.Min(index, Notes.Count - 1)];
         InvalidateLayout();

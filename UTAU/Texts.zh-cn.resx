@@ -122,7 +122,6 @@
 <data name="PronounceNotes" xml:space="preserve"><value>音符</value></data>
 <data name="PronounceNotesDescription" xml:space="preserve"><value>编辑由发音生成的音符序列。</value></data>
 <data name="EditNotes" xml:space="preserve"><value>编辑音符</value></data>
-<data name="NoteEditorHint" xml:space="preserve"><value>上下拖动音符可改变音高，拖动右端可改变长度。</value></data>
 <data name="ZoomIn" xml:space="preserve"><value>放大</value></data>
 <data name="ZoomOut" xml:space="preserve"><value>缩小</value></data>
 <data name="InsertRest" xml:space="preserve"><value>插入休止符</value></data>
@@ -171,4 +170,9 @@
 <data name="AboutUTAUNotation" xml:space="preserve"><value>在发音中书写 &lt;!音名:长度&gt; 可决定其后假名的音高与长度。长度可用毫秒或 1/4 之类的音符书写。</value></data>
 <data name="AboutUTAUNotationExample" xml:space="preserve"><value>例：&lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み　休止符写作 &lt;!R:200&gt;。</value></data>
 <data name="AboutUTAUCredit" xml:space="preserve"><value>语音的分析与合成使用了 M. Morise 的 WORLD 的移植版 WorldNet。</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>上下拖动音符可改变音高，拖动右端可改变长度。Ctrl 加滚轮缩放，Shift 加滚轮横向滚动，Alt 解除吸附。</value></data>
+<data name="NoteLyricDescription" xml:space="preserve"><value>也可以直接书写原音设定的别名。</value></data>
+<data name="NoteVelocityDescription" xml:space="preserve"><value>辅音长度的倍率。100 表示保持原始长度，倍率为 2^((100-值)/100)。</value></data>
+<data name="NoteFollowOtoDescription" xml:space="preserve"><value>为 0 时使用原音设定中的值。</value></data>
+<data name="NoteStartPointDescription" xml:space="preserve"><value>将原音的读取起点向后移动此时长。</value></data>
 </root>

@@ -10,38 +10,43 @@
              mc:Ignorable="d"
              d:DesignHeight="360" d:DesignWidth="900"
              d:DataContext="{d:DesignInstance Type={x:Type vm:NoteEditorViewModel}}">
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="AccidentalRowBrush" Color="#26000000"/>
+        <SolidColorBrush x:Key="AccidentalKeyBrush" Color="#40000000"/>
+    </UserControl.Resources>
     <c:PopupButton Content="{x:Static root:Texts.EditNotes}"
-                   PopupWidth="940"
-                   PopupHeight="440"
+                   PopupWidth="960"
+                   PopupHeight="460"
                    ResizeMode="Both"
                    BeginEdit="PopupButton_BeginEdit"
                    EndEdit="PopupButton_EndEdit">
         <c:PopupButton.PopupContent>
             <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="272"/>
+                </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="26"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="260"/>
-                </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal">
-                    <Button Width="26" Command="{Binding ZoomOutCommand}" ToolTip="{x:Static root:Texts.ZoomOut}"
+                    <Button Width="26" Height="26" Command="{Binding ZoomOutCommand}" ToolTip="{x:Static root:Texts.ZoomOut}"
                             Content="{DynamicResource {x:Static icons:IconKeys.MagnifyMinusOutline}}"/>
-                    <Button Width="26" Command="{Binding ZoomInCommand}" ToolTip="{x:Static root:Texts.ZoomIn}"
+                    <Button Width="26" Height="26" Command="{Binding ZoomInCommand}" ToolTip="{x:Static root:Texts.ZoomIn}"
                             Content="{DynamicResource {x:Static icons:IconKeys.MagnifyPlusOutline}}"/>
-                    <Button Width="26" Command="{Binding InsertRestCommand}" ToolTip="{x:Static root:Texts.InsertRest}"
+                    <Button Width="26" Height="26" Command="{Binding InsertRestCommand}" ToolTip="{x:Static root:Texts.InsertRest}"
                             Content="{DynamicResource {x:Static icons:IconKeys.Plus}}"/>
-                    <Button Width="26" Command="{Binding RemoveNoteCommand}" ToolTip="{x:Static root:Texts.RemoveNote}"
+                    <Button Width="26" Height="26" Command="{Binding RemoveNoteCommand}" ToolTip="{x:Static root:Texts.RemoveNote}"
                             Content="{DynamicResource {x:Static icons:IconKeys.Delete}}"/>
-                    <TextBlock VerticalAlignment="Center" Text="{x:Static root:Texts.NoteEditorHint}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock VerticalAlignment="Center" Margin="6,0,0,0" Opacity="0.7"
+                               Text="{x:Static root:Texts.NoteEditorHint}" TextTrimming="CharacterEllipsis"/>
                 </StackPanel>
 
                 <Grid Grid.Row="1" Grid.Column="0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="46"/>
+                        <ColumnDefinition Width="42"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <ScrollViewer x:Name="KeyboardScroller" Grid.Column="0"
@@ -50,18 +55,19 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Height="{Binding Height}"
-                                            BorderThickness="0,0,0,1"
+                                            BorderThickness="0,0,1,1"
                                             BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
                                         <Border.Style>
                                             <Style TargetType="Border">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsAccidental}" Value="True">
-                                                        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"/>
+                                                        <Setter Property="Background" Value="{StaticResource AccidentalKeyBrush}"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </Border.Style>
-                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="9"/>
+                                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Right"
+                                                   Margin="0,0,3,0" FontSize="9" Opacity="0.75"/>
                                     </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -70,7 +76,8 @@
 
                     <ScrollViewer x:Name="RollScroller" Grid.Column="1"
                                   HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
-                                  ScrollChanged="RollScroller_ScrollChanged">
+                                  ScrollChanged="RollScroller_ScrollChanged"
+                                  PreviewMouseWheel="RollScroller_PreviewMouseWheel">
                         <Canvas x:Name="RollCanvas"
                                 Width="{Binding CanvasWidth}"
                                 Height="{Binding CanvasHeight}"
@@ -88,7 +95,7 @@
                                                 <Style TargetType="Border">
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding IsAccidental}" Value="True">
-                                                            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"/>
+                                                            <Setter Property="Background" Value="{StaticResource AccidentalRowBrush}"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
@@ -111,7 +118,7 @@
                                 </ItemsControl.ItemContainerStyle>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Rectangle Width="1" Height="{Binding Height}"
+                                        <Rectangle Width="1" Height="{Binding Height}" Opacity="0.6"
                                                    Fill="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"/>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -127,198 +134,103 @@
                                     <Style TargetType="ContentPresenter">
                                         <Setter Property="Canvas.Left" Value="{Binding Left}"/>
                                         <Setter Property="Canvas.Top" Value="{Binding Top}"/>
+                                        <Setter Property="Panel.ZIndex" Value="1"/>
                                     </Style>
                                 </ItemsControl.ItemContainerStyle>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Grid Width="{Binding Width}" Height="{Binding Height}"
-                                              MouseLeftButtonDown="Note_MouseLeftButtonDown">
-                                            <Border BorderThickness="1"
-                                                    BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}">
+                                        <Grid Width="{Binding Width}" Height="{Binding Height}" Cursor="Hand"
+                                              MouseLeftButtonDown="Note_MouseLeftButtonDown"
+                                              ToolTip="{Binding ToneName}">
+                                            <Border CornerRadius="2" BorderThickness="1">
                                                 <Border.Style>
                                                     <Style TargetType="Border">
-                                                        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}"/>
+                                                        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                                                        <Setter Property="Opacity" Value="0.55"/>
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsRest}" Value="True">
                                                                 <Setter Property="Background" Value="Transparent"/>
+                                                                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"/>
+                                                                <Setter Property="Opacity" Value="0.9"/>
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                                <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                                                                <Setter Property="Opacity" Value="1"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Border.Style>
-                                                <TextBlock Text="{Binding Display}" FontSize="10" VerticalAlignment="Center" ClipToBounds="True"/>
                                             </Border>
-                                            <Rectangle Width="4" HorizontalAlignment="Right" Fill="Transparent" Cursor="SizeWE"
+                                            <TextBlock Text="{Binding Display}" FontSize="10" Margin="3,0,0,0"
+                                                       VerticalAlignment="Center" ClipToBounds="True" IsHitTestVisible="False">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsRest}" Value="True">
+                                                                <Setter Property="Foreground" Value="{x:Null}"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                            <Rectangle Width="5" HorizontalAlignment="Right" Fill="Transparent" Cursor="SizeWE"
                                                        MouseLeftButtonDown="NoteResize_MouseLeftButtonDown"/>
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
-                            <Polyline Points="{Binding PitchCurve}" StrokeThickness="1.5"
-                                      Stroke="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"
+                            <Polyline Points="{Binding PitchCurve}" StrokeThickness="1.5" Panel.ZIndex="2"
+                                      Stroke="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"
+                                      Opacity="0.85"
                                       IsHitTestVisible="False"/>
                         </Canvas>
                     </ScrollViewer>
                 </Grid>
 
-                <ScrollViewer Grid.Row="1" Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
-                              IsEnabled="{Binding HasSelection}">
-                    <StackPanel>
-                        <Expander Header="{x:Static root:Texts.NoteGroupBasic}" IsExpanded="True">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="92"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static root:Texts.NoteLyric}" VerticalAlignment="Center"/>
-                                <TextBox Grid.Row="0" Grid.Column="1" VerticalContentAlignment="Center"
-                                         Text="{Binding SelectedNote.Lyric, UpdateSourceTrigger=PropertyChanged}"/>
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static root:Texts.NoteTone}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedNote.ToneName}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static root:Texts.NoteLength}" VerticalAlignment="Center"/>
-                                <c:TextBoxSlider Grid.Row="2" Grid.Column="1" Value="{Binding SelectedNote.LengthMilliseconds}"
-                                                 StringFormat="F0" Unit="ms" DefaultValue="200" Min="1" Max="10000" Delay="-1"/>
-                            </Grid>
-                        </Expander>
-
-                        <Expander Header="{x:Static root:Texts.NoteGroupExpression}" IsExpanded="True">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="92"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static root:Texts.NoteVelocity}" VerticalAlignment="Center"/>
-                                <c:TextBoxSlider Grid.Row="0" Grid.Column="1" Value="{Binding SelectedNote.Velocity}"
-                                                 StringFormat="F0" DefaultValue="100" Min="0" Max="200" Delay="-1"/>
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static root:Texts.NoteIntensity}" VerticalAlignment="Center"/>
-                                <c:TextBoxSlider Grid.Row="1" Grid.Column="1" Value="{Binding SelectedNote.Intensity}"
-                                                 StringFormat="F0" Unit="%" DefaultValue="100" Min="0" Max="200" Delay="-1"/>
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static root:Texts.NoteModulation}" VerticalAlignment="Center"/>
-                                <c:TextBoxSlider Grid.Row="2" Grid.Column="1" Value="{Binding SelectedNote.Modulation}"
-                                                 StringFormat="F0" Unit="%" DefaultValue="0" Min="-200" Max="200" Delay="-1"/>
-                            </Grid>
-                        </Expander>
-
-                        <Expander Header="{x:Static root:Texts.NoteGroupTiming}" IsExpanded="False">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="92"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static root:Texts.NotePreutterance}" VerticalAlignment="Center"/>
-                                <c:TextBoxSlider Grid.Row="0" Grid.Column="1" Value="{Binding SelectedNote.PreutteranceOverride}"
-                                                 StringFormat="F0" Unit="ms" DefaultValue="0" Min="0" Max="1000" Delay="-1"/>
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static root:Texts.NoteOverlap}" VerticalAlignment="Center"/>
-                                <c:TextBoxSlider Grid.Row="1" Grid.Column="1" Value="{Binding SelectedNote.OverlapOverride}"
-                                                 StringFormat="F0" Unit="ms" DefaultValue="0" Min="0" Max="1000" Delay="-1"/>
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static root:Texts.NoteStartPoint}" VerticalAlignment="Center"/>
-                                <c:TextBoxSlider Grid.Row="2" Grid.Column="1" Value="{Binding SelectedNote.StartPointMilliseconds}"
-                                                 StringFormat="F0" Unit="ms" DefaultValue="0" Min="0" Max="1000" Delay="-1"/>
-                                <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static root:Texts.NoteFadeIn}" VerticalAlignment="Center"/>
-                                <c:TextBoxSlider Grid.Row="3" Grid.Column="1" Value="{Binding SelectedNote.FadeInMilliseconds}"
-                                                 StringFormat="F0" Unit="ms" DefaultValue="5" Min="0" Max="1000" Delay="-1"/>
-                                <TextBlock Grid.Row="4" Grid.Column="0" Text="{x:Static root:Texts.NoteFadeOut}" VerticalAlignment="Center"/>
-                                <c:TextBoxSlider Grid.Row="4" Grid.Column="1" Value="{Binding SelectedNote.FadeOutMilliseconds}"
-                                                 StringFormat="F0" Unit="ms" DefaultValue="35" Min="0" Max="1000" Delay="-1"/>
-                            </Grid>
-                        </Expander>
-
-                        <Expander Header="{x:Static root:Texts.NoteGroupPortamento}" IsExpanded="False">
-                            <StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Button Width="26" Command="{Binding AddPitchPointCommand}" ToolTip="{x:Static root:Texts.AddPitchPoint}"
-                                            Content="{DynamicResource {x:Static icons:IconKeys.Plus}}"/>
-                                    <Button Width="26" Command="{Binding RemovePitchPointCommand}" ToolTip="{x:Static root:Texts.RemovePitchPoint}"
-                                            Content="{DynamicResource {x:Static icons:IconKeys.Minus}}"/>
-                                    <Button Width="26" Command="{Binding ResetPitchCommand}" ToolTip="{x:Static root:Texts.ResetPitch}"
-                                            Content="{DynamicResource {x:Static icons:IconKeys.Restore}}"/>
-                                </StackPanel>
-                                <DataGrid ItemsSource="{Binding PitchPoints}"
-                                          SelectedItem="{Binding SelectedPitchPoint}"
-                                          AutoGenerateColumns="False"
-                                          CanUserAddRows="False"
-                                          CanUserDeleteRows="False"
-                                          CanUserReorderColumns="False"
-                                          SelectionMode="Single"
-                                          HeadersVisibility="Column"
-                                          MinHeight="60"
-                                          MaxHeight="160"
-                                          CellEditEnding="PitchGrid_CellEditEnding">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="{x:Static root:Texts.PitchPointTime}" Width="*"
-                                                            Binding="{Binding Milliseconds, StringFormat=F0}"/>
-                                        <DataGridTextColumn Header="{x:Static root:Texts.PitchPointCents}" Width="*"
-                                                            Binding="{Binding Cents, StringFormat=F0}"/>
-                                        <DataGridComboBoxColumn Header="{x:Static root:Texts.PitchPointShape}" Width="*"
-                                                                ItemsSource="{Binding Source={x:Static vm:NoteEditorViewModel.PitchShapes}}"
-                                                                DisplayMemberPath="Name"
-                                                                SelectedValuePath="Value"
-                                                                SelectedValueBinding="{Binding Shape}"/>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </StackPanel>
-                        </Expander>
-
-                        <Expander Header="{x:Static root:Texts.NoteGroupVibrato}" IsExpanded="False">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="92"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static root:Texts.VibratoLength}" VerticalAlignment="Center"/>
-                                <c:TextBoxSlider Grid.Row="0" Grid.Column="1" Value="{Binding SelectedNote.Vibrato.LengthPercent}"
-                                                 StringFormat="F0" Unit="%" DefaultValue="0" Min="0" Max="100" Delay="-1"/>
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static root:Texts.VibratoPeriod}" VerticalAlignment="Center"/>
-                                <c:TextBoxSlider Grid.Row="1" Grid.Column="1" Value="{Binding SelectedNote.Vibrato.PeriodMilliseconds}"
-                                                 StringFormat="F0" Unit="ms" DefaultValue="175" Min="10" Max="1000" Delay="-1"/>
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static root:Texts.VibratoDepth}" VerticalAlignment="Center"/>
-                                <c:TextBoxSlider Grid.Row="2" Grid.Column="1" Value="{Binding SelectedNote.Vibrato.DepthCents}"
-                                                 StringFormat="F0" DefaultValue="25" Min="0" Max="400" Delay="-1"/>
-                                <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static root:Texts.VibratoFadeIn}" VerticalAlignment="Center"/>
-                                <c:TextBoxSlider Grid.Row="3" Grid.Column="1" Value="{Binding SelectedNote.Vibrato.FadeInPercent}"
-                                                 StringFormat="F0" Unit="%" DefaultValue="20" Min="0" Max="100" Delay="-1"/>
-                                <TextBlock Grid.Row="4" Grid.Column="0" Text="{x:Static root:Texts.VibratoFadeOut}" VerticalAlignment="Center"/>
-                                <c:TextBoxSlider Grid.Row="4" Grid.Column="1" Value="{Binding SelectedNote.Vibrato.FadeOutPercent}"
-                                                 StringFormat="F0" Unit="%" DefaultValue="20" Min="0" Max="100" Delay="-1"/>
-                                <TextBlock Grid.Row="5" Grid.Column="0" Text="{x:Static root:Texts.VibratoPhase}" VerticalAlignment="Center"/>
-                                <c:TextBoxSlider Grid.Row="5" Grid.Column="1" Value="{Binding SelectedNote.Vibrato.PhasePercent}"
-                                                 StringFormat="F0" Unit="%" DefaultValue="0" Min="-100" Max="100" Delay="-1"/>
-                                <TextBlock Grid.Row="6" Grid.Column="0" Text="{x:Static root:Texts.VibratoOffset}" VerticalAlignment="Center"/>
-                                <c:TextBoxSlider Grid.Row="6" Grid.Column="1" Value="{Binding SelectedNote.Vibrato.OffsetPercent}"
-                                                 StringFormat="F0" Unit="%" DefaultValue="0" Min="-100" Max="100" Delay="-1"/>
-                            </Grid>
-                        </Expander>
-                    </StackPanel>
-                </ScrollViewer>
+                <Grid Grid.Row="1" Grid.Column="1" IsEnabled="{Binding HasSelection}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="26"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <c:PropertiesEditor Grid.Row="0" Target="{Binding SelectedNote.Note}" IsScrollViewerEnabled="True"/>
+                    <Grid Grid.Row="1">
+                        <TextBlock Text="{x:Static root:Texts.NoteGroupPortamento}" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Width="26" Height="26" Command="{Binding AddPitchPointCommand}" ToolTip="{x:Static root:Texts.AddPitchPoint}"
+                                    Content="{DynamicResource {x:Static icons:IconKeys.Plus}}"/>
+                            <Button Width="26" Height="26" Command="{Binding RemovePitchPointCommand}" ToolTip="{x:Static root:Texts.RemovePitchPoint}"
+                                    Content="{DynamicResource {x:Static icons:IconKeys.Minus}}"/>
+                            <Button Width="26" Height="26" Command="{Binding ResetPitchCommand}" ToolTip="{x:Static root:Texts.ResetPitch}"
+                                    Content="{DynamicResource {x:Static icons:IconKeys.Restore}}"/>
+                        </StackPanel>
+                    </Grid>
+                    <DataGrid Grid.Row="2" ItemsSource="{Binding PitchPoints}"
+                              SelectedItem="{Binding SelectedPitchPoint}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              CanUserReorderColumns="False"
+                              SelectionMode="Single"
+                              HeadersVisibility="Column"
+                              MinHeight="52"
+                              MaxHeight="140"
+                              CellEditEnding="PitchGrid_CellEditEnding">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{x:Static root:Texts.PitchPointTime}" Width="*"
+                                                Binding="{Binding Milliseconds, StringFormat=F0}"/>
+                            <DataGridTextColumn Header="{x:Static root:Texts.PitchPointCents}" Width="*"
+                                                Binding="{Binding Cents, StringFormat=F0}"/>
+                            <DataGridComboBoxColumn Header="{x:Static root:Texts.PitchPointShape}" Width="*"
+                                                    ItemsSource="{Binding Source={x:Static vm:NoteEditorViewModel.PitchShapes}}"
+                                                    DisplayMemberPath="Name"
+                                                    SelectedValuePath="Value"
+                                                    SelectedValueBinding="{Binding Shape}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
             </Grid>
         </c:PopupButton.PopupContent>
     </c:PopupButton>

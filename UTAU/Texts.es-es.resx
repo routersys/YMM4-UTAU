@@ -122,7 +122,6 @@
 <data name="PronounceNotes" xml:space="preserve"><value>Notas</value></data>
 <data name="PronounceNotesDescription" xml:space="preserve"><value>Edita la secuencia de notas construida a partir de la pronunciación.</value></data>
 <data name="EditNotes" xml:space="preserve"><value>Editar las notas</value></data>
-<data name="NoteEditorHint" xml:space="preserve"><value>Arrastre una nota verticalmente para cambiar su tono y arrastre su borde derecho para cambiar su duración.</value></data>
 <data name="ZoomIn" xml:space="preserve"><value>Acercar</value></data>
 <data name="ZoomOut" xml:space="preserve"><value>Alejar</value></data>
 <data name="InsertRest" xml:space="preserve"><value>Insertar un silencio</value></data>
@@ -171,4 +170,9 @@
 <data name="AboutUTAUNotation" xml:space="preserve"><value>Escribir &lt;!nota:duración&gt; en la pronunciación fija el tono y la duración del kana que le sigue. La duración se escribe en milisegundos o como una nota tal como 1/4.</value></data>
 <data name="AboutUTAUNotationExample" xml:space="preserve"><value>Ejemplo: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  Un silencio se escribe como &lt;!R:200&gt;.</value></data>
 <data name="AboutUTAUCredit" xml:space="preserve"><value>Para el análisis y la síntesis se utiliza WorldNet, una adaptación de WORLD de M. Morise.</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>Arrastre una nota verticalmente para cambiar su tono y arrastre su borde derecho para cambiar su duración. Ctrl con la rueda amplía, Mayús con la rueda desplaza en horizontal y Alt libera el ajuste.</value></data>
+<data name="NoteLyricDescription" xml:space="preserve"><value>También se puede escribir directamente el alias del oto.ini.</value></data>
+<data name="NoteVelocityDescription" xml:space="preserve"><value>Escala la duración de la consonante. 100 conserva la duración original y el factor es 2^((100-valor)/100).</value></data>
+<data name="NoteFollowOtoDescription" xml:space="preserve"><value>El valor 0 utiliza el valor declarado en el oto.ini.</value></data>
+<data name="NoteStartPointDescription" xml:space="preserve"><value>Desplaza hacia adelante el punto donde empieza la lectura de la muestra original.</value></data>
 </root>

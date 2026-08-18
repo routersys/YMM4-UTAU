@@ -18,7 +18,11 @@ internal sealed record PhonemeUnit(
 
     public double EndMilliseconds => StartMilliseconds + LengthMilliseconds;
 
-    public double Preutterance => Note.PreutteranceOverride ?? Entry?.Preutterance ?? 0.0;
+    public double Preutterance => Note.PreutteranceOverride > UTAUNote.FollowOtoValue
+        ? Note.PreutteranceOverride
+        : Entry?.Preutterance ?? 0.0;
 
-    public double Overlap => Note.OverlapOverride ?? Entry?.Overlap ?? 0.0;
+    public double Overlap => Note.OverlapOverride > UTAUNote.FollowOtoValue
+        ? Note.OverlapOverride
+        : Entry?.Overlap ?? 0.0;
 }

@@ -16,7 +16,7 @@ internal sealed class UTAUVoicePronounce : UndoRedoable, IVoicePronounce
     LipSyncFrame[]? lipSyncFrames;
 
     [Display(Name = nameof(Texts.PronounceNotes), Description = nameof(Texts.PronounceNotesDescription), ResourceType = typeof(Texts))]
-    [NoteEditor(PropertyEditorSize = PropertyEditorSize.FullWidth, MinHeight = 320)]
+    [NoteEditor]
     public ObservableCollection<UTAUNote> Notes
     {
         get => notes;

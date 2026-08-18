@@ -122,7 +122,6 @@
 <data name="PronounceNotes" xml:space="preserve"><value>노트</value></data>
 <data name="PronounceNotesDescription" xml:space="preserve"><value>발음에서 만든 노트 열을 편집합니다.</value></data>
 <data name="EditNotes" xml:space="preserve"><value>노트 편집</value></data>
-<data name="NoteEditorHint" xml:space="preserve"><value>노트를 위아래로 옮기면 음정이, 오른쪽 끝을 옮기면 길이가 바뀝니다.</value></data>
 <data name="ZoomIn" xml:space="preserve"><value>확대</value></data>
 <data name="ZoomOut" xml:space="preserve"><value>축소</value></data>
 <data name="InsertRest" xml:space="preserve"><value>쉼표 삽입</value></data>
@@ -171,4 +170,9 @@
 <data name="AboutUTAUNotation" xml:space="preserve"><value>발음 안에 &lt;!음이름:길이&gt; 라고 쓰면 그 뒤 가나의 음정과 길이가 정해집니다. 길이는 밀리초나 1/4 같은 음표로 쓸 수 있습니다.</value></data>
 <data name="AboutUTAUNotationExample" xml:space="preserve"><value>예: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  쉼표는 &lt;!R:200&gt; 이라고 씁니다.</value></data>
 <data name="AboutUTAUCredit" xml:space="preserve"><value>음성 분석과 합성에는 M. Morise의 WORLD를 이식한 WorldNet을 사용합니다.</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>노트를 위아래로 옮기면 음정이, 오른쪽 끝을 옮기면 길이가 바뀝니다. Ctrl과 휠로 확대 축소, Shift와 휠로 가로 이동, Alt로 스냅을 해제합니다.</value></data>
+<data name="NoteLyricDescription" xml:space="preserve"><value>원음 설정의 에일리어스를 그대로 쓸 수도 있습니다.</value></data>
+<data name="NoteVelocityDescription" xml:space="preserve"><value>자음 길이의 배율입니다. 100이 원음 그대로이며 배율은 2^((100-값)/100)입니다.</value></data>
+<data name="NoteFollowOtoDescription" xml:space="preserve"><value>0일 때는 원음 설정의 값을 사용합니다.</value></data>
+<data name="NoteStartPointDescription" xml:space="preserve"><value>원음을 읽기 시작하는 위치를 이 시간만큼 뒤로 옮깁니다.</value></data>
 </root>
