@@ -14,6 +14,7 @@
         <SolidColorBrush x:Key="AccidentalRowBrush" Color="#26000000"/>
         <SolidColorBrush x:Key="AccidentalKeyBrush" Color="#59000000"/>
         <SolidColorBrush x:Key="NaturalKeyBrush" Color="#14FFFFFF"/>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibility"/>
     </UserControl.Resources>
     <c:PopupButton Content="{x:Static root:Texts.EditNotes}"
                    PopupWidth="980"
@@ -51,6 +52,7 @@
                               ItemsSource="{Binding SnapDivisions}"
                               SelectedItem="{Binding SnapDivision}"
                               DisplayMemberPath="Name"/>
+                    <TextBlock Text="{Binding GuideText}" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.75"/>
                 </StackPanel>
 
                 <ScrollViewer x:Name="VerticalScroller" Grid.Row="1" Grid.Column="0"
@@ -96,6 +98,8 @@
                                     MouseMove="RollCanvas_MouseMove"
                                     MouseLeftButtonUp="RollCanvas_MouseLeftButtonUp"
                                     MouseLeave="RollCanvas_MouseLeave"
+                                    MouseDown="RollCanvas_MouseDown"
+                                    MouseUp="RollCanvas_MouseUp"
                                     PreviewMouseWheel="RollCanvas_PreviewMouseWheel">
                                 <ItemsControl ItemsSource="{Binding Keyboard}">
                                     <ItemsControl.ItemTemplate>
@@ -173,9 +177,9 @@
                                                             <Setter Property="Opacity" Value="0.6"/>
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding IsRest}" Value="True">
-                                                                    <Setter Property="Background" Value="Transparent"/>
+                                                                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"/>
                                                                     <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"/>
-                                                                    <Setter Property="Opacity" Value="0.9"/>
+                                                                    <Setter Property="Opacity" Value="0.35"/>
                                                                 </DataTrigger>
                                                                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
                                                                     <Setter Property="Opacity" Value="1"/>
@@ -184,7 +188,10 @@
                                                         </Style>
                                                     </Border.Style>
                                                 </Border>
-                                                <TextBlock Text="{Binding Display}" FontSize="10" Margin="3,0,0,0"
+                                                <Border BorderThickness="2" IsHitTestVisible="False"
+                                                        BorderBrush="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"
+                                                        Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibility}}"/>
+                                                <TextBlock Text="{Binding Display}" FontSize="10" Margin="4,0,0,0"
                                                            VerticalAlignment="Center" ClipToBounds="True" IsHitTestVisible="False"
                                                            Foreground="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
                                                 <Rectangle Width="6" HorizontalAlignment="Right" Fill="Transparent" Cursor="SizeWE"
@@ -198,6 +205,13 @@
                                           Stroke="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"
                                           Opacity="0.85"
                                           IsHitTestVisible="False"/>
+
+                                <Rectangle Width="1" Height="{Binding CanvasHeight}" Panel.ZIndex="3"
+                                           Canvas.Left="{Binding GuideLeft}"
+                                           Fill="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"
+                                           Opacity="0.6"
+                                           IsHitTestVisible="False"
+                                           Visibility="{Binding IsGuideVisible, Converter={StaticResource BooleanToVisibility}}"/>
                             </Canvas>
                         </ScrollViewer>
                     </Grid>

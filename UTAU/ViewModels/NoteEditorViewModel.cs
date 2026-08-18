@@ -29,6 +29,9 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     NoteViewModel? selectedNote;
     PitchPoint? selectedPitchPoint;
     PointCollection pitchCurve = [];
+    double guideLeft;
+    bool isGuideVisible;
+    string guideText = string.Empty;
 
     public NoteEditorViewModel(ObservableCollection<UTAUNote> notes)
     {
@@ -134,6 +137,24 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         private set => Set(ref pitchCurve, value);
     }
 
+    public double GuideLeft
+    {
+        get => guideLeft;
+        private set => Set(ref guideLeft, value);
+    }
+
+    public bool IsGuideVisible
+    {
+        get => isGuideVisible;
+        private set => Set(ref isGuideVisible, value);
+    }
+
+    public string GuideText
+    {
+        get => guideText;
+        private set => Set(ref guideText, value);
+    }
+
     public double CanvasWidth => Math.Max(TotalTicks * PixelsPerTick, 1.0);
 
     public double CanvasHeight => (MaximumTone - MinimumTone + 1) * SemitoneHeight;
@@ -221,6 +242,28 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         => Math.Clamp((int)Math.Round(MaximumTone - y / SemitoneHeight + 0.5), 0, 127);
 
     public int TicksFromCanvasX(double x) => (int)Math.Round(x / PixelsPerTick);
+
+    public void UpdateGuide(Point position)
+    {
+        var ticks = Math.Max(TicksFromCanvasX(position.X), 0);
+        var snapped = SnapDivision.IsFree ? ticks : SnapDivision.Snap(ticks);
+        GuideLeft = snapped * PixelsPerTick;
+        GuideText = FormatPosition(snapped, ToneFromCanvasY(position.Y));
+        IsGuideVisible = true;
+    }
+
+    public void HideGuide()
+    {
+        IsGuideVisible = false;
+        GuideText = string.Empty;
+    }
+
+    static string FormatPosition(int ticks, int tone)
+    {
+        var bar = ticks / TimeBase.TicksPerWholeNote + 1;
+        var beat = ticks % TimeBase.TicksPerWholeNote / TimeBase.TicksPerQuarterNote + 1;
+        return $"{new MusicalTone(tone).Name}  {bar}:{beat}";
+    }
 
     public int SnapLength(int ticks)
         => Math.Clamp(SnapDivision.Snap(ticks), UTAUNote.MinimumLengthTicks, UTAUNote.MaximumLengthTicks);

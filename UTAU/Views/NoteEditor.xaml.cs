@@ -25,6 +25,10 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
     Point dragOrigin;
     int dragOriginLengthTicks;
     int dragOriginTone;
+    bool isPanning;
+    Point panOrigin;
+    double panHorizontalOffset;
+    double panVerticalOffset;
 
     public event EventHandler? BeginEdit;
 
@@ -87,11 +91,46 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
             return;
         }
 
-        if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+        if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+        {
+            HorizontalScroller.ScrollToHorizontalOffset(HorizontalScroller.HorizontalOffset - Math.Sign(e.Delta) * WheelScrollStep);
+            e.Handled = true;
+            return;
+        }
+
+        VerticalScroller.ScrollToVerticalOffset(VerticalScroller.VerticalOffset - Math.Sign(e.Delta) * WheelScrollStep);
+        e.Handled = true;
+    }
+
+    void RollCanvas_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton != MouseButton.Middle)
             return;
 
-        HorizontalScroller.ScrollToHorizontalOffset(HorizontalScroller.HorizontalOffset - Math.Sign(e.Delta) * WheelScrollStep);
+        isPanning = true;
+        panOrigin = e.GetPosition(RollCanvas);
+        panHorizontalOffset = HorizontalScroller.HorizontalOffset;
+        panVerticalOffset = VerticalScroller.VerticalOffset;
+        RollCanvas.CaptureMouse();
         e.Handled = true;
+    }
+
+    void RollCanvas_MouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton != MouseButton.Middle)
+            return;
+
+        EndPan();
+        e.Handled = true;
+    }
+
+    void EndPan()
+    {
+        if (!isPanning)
+            return;
+
+        isPanning = false;
+        RollCanvas.ReleaseMouseCapture();
     }
 
     void Key_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -135,10 +174,22 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
 
     void RollCanvas_MouseMove(object sender, MouseEventArgs e)
     {
-        if (dragMode == DragMode.None || dragTarget is null || ViewModel is not { } viewModel)
+        if (ViewModel is not { } viewModel)
             return;
 
         var position = e.GetPosition(RollCanvas);
+        viewModel.UpdateGuide(position);
+
+        if (isPanning)
+        {
+            HorizontalScroller.ScrollToHorizontalOffset(panHorizontalOffset - (position.X - panOrigin.X));
+            VerticalScroller.ScrollToVerticalOffset(panVerticalOffset - (position.Y - panOrigin.Y));
+            return;
+        }
+
+        if (dragMode == DragMode.None || dragTarget is null)
+            return;
+
         if (dragMode == DragMode.Tone)
         {
             var delta = (int)Math.Round((dragOrigin.Y - position.Y) / viewModel.SemitoneHeight);
@@ -154,6 +205,9 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
 
     void RollCanvas_MouseLeave(object sender, MouseEventArgs e)
     {
+        ViewModel?.HideGuide();
+        if (e.MiddleButton != MouseButtonState.Pressed)
+            EndPan();
         if (e.LeftButton != MouseButtonState.Pressed)
             EndDrag();
     }
