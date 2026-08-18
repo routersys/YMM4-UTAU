@@ -100,14 +100,6 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     public IReadOnlyList<ExpressionItem> Expressions => ExpressionItem.All;
 
-    public static IReadOnlyList<PitchShapeItem> PitchShapes { get; } =
-    [
-        new(Texts.PitchShapeSCurve, PitchPointShape.SCurve),
-        new(Texts.PitchShapeLinear, PitchPointShape.Linear),
-        new(Texts.PitchShapeRCurve, PitchPointShape.RCurve),
-        new(Texts.PitchShapeJCurve, PitchPointShape.JCurve),
-    ];
-
     public NoteDivision SnapDivision
     {
         get => snapDivision;

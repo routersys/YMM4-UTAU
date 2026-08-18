@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Reflection;
 using UTAU.Notes;
 using UTAU;
 using UTAU.ViewModels;
@@ -186,10 +187,16 @@ public sealed class PitchCurveTests
     }
 
     [Fact]
-    public void EverySelectableCurveShapeIsOffered()
+    public void EveryCurveShapeCarriesALocalizedName()
     {
-        var offered = NoteEditorViewModel.PitchShapes.Select(x => x.Value).ToArray();
-        Assert.Equal(Enum.GetValues<PitchPointShape>(), offered);
-        Assert.All(NoteEditorViewModel.PitchShapes, x => Assert.False(string.IsNullOrEmpty(x.Name)));
+        foreach (var shape in Enum.GetValues<PitchPointShape>())
+        {
+            var display = typeof(PitchPointShape)
+                .GetField(shape.ToString())!
+                .GetCustomAttribute<System.ComponentModel.DataAnnotations.DisplayAttribute>();
+
+            Assert.NotNull(display);
+            Assert.False(string.IsNullOrEmpty(display!.GetName()), shape.ToString());
+        }
     }
 }

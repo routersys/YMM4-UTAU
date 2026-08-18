@@ -1,3 +1,6 @@
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using YukkuriMovieMaker.Controls;
 using YukkuriMovieMaker.UndoRedo;
 
 namespace UTAU.Notes;
@@ -24,18 +27,28 @@ internal sealed class PitchPoint : UndoRedoable
         this.shape = shape;
     }
 
+    [Display(GroupName = nameof(Texts.NoteGroupPortamento), Name = nameof(Texts.PitchPointTime), Description = nameof(Texts.PitchPointTimeDescription), ResourceType = typeof(Texts))]
+    [TextBoxSlider("F0", nameof(Texts.UnitTick), 0.0, 1920.0, Delay = -1, ResourceType = typeof(Texts))]
+    [Range(MinimumTicks, MaximumTicks)]
+    [DefaultValue(0)]
     public int Ticks
     {
         get => ticks;
         set => Set(ref ticks, Math.Clamp(value, MinimumTicks, MaximumTicks));
     }
 
+    [Display(GroupName = nameof(Texts.NoteGroupPortamento), Name = nameof(Texts.PitchPointCents), Description = nameof(Texts.PitchPointCentsDescription), ResourceType = typeof(Texts))]
+    [TextBoxSlider("F0", "", -1200.0, 1200.0, Delay = -1)]
+    [Range(MinimumCents, MaximumCents)]
+    [DefaultValue(0.0)]
     public double Cents
     {
         get => cents;
         set => Set(ref cents, Math.Clamp(value, MinimumCents, MaximumCents));
     }
 
+    [Display(GroupName = nameof(Texts.NoteGroupPortamento), Name = nameof(Texts.PitchPointShape), ResourceType = typeof(Texts))]
+    [EnumComboBox]
     public PitchPointShape Shape
     {
         get => shape;

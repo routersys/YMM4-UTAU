@@ -188,4 +188,7 @@
 <data name="PitchPointTime" xml:space="preserve"><value>الزمن</value></data>
 <data name="PitchPointCents" xml:space="preserve"><value>السنت</value></data>
 <data name="PitchGuideFormat" xml:space="preserve"><value>{0} tick / {1} cent</value></data>
+<data name="NoteGroupPortamento" xml:space="preserve"><value>الانزلاق</value></data>
+<data name="PitchPointTimeDescription" xml:space="preserve"><value>الموضع من بداية النوتة. 480 نبضة تساوي نوتة ربعية.</value></data>
+<data name="PitchPointCentsDescription" xml:space="preserve"><value>الانحراف عن درجة النوتة. 100 سنت تساوي نصف نغمة.</value></data>
 </root>

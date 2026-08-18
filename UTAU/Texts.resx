@@ -188,4 +188,7 @@
 <data name="PitchPointTime" xml:space="preserve"><value>時間</value></data>
 <data name="PitchPointCents" xml:space="preserve"><value>セント</value></data>
 <data name="PitchGuideFormat" xml:space="preserve"><value>{0} tick / {1} cent</value></data>
+<data name="NoteGroupPortamento" xml:space="preserve"><value>ポルタメント</value></data>
+<data name="PitchPointTimeDescription" xml:space="preserve"><value>ノートの先頭からの位置です。480ティックが四分音符です。</value></data>
+<data name="PitchPointCentsDescription" xml:space="preserve"><value>ノートの音程からのずれです。100セントが半音です。</value></data>
 </root>

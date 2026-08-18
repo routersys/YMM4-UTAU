@@ -13,6 +13,7 @@ public sealed class EditorMetadataTests
     static readonly Type[] EditedTypes =
     [
         typeof(UTAUNote),
+        typeof(PitchPoint),
         typeof(VibratoSettings),
         typeof(UTAUVoiceParameter),
         typeof(UTAUVoicePronounce),

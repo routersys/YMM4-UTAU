@@ -1,5 +1,4 @@
 using UTAU.Models;
-using UTAU.Notes;
 
 namespace UTAU.ViewModels;
 
@@ -28,5 +27,3 @@ internal static class ComboBoxItems
 internal sealed record KeyRowViewModel(string Name, bool IsAccidental, int NoteNumber, double Height, double RollWidth);
 
 internal sealed record GridLineViewModel(double Left, double Height, bool IsBar);
-
-internal sealed record PitchShapeItem(string Name, PitchPointShape Value);

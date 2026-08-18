@@ -188,4 +188,7 @@
 <data name="PitchPointTime" xml:space="preserve"><value>时间</value></data>
 <data name="PitchPointCents" xml:space="preserve"><value>音分</value></data>
 <data name="PitchGuideFormat" xml:space="preserve"><value>{0} tick / {1} cent</value></data>
+<data name="NoteGroupPortamento" xml:space="preserve"><value>滑音</value></data>
+<data name="PitchPointTimeDescription" xml:space="preserve"><value>从音符起点开始的位置。480 个 tick 为四分音符。</value></data>
+<data name="PitchPointCentsDescription" xml:space="preserve"><value>相对音符音高的偏移。100 音分为半音。</value></data>
 </root>
