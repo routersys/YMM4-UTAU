@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="UTAU/UTAU.csproj" />
+  <Project Path="YukkuriMovieMaker.Generator/YukkuriMovieMaker.Generator/YukkuriMovieMaker.Generator.csproj" />
 </Solution>
