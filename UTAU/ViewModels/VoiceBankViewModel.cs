@@ -71,7 +71,7 @@ internal sealed class VoiceBankViewModel(VoiceBank bank)
                 $"{(subBank.Color.Length == 0 ? Texts.DefaultColor : subBank.Color)} / {subBank.Prefix}*{subBank.Suffix} / {string.Join(", ", subBank.ToneRanges)}"));
 
         items.AddRange(bank.Character.AdditionalEntries.Select(x => new VoiceBankInformation(x.Key, x.Value)));
-        items.AddRange(bank.CharacterYaml.Scalars.Select(x => new VoiceBankInformation(x.Key, x.Value)));
+        items.AddRange(bank.CharacterYaml.EnumerateAdditionalScalars().Select(x => new VoiceBankInformation(x.Key, x.Value)));
         items.Add(new VoiceBankInformation(Texts.InfoPath, bank.RootDirectory));
         return items;
     }

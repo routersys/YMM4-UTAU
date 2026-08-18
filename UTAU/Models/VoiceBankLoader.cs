@@ -95,19 +95,14 @@ internal static class VoiceBankLoader
             ? CharacterProfile.Empty
             : CharacterProfileParser.Parse(content, rootDirectory);
 
-        var yamlName = yaml.Find("name");
-        var yamlImage = CharacterProfileParser.ResolveRelativePath(rootDirectory, yaml.Find("image"));
-        if (yamlName is null && yamlImage is null)
-            return profile;
-
         return new CharacterProfile
         {
-            Name = profile.Name ?? yamlName,
-            Author = profile.Author,
-            Web = profile.Web,
-            Version = profile.Version,
-            ImagePath = profile.ImagePath ?? yamlImage,
-            SamplePath = profile.SamplePath,
+            Name = profile.Name ?? yaml.Find("name"),
+            Author = profile.Author ?? yaml.Find("author") ?? yaml.Find("voice"),
+            Web = profile.Web ?? yaml.Find("web"),
+            Version = profile.Version ?? yaml.Find("version"),
+            ImagePath = profile.ImagePath ?? CharacterProfileParser.ResolveRelativePath(rootDirectory, yaml.Find("image")),
+            SamplePath = profile.SamplePath ?? CharacterProfileParser.ResolveRelativePath(rootDirectory, yaml.Find("sample")),
             AdditionalEntries = profile.AdditionalEntries,
         };
     }

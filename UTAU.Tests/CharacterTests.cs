@@ -195,6 +195,72 @@ public sealed class CharacterYamlReaderTests
     }
 
     [Fact]
+    public void EveryDocumentedTopLevelKeyIsRead()
+    {
+        var yaml = CharacterYamlReader.Parse(
+            """
+            name: 歌音
+            singer_type: utau
+            text_file_encoding: shift_jis
+            image: icon.png
+            portrait: portrait.png
+            portrait_opacity: 0.67
+            portrait_height: 0
+            author: 作者
+            voice: 声
+            version: 1.2
+            web: https://example.invalid/
+            default_phonemizer: OpenUtau.Plugin.Builtin.JapaneseVCVPhonemizer
+            """);
+
+        Assert.Equal("歌音", yaml.Find("name"));
+        Assert.Equal("utau", yaml.Find("singer_type"));
+        Assert.Equal("shift_jis", yaml.Find("text_file_encoding"));
+        Assert.Equal("icon.png", yaml.Find("image"));
+        Assert.Equal("portrait.png", yaml.Find("portrait"));
+        Assert.Equal("0.67", yaml.Find("portrait_opacity"));
+        Assert.Equal("0", yaml.Find("portrait_height"));
+        Assert.Equal("作者", yaml.Find("author"));
+        Assert.Equal("声", yaml.Find("voice"));
+        Assert.Equal("1.2", yaml.Find("version"));
+        Assert.Equal("https://example.invalid/", yaml.Find("web"));
+        Assert.Equal("OpenUtau.Plugin.Builtin.JapaneseVCVPhonemizer", yaml.Find("default_phonemizer"));
+    }
+
+    [Fact]
+    public void KnownKeysAreNotRepeatedAsAdditionalScalars()
+    {
+        var yaml = CharacterYamlReader.Parse(
+            """
+            name: 歌音
+            author: 作者
+            portrait_opacity: 0.67
+            """);
+        var additional = yaml.EnumerateAdditionalScalars().Select(x => x.Key).ToArray();
+
+        Assert.DoesNotContain("name", additional);
+        Assert.DoesNotContain("author", additional);
+        Assert.Contains("portrait_opacity", additional);
+    }
+
+    [Fact]
+    public void NestedMapsDoNotLeakIntoTheScalars()
+    {
+        var yaml = CharacterYamlReader.Parse(
+            """
+            name: 歌音
+            localized_names:
+              en: Kaon
+              ja: 歌音
+            web: https://example.invalid/
+            """);
+
+        Assert.Equal("歌音", yaml.Find("name"));
+        Assert.Equal("https://example.invalid/", yaml.Find("web"));
+        Assert.DoesNotContain(yaml.Scalars, x => x.Key is "en" or "ja");
+    }
+
+    [Fact]
     public void ColonWithoutSpaceIsNotAMappingSeparator()
         => Assert.Equal("https://example.invalid/", CharacterYamlReader.Parse("web: https://example.invalid/").Find("web"));
 }
