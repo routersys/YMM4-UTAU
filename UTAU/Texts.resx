@@ -183,4 +183,5 @@
 <data name="NoteEditorHint" xml:space="preserve"><value>ノートを上下に動かすと音程が、右端を動かすと長さが変わります。鍵盤を押すと選択中のノートがその音程になります。Ctrlと車輪で横方向、CtrlとShiftと車輪で縦方向に拡大縮小し、Shiftと車輪で横へ移動します。</value></data>
 <data name="FitToWindow" xml:space="preserve"><value>表示範囲に合わせる</value></data>
 <data name="InfoTabInformation" xml:space="preserve"><value>情報</value></data>
+<data name="InfoTabPortrait" xml:space="preserve"><value>立ち絵</value></data>
 </root>

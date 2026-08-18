@@ -27,6 +27,8 @@ internal sealed class VoiceBankViewModel(VoiceBank bank)
 
     public bool HasWeb => !string.IsNullOrWhiteSpace(bank.Character.Web);
 
+    public bool HasPortrait => Portrait is not null;
+
     public ImageSource? Image { get; } = LoadImage(bank.Character.ImagePath);
 
     public ImageSource? Portrait { get; } = LoadImage(bank.PortraitPath);

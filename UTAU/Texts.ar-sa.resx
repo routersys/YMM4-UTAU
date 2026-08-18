@@ -183,4 +183,5 @@
 <data name="NoteEditorHint" xml:space="preserve"><value>اسحب النوتة رأسياً لتغيير درجتها واسحب حافتها اليمنى لتغيير طولها. والنقر على مفتاح ينقل النوتة المحددة إلى تلك الدرجة. مفتاح Ctrl مع العجلة يقرّب أفقياً، وCtrl مع Shift والعجلة يقرّب رأسياً، وShift مع العجلة يمرر أفقياً.</value></data>
 <data name="FitToWindow" xml:space="preserve"><value>ملاءمة العرض</value></data>
 <data name="InfoTabInformation" xml:space="preserve"><value>المعلومات</value></data>
+<data name="InfoTabPortrait" xml:space="preserve"><value>الصورة</value></data>
 </root>

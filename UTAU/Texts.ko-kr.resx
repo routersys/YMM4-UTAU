@@ -183,4 +183,5 @@
 <data name="NoteEditorHint" xml:space="preserve"><value>노트를 위아래로 옮기면 음정이, 오른쪽 끝을 옮기면 길이가 바뀝니다. 건반을 누르면 선택한 노트가 그 음정이 됩니다. Ctrl과 휠로 가로, Ctrl과 Shift와 휠로 세로를 확대 축소하고, Shift와 휠로 가로 이동합니다.</value></data>
 <data name="FitToWindow" xml:space="preserve"><value>보기에 맞추기</value></data>
 <data name="InfoTabInformation" xml:space="preserve"><value>정보</value></data>
+<data name="InfoTabPortrait" xml:space="preserve"><value>일러스트</value></data>
 </root>

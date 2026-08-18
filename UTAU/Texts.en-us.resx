@@ -183,4 +183,5 @@
 <data name="NoteEditorHint" xml:space="preserve"><value>Drag a note vertically to change its pitch and drag its right edge to change its length. Clicking a key moves the selected note to that pitch. Ctrl with the wheel zooms horizontally, Ctrl and Shift with the wheel zooms vertically and Shift with the wheel scrolls sideways.</value></data>
 <data name="FitToWindow" xml:space="preserve"><value>Fit to the view</value></data>
 <data name="InfoTabInformation" xml:space="preserve"><value>Information</value></data>
+<data name="InfoTabPortrait" xml:space="preserve"><value>Portrait</value></data>
 </root>

@@ -63,15 +63,16 @@
             </Expander>
 
             <Expander Header="{x:Static root:Texts.VoiceBankList}" IsExpanded="True">
-                <Grid>
+                <Grid Height="340">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="220"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <ListBox Grid.Column="0" MinHeight="180" MaxHeight="360"
+                    <ListBox Grid.Column="0" Margin="0"
                              ItemsSource="{Binding Banks}"
                              SelectedItem="{Binding SelectedBank}"
-                             HorizontalContentAlignment="Stretch">
+                             HorizontalContentAlignment="Stretch"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
@@ -82,45 +83,37 @@
                                     <Image Grid.Column="0" Width="32" Height="32" Stretch="Uniform" Source="{Binding Image}"/>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                         <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
-                                        <TextBlock Text="{Binding Author}" FontSize="10" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding Author}" FontSize="10" Opacity="0.75" TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
 
-                    <Grid Grid.Column="1" DataContext="{Binding SelectedBank}">
+                    <Grid Grid.Column="1" Margin="0" DataContext="{Binding SelectedBank}">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="108"/>
+                            <RowDefinition Height="26"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <Image Grid.Column="0" MaxWidth="108" Stretch="Uniform" Source="{Binding Portrait}"/>
-                            <Grid Grid.Column="1">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="22"/>
-                                    <RowDefinition Height="22"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Text="{Binding Name}" FontWeight="Bold"
-                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                <TextBlock Grid.Row="1" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
-                                           Visibility="{Binding HasWeb, Converter={StaticResource BooleanToVisibility}}">
-                                    <Hyperlink Command="{Binding Source={x:Static ps:CommandSettings.Default}, Path=[OpenUri]}" CommandParameter="{Binding Web}">
-                                        <Run Text="{Binding Web, Mode=OneWay}"/>
-                                    </Hyperlink>
-                                </TextBlock>
-                                <TextBlock Grid.Row="2" Text="{Binding Author}" VerticalAlignment="Top"
-                                           TextTrimming="CharacterEllipsis" Opacity="0.75"/>
-                            </Grid>
+                            <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Bold"
+                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Column="1" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                       Visibility="{Binding HasWeb, Converter={StaticResource BooleanToVisibility}}">
+                                <Hyperlink Command="{Binding Source={x:Static ps:CommandSettings.Default}, Path=[OpenUri]}" CommandParameter="{Binding Web}">
+                                    <Run Text="{Binding Web, Mode=OneWay}"/>
+                                </Hyperlink>
+                            </TextBlock>
                         </Grid>
-                        <TabControl Grid.Row="1" MinHeight="180" MaxHeight="260">
+                        <TabControl Grid.Row="1" Margin="0" Padding="0">
                             <TabItem Header="{x:Static root:Texts.InfoTabInformation}">
                                 <DataGrid ItemsSource="{Binding Information}"
+                                          Margin="0"
+                                          BorderThickness="0"
                                           AutoGenerateColumns="False"
                                           CanUserAddRows="False"
                                           CanUserDeleteRows="False"
@@ -135,11 +128,15 @@
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </TabItem>
-                            <TabItem Header="{x:Static root:Texts.InfoReadme}"
-                                     IsEnabled="{Binding HasReadme}">
+                            <TabItem Header="{x:Static root:Texts.InfoTabPortrait}" IsEnabled="{Binding HasPortrait}">
+                                <Image Source="{Binding Portrait}" Stretch="Uniform" StretchDirection="DownOnly"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </TabItem>
+                            <TabItem Header="{x:Static root:Texts.InfoReadme}" IsEnabled="{Binding HasReadme}">
                                 <TextBox Text="{Binding Readme, Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap"
+                                         Margin="0" BorderThickness="0" Background="Transparent"
                                          VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
-                                         AcceptsReturn="True" BorderThickness="0" Background="Transparent"/>
+                                         AcceptsReturn="True"/>
                             </TabItem>
                         </TabControl>
                     </Grid>
