@@ -245,6 +245,7 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
                 dragPoint,
                 Math.Clamp(ticks, 0, owner.Note.LengthTicks),
                 viewModel.CentsFromCanvasY(position.Y, owner.Note.Tone));
+            viewModel.ShowPitchGuide(dragPoint);
             return;
         }
 

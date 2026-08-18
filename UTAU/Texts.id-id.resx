@@ -185,4 +185,7 @@
 <data name="ResetExpression" xml:space="preserve"><value>Setel ulang ekspresi</value></data>
 <data name="ExpressionHint" xml:space="preserve"><value>Seret vertikal untuk mengubah nilai. Item per not digambar sebagai batang dan item kurva sebagai garis.</value></data>
 <data name="PitchHandleHint" xml:space="preserve"><value>Seret untuk mengubah nada. Klik kanan untuk menghapus.</value></data>
+<data name="PitchPointTime" xml:space="preserve"><value>Waktu</value></data>
+<data name="PitchPointCents" xml:space="preserve"><value>Sen</value></data>
+<data name="PitchGuideFormat" xml:space="preserve"><value>{0} tick / {1} cent</value></data>
 </root>

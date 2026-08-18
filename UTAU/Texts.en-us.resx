@@ -185,4 +185,7 @@
 <data name="ResetExpression" xml:space="preserve"><value>Reset the expression</value></data>
 <data name="ExpressionHint" xml:space="preserve"><value>Drag vertically to change the value. Note level items are drawn as bars and curve items as a line.</value></data>
 <data name="PitchHandleHint" xml:space="preserve"><value>Drag to change the pitch. Right click to remove it.</value></data>
+<data name="PitchPointTime" xml:space="preserve"><value>Time</value></data>
+<data name="PitchPointCents" xml:space="preserve"><value>Cents</value></data>
+<data name="PitchGuideFormat" xml:space="preserve"><value>{0} tick / {1} cent</value></data>
 </root>

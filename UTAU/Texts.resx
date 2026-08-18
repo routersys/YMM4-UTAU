@@ -185,4 +185,7 @@
 <data name="ResetExpression" xml:space="preserve"><value>表現を戻す</value></data>
 <data name="ExpressionHint" xml:space="preserve"><value>上下に引くと値が変わります。ノート単位の項目は棒、曲線の項目は線として描かれます。</value></data>
 <data name="PitchHandleHint" xml:space="preserve"><value>引くと音程が変わります。右押しで削除します。</value></data>
+<data name="PitchPointTime" xml:space="preserve"><value>時間</value></data>
+<data name="PitchPointCents" xml:space="preserve"><value>セント</value></data>
+<data name="PitchGuideFormat" xml:space="preserve"><value>{0} tick / {1} cent</value></data>
 </root>

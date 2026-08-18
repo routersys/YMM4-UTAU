@@ -504,3 +504,84 @@ public sealed class CurveRenderingTests : IDisposable
         Assert.True(samples.Max(Math.Abs) > 0.001);
     }
 }
+
+public sealed class PitchPointValueTests
+{
+    static NoteEditorViewModel CreateViewModel(out UTAUVoicePronounce pronounce)
+    {
+        pronounce = new UTAUVoicePronounce();
+        pronounce.Notes.Add(new UTAUNote { Lyric = "あ", Tone = 60, LengthTicks = 480 });
+        var viewModel = new NoteEditorViewModel(pronounce);
+        viewModel.FitToViewport(800.0, 400.0);
+        return viewModel;
+    }
+
+    [Fact]
+    public void TheSelectedPointExposesItsExactValues()
+    {
+        var viewModel = CreateViewModel(out var pronounce);
+        viewModel.AddPitchPointAt(240, -125.0);
+
+        var point = Assert.Single(pronounce.Notes[0].PitchPoints);
+        Assert.Same(point, viewModel.SelectedPitchPoint);
+        Assert.Equal(240, viewModel.SelectedPitchPoint!.Ticks);
+        Assert.Equal(-125.0, viewModel.SelectedPitchPoint.Cents, 9);
+    }
+
+    [Fact]
+    public void TypedValuesAreAppliedAndRedrawTheCurve()
+    {
+        var viewModel = CreateViewModel(out var pronounce);
+        viewModel.AddPitchPointAt(0, 0.0);
+        var point = pronounce.Notes[0].PitchPoints[0];
+        var before = viewModel.PitchCurve;
+
+        point.Ticks = 360;
+        point.Cents = 275.0;
+
+        Assert.Equal(360, point.Ticks);
+        Assert.Equal(275.0, point.Cents, 9);
+        Assert.NotSame(before, viewModel.PitchCurve);
+    }
+
+    [Fact]
+    public void TypedValuesAreClampedToTheDeclaredRange()
+    {
+        var point = new PitchPoint();
+        point.Ticks = PitchPoint.MinimumTicks - 1000;
+        point.Cents = PitchPoint.MaximumCents + 1000.0;
+
+        Assert.Equal(PitchPoint.MinimumTicks, point.Ticks);
+        Assert.Equal(PitchPoint.MaximumCents, point.Cents, 9);
+    }
+
+    [Fact]
+    public void DraggingReportsTheValuesThroughTheGuide()
+    {
+        var viewModel = CreateViewModel(out var pronounce);
+        viewModel.AddPitchPointAt(120, -50.0);
+        var point = pronounce.Notes[0].PitchPoints[0];
+
+        viewModel.ShowPitchGuide(point);
+
+        Assert.True(viewModel.IsGuideVisible);
+        Assert.Contains("120", viewModel.GuideText);
+        Assert.Contains("-50", viewModel.GuideText);
+    }
+
+    [Fact]
+    public void TheHandlePositionAgreesWithTheTypedValues()
+    {
+        var viewModel = CreateViewModel(out var pronounce);
+        viewModel.AddPitchPointAt(0, 0.0);
+        var point = pronounce.Notes[0].PitchPoints[0];
+
+        point.Ticks = 240;
+        point.Cents = 100.0;
+
+        var handle = Assert.Single(viewModel.PitchHandles);
+        var expected = viewModel.ToCanvasPoint(240, 61.0);
+        Assert.Equal(expected.X - NoteEditorViewModel.PitchHandleSize / 2.0, handle.Left, 6);
+        Assert.Equal(expected.Y - NoteEditorViewModel.PitchHandleSize / 2.0, handle.Top, 6);
+    }
+}

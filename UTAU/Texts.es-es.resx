@@ -185,4 +185,7 @@
 <data name="ResetExpression" xml:space="preserve"><value>Restablecer la expresión</value></data>
 <data name="ExpressionHint" xml:space="preserve"><value>Arrastre verticalmente para cambiar el valor. Los elementos por nota se dibujan como barras y los de curva como una línea.</value></data>
 <data name="PitchHandleHint" xml:space="preserve"><value>Arrastre para cambiar el tono. Haga clic derecho para quitarlo.</value></data>
+<data name="PitchPointTime" xml:space="preserve"><value>Tiempo</value></data>
+<data name="PitchPointCents" xml:space="preserve"><value>Centésimas</value></data>
+<data name="PitchGuideFormat" xml:space="preserve"><value>{0} tick / {1} cent</value></data>
 </root>

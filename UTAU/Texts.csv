@@ -125,3 +125,6 @@ ExpressionLabel,,表現,Expression,表现,表現,표현,Expresión,التعبي�
 ResetExpression,,表現を戻す,Reset the expression,重置表现,重設表現,표현 되돌리기,Restablecer la expresión,إعادة ضبط التعبير,Setel ulang ekspresi
 ExpressionHint,,上下に引くと値が変わります。ノート単位の項目は棒、曲線の項目は線として描かれます。,Drag vertically to change the value. Note level items are drawn as bars and curve items as a line.,上下拖动可改变数值。音符单位的项目绘制为柱，曲线项目绘制为线。,上下拖曳可改變數值。音符單位的項目繪製為柱，曲線項目繪製為線。,"위아래로 끌면 값이 바뀝니다. 노트 단위 항목은 막대로, 곡선 항목은 선으로 그려집니다.",Arrastre verticalmente para cambiar el valor. Los elementos por nota se dibujan como barras y los de curva como una línea.,اسحب رأسياً لتغيير القيمة. تُرسم عناصر مستوى النوتة كأعمدة وعناصر المنحنى كخط.,Seret vertikal untuk mengubah nilai. Item per not digambar sebagai batang dan item kurva sebagai garis.
 PitchHandleHint,,引くと音程が変わります。右押しで削除します。,Drag to change the pitch. Right click to remove it.,拖动可改变音高。右键点击可删除。,拖曳可改變音高。右鍵點擊可刪除。,끌면 음정이 바뀝니다. 오른쪽 클릭으로 삭제합니다.,Arrastre para cambiar el tono. Haga clic derecho para quitarlo.,اسحب لتغيير الدرجة. انقر بالزر الأيمن لحذفها.,Seret untuk mengubah nada. Klik kanan untuk menghapus.
+PitchPointTime,,時間,Time,时间,時間,시간,Tiempo,الزمن,Waktu
+PitchPointCents,,セント,Cents,音分,音分,센트,Centésimas,السنت,Sen
+PitchGuideFormat,,{0} tick / {1} cent,{0} tick / {1} cent,{0} tick / {1} cent,{0} tick / {1} cent,{0} tick / {1} cent,{0} tick / {1} cent,{0} tick / {1} cent,{0} tick / {1} cent

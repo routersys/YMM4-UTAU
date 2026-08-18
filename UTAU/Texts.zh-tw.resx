@@ -185,4 +185,7 @@
 <data name="ResetExpression" xml:space="preserve"><value>重設表現</value></data>
 <data name="ExpressionHint" xml:space="preserve"><value>上下拖曳可改變數值。音符單位的項目繪製為柱，曲線項目繪製為線。</value></data>
 <data name="PitchHandleHint" xml:space="preserve"><value>拖曳可改變音高。右鍵點擊可刪除。</value></data>
+<data name="PitchPointTime" xml:space="preserve"><value>時間</value></data>
+<data name="PitchPointCents" xml:space="preserve"><value>音分</value></data>
+<data name="PitchGuideFormat" xml:space="preserve"><value>{0} tick / {1} cent</value></data>
 </root>

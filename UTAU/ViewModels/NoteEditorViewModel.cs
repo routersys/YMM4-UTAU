@@ -440,6 +440,13 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         IsGuideVisible = true;
     }
 
+    public void ShowPitchGuide(PitchPoint point)
+    {
+        GuideLeft = (SelectedNote?.StartTicks ?? 0) * PixelsPerTick + point.Ticks * PixelsPerTick;
+        GuideText = string.Format(Texts.PitchGuideFormat, point.Ticks, Math.Round(point.Cents));
+        IsGuideVisible = true;
+    }
+
     public void HideGuide()
     {
         IsGuideVisible = false;
