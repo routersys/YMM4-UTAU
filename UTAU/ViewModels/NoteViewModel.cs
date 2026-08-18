@@ -9,6 +9,7 @@ internal sealed class NoteViewModel : Bindable, IDisposable
 {
     readonly NoteEditorViewModel owner;
     bool isSelected;
+    bool isPrimary;
     int startTicks;
 
     public NoteViewModel(UTAUNote note, NoteEditorViewModel owner)
@@ -30,6 +31,12 @@ internal sealed class NoteViewModel : Bindable, IDisposable
     {
         get => isSelected;
         set => Set(ref isSelected, value);
+    }
+
+    public bool IsPrimary
+    {
+        get => isPrimary;
+        set => Set(ref isPrimary, value);
     }
 
     public bool IsRest => Note.IsRest;
