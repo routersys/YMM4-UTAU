@@ -29,8 +29,12 @@ internal sealed class UTAUNote : UndoRedoable
     double overlapOverride;
     double fadeInMilliseconds = DefaultFadeInMilliseconds;
     double fadeOutMilliseconds = DefaultFadeOutMilliseconds;
-    VibratoSettings vibrato = new();
-    ObservableCollection<PitchPoint> pitchPoints = [];
+
+    public UTAUNote()
+    {
+        SubscribeChildUndoRedoable(Vibrato);
+        SubscribeObservableCollectionChangedAndChild(PitchPoints);
+    }
 
     [Display(GroupName = nameof(Texts.NoteGroupBasic), Name = nameof(Texts.NoteLyric), Description = nameof(Texts.NoteLyricDescription), ResourceType = typeof(Texts))]
     [TextEditor]
@@ -139,18 +143,10 @@ internal sealed class UTAUNote : UndoRedoable
     }
 
     [Display(AutoGenerateField = true)]
-    public VibratoSettings Vibrato
-    {
-        get => vibrato;
-        set => Set(ref vibrato, value ?? new VibratoSettings());
-    }
+    public VibratoSettings Vibrato { get; } = new();
 
     [Browsable(false)]
-    public ObservableCollection<PitchPoint> PitchPoints
-    {
-        get => pitchPoints;
-        set => Set(ref pitchPoints, value ?? []);
-    }
+    public ObservableCollection<PitchPoint> PitchPoints { get; } = [];
 
     [Browsable(false)]
     public bool IsRest => Lyric.Length == 0 || Lyric == RestLyric || Lyric == "-";
@@ -173,8 +169,8 @@ internal sealed class UTAUNote : UndoRedoable
             OverlapOverride = OverlapOverride,
             FadeInMilliseconds = FadeInMilliseconds,
             FadeOutMilliseconds = FadeOutMilliseconds,
-            Vibrato = Vibrato.Clone(),
         };
+        Vibrato.CopyTo(clone.Vibrato);
         foreach (var point in PitchPoints)
             clone.PitchPoints.Add(point.Clone());
         return clone;

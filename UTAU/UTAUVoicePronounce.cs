@@ -12,16 +12,13 @@ namespace UTAU;
 internal sealed class UTAUVoicePronounce : UndoRedoable, IVoicePronounce
 {
     string sourceText = string.Empty;
-    ObservableCollection<UTAUNote> notes = [];
     LipSyncFrame[]? lipSyncFrames;
+
+    public UTAUVoicePronounce() => SubscribeObservableCollectionChangedAndChild(Notes);
 
     [Display(Name = nameof(Texts.PronounceNotes), Description = nameof(Texts.PronounceNotesDescription), ResourceType = typeof(Texts))]
     [NoteEditor]
-    public ObservableCollection<UTAUNote> Notes
-    {
-        get => notes;
-        set => Set(ref notes, value ?? []);
-    }
+    public ObservableCollection<UTAUNote> Notes { get; } = [];
 
     [Browsable(false)]
     public string SourceText

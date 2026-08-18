@@ -88,16 +88,17 @@ internal sealed class VibratoSettings : UndoRedoable
     [Browsable(false)]
     public bool IsEnabled => LengthPercent > 0.0 && DepthCents > 0.0;
 
-    public VibratoSettings Clone() => new()
+    public void CopyTo(VibratoSettings destination)
     {
-        LengthPercent = LengthPercent,
-        PeriodMilliseconds = PeriodMilliseconds,
-        DepthCents = DepthCents,
-        FadeInPercent = FadeInPercent,
-        FadeOutPercent = FadeOutPercent,
-        PhasePercent = PhasePercent,
-        OffsetPercent = OffsetPercent,
-    };
+        ArgumentNullException.ThrowIfNull(destination);
+        destination.LengthPercent = LengthPercent;
+        destination.PeriodMilliseconds = PeriodMilliseconds;
+        destination.DepthCents = DepthCents;
+        destination.FadeInPercent = FadeInPercent;
+        destination.FadeOutPercent = FadeOutPercent;
+        destination.PhasePercent = PhasePercent;
+        destination.OffsetPercent = OffsetPercent;
+    }
 
     public double Evaluate(double millisecondsFromNoteStart, double noteLengthMilliseconds)
     {
