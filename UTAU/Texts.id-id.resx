@@ -177,7 +177,7 @@
 <data name="SnapLabel" xml:space="preserve"><value>Pengancingan</value></data>
 <data name="ZoomVerticalIn" xml:space="preserve"><value>Perbesar vertikal</value></data>
 <data name="ZoomVerticalOut" xml:space="preserve"><value>Perkecil vertikal</value></data>
-<data name="NoteEditorHint" xml:space="preserve"><value>Seret not secara vertikal untuk mengubah nada dan seret tepi kanannya untuk mengubah panjangnya. Menekan tuts memindahkan not terpilih ke nada tersebut. Ctrl dengan roda memperbesar mendatar, Ctrl dan Shift dengan roda memperbesar tegak, dan Shift dengan roda menggulir mendatar.</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>Seret not secara vertikal untuk mengubah nada dan seret tepi kanannya untuk mengubah panjangnya. Ctrl dan klik menambahkan not ke pilihan atau mengeluarkannya, Shift dan klik memilih rentang, dan menyeret di ruang kosong memilih not di dalam kotak. Menekan tuts memindahkan not utama ke nada tersebut dan menggeser sisa pilihan sebanyak itu juga. Ctrl dengan roda memperbesar mendatar, Ctrl dan Shift dengan roda memperbesar tegak, dan Shift dengan roda menggulir mendatar.</value></data>
 <data name="FitToWindow" xml:space="preserve"><value>Sesuaikan tampilan</value></data>
 <data name="InfoTabInformation" xml:space="preserve"><value>Informasi</value></data>
 <data name="InfoTabPortrait" xml:space="preserve"><value>Potret</value></data>
@@ -191,4 +191,6 @@
 <data name="NoteGroupPortamento" xml:space="preserve"><value>Portamento</value></data>
 <data name="PitchPointTimeDescription" xml:space="preserve"><value>Posisi dari awal not. 480 tik sama dengan satu not seperempat.</value></data>
 <data name="PitchPointCentsDescription" xml:space="preserve"><value>Selisih dari nada not. 100 sen sama dengan satu seminada.</value></data>
+<data name="SelectAllNotes" xml:space="preserve"><value>Pilih semua not</value></data>
+<data name="SelectionCountFormat" xml:space="preserve"><value>{0} not terpilih</value></data>
 </root>

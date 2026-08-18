@@ -177,7 +177,7 @@
 <data name="SnapLabel" xml:space="preserve"><value>吸着</value></data>
 <data name="ZoomVerticalIn" xml:space="preserve"><value>縦に拡大</value></data>
 <data name="ZoomVerticalOut" xml:space="preserve"><value>縦に縮小</value></data>
-<data name="NoteEditorHint" xml:space="preserve"><value>ノートを上下に動かすと音程が、右端を動かすと長さが変わります。鍵盤を押すと選択中のノートがその音程になります。Ctrlと車輪で横方向、CtrlとShiftと車輪で縦方向に拡大縮小し、Shiftと車輪で横へ移動します。</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>ノートを上下に動かすと音程が、右端を動かすと長さが変わります。Ctrlを押しながらノートを押すと選択へ加えたり外したりでき、Shiftを押しながら押すと範囲で選び、何もない所を引くと囲んで選びます。鍵盤を押すと主となるノートがその音程になり、他の選択も同じだけ動きます。Ctrlと車輪で横方向、CtrlとShiftと車輪で縦方向に拡大縮小し、Shiftと車輪で横へ移動します。</value></data>
 <data name="FitToWindow" xml:space="preserve"><value>表示範囲に合わせる</value></data>
 <data name="InfoTabInformation" xml:space="preserve"><value>情報</value></data>
 <data name="InfoTabPortrait" xml:space="preserve"><value>立ち絵</value></data>
@@ -191,4 +191,6 @@
 <data name="NoteGroupPortamento" xml:space="preserve"><value>ポルタメント</value></data>
 <data name="PitchPointTimeDescription" xml:space="preserve"><value>ノートの先頭からの位置です。480ティックが四分音符です。</value></data>
 <data name="PitchPointCentsDescription" xml:space="preserve"><value>ノートの音程からのずれです。100セントが半音です。</value></data>
+<data name="SelectAllNotes" xml:space="preserve"><value>すべてのノートを選択</value></data>
+<data name="SelectionCountFormat" xml:space="preserve"><value>{0} 個を選択中</value></data>
 </root>

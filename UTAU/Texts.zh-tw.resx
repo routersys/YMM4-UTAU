@@ -177,7 +177,7 @@
 <data name="SnapLabel" xml:space="preserve"><value>吸附</value></data>
 <data name="ZoomVerticalIn" xml:space="preserve"><value>縱向放大</value></data>
 <data name="ZoomVerticalOut" xml:space="preserve"><value>縱向縮小</value></data>
-<data name="NoteEditorHint" xml:space="preserve"><value>上下拖曳音符可改變音高，拖曳右端可改變長度。點擊琴鍵可將所選音符移到該音高。Ctrl 加滾輪橫向縮放，Ctrl 加 Shift 加滾輪縱向縮放，Shift 加滾輪橫向捲動。</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>上下拖曳音符可改變音高，拖曳右端可改變長度。按住 Ctrl 點擊可將音符加入或移出選擇，按住 Shift 點擊可選擇範圍，在空白處拖曳可框選。點擊琴鍵會將主音符移到該音高，其餘所選音符同步移動相同的音程。Ctrl 加滾輪橫向縮放，Ctrl 加 Shift 加滾輪縱向縮放，Shift 加滾輪橫向捲動。</value></data>
 <data name="FitToWindow" xml:space="preserve"><value>適應視圖</value></data>
 <data name="InfoTabInformation" xml:space="preserve"><value>資訊</value></data>
 <data name="InfoTabPortrait" xml:space="preserve"><value>立繪</value></data>
@@ -191,4 +191,6 @@
 <data name="NoteGroupPortamento" xml:space="preserve"><value>滑音</value></data>
 <data name="PitchPointTimeDescription" xml:space="preserve"><value>從音符起點開始的位置。480 個 tick 為四分音符。</value></data>
 <data name="PitchPointCentsDescription" xml:space="preserve"><value>相對音符音高的偏移。100 音分為半音。</value></data>
+<data name="SelectAllNotes" xml:space="preserve"><value>選擇所有音符</value></data>
+<data name="SelectionCountFormat" xml:space="preserve"><value>已選擇 {0} 個音符</value></data>
 </root>

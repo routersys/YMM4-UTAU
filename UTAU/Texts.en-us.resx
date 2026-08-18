@@ -177,7 +177,7 @@
 <data name="SnapLabel" xml:space="preserve"><value>Snap</value></data>
 <data name="ZoomVerticalIn" xml:space="preserve"><value>Zoom in vertically</value></data>
 <data name="ZoomVerticalOut" xml:space="preserve"><value>Zoom out vertically</value></data>
-<data name="NoteEditorHint" xml:space="preserve"><value>Drag a note vertically to change its pitch and drag its right edge to change its length. Clicking a key moves the selected note to that pitch. Ctrl with the wheel zooms horizontally, Ctrl and Shift with the wheel zooms vertically and Shift with the wheel scrolls sideways.</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>Drag a note vertically to change its pitch and drag its right edge to change its length. Ctrl and a click add a note to the selection or take it out, Shift and a click select a range, and dragging over empty space selects the notes inside the box. Clicking a key moves the primary note to that pitch and shifts the rest of the selection by the same amount. Ctrl with the wheel zooms horizontally, Ctrl and Shift with the wheel zooms vertically and Shift with the wheel scrolls sideways.</value></data>
 <data name="FitToWindow" xml:space="preserve"><value>Fit to the view</value></data>
 <data name="InfoTabInformation" xml:space="preserve"><value>Information</value></data>
 <data name="InfoTabPortrait" xml:space="preserve"><value>Portrait</value></data>
@@ -191,4 +191,6 @@
 <data name="NoteGroupPortamento" xml:space="preserve"><value>Portamento</value></data>
 <data name="PitchPointTimeDescription" xml:space="preserve"><value>The position from the head of the note. 480 ticks is a quarter note.</value></data>
 <data name="PitchPointCentsDescription" xml:space="preserve"><value>The offset from the pitch of the note. 100 cents is a semitone.</value></data>
+<data name="SelectAllNotes" xml:space="preserve"><value>Select all the notes</value></data>
+<data name="SelectionCountFormat" xml:space="preserve"><value>{0} notes selected</value></data>
 </root>

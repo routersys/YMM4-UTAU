@@ -177,7 +177,7 @@
 <data name="SnapLabel" xml:space="preserve"><value>스냅</value></data>
 <data name="ZoomVerticalIn" xml:space="preserve"><value>세로 확대</value></data>
 <data name="ZoomVerticalOut" xml:space="preserve"><value>세로 축소</value></data>
-<data name="NoteEditorHint" xml:space="preserve"><value>노트를 위아래로 옮기면 음정이, 오른쪽 끝을 옮기면 길이가 바뀝니다. 건반을 누르면 선택한 노트가 그 음정이 됩니다. Ctrl과 휠로 가로, Ctrl과 Shift와 휠로 세로를 확대 축소하고, Shift와 휠로 가로 이동합니다.</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>노트를 위아래로 옮기면 음정이, 오른쪽 끝을 옮기면 길이가 바뀝니다. Ctrl과 함께 누르면 선택에 넣거나 뺄 수 있고, Shift와 함께 누르면 범위로 선택하며, 빈 곳을 끌면 둘러싸서 선택합니다. 건반을 누르면 주가 되는 노트가 그 음정이 되고 다른 선택도 같은 만큼 움직입니다. Ctrl과 휠로 가로, Ctrl과 Shift와 휠로 세로를 확대 축소하고, Shift와 휠로 가로 이동합니다.</value></data>
 <data name="FitToWindow" xml:space="preserve"><value>보기에 맞추기</value></data>
 <data name="InfoTabInformation" xml:space="preserve"><value>정보</value></data>
 <data name="InfoTabPortrait" xml:space="preserve"><value>일러스트</value></data>
@@ -191,4 +191,6 @@
 <data name="NoteGroupPortamento" xml:space="preserve"><value>포르타멘토</value></data>
 <data name="PitchPointTimeDescription" xml:space="preserve"><value>노트 앞부분부터의 위치입니다. 480틱이 4분음표입니다.</value></data>
 <data name="PitchPointCentsDescription" xml:space="preserve"><value>노트 음정으로부터의 차이입니다. 100센트가 반음입니다.</value></data>
+<data name="SelectAllNotes" xml:space="preserve"><value>모든 노트 선택</value></data>
+<data name="SelectionCountFormat" xml:space="preserve"><value>{0}개 선택 중</value></data>
 </root>

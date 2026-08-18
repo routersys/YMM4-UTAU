@@ -177,7 +177,7 @@
 <data name="SnapLabel" xml:space="preserve"><value>المحاذاة</value></data>
 <data name="ZoomVerticalIn" xml:space="preserve"><value>تكبير رأسي</value></data>
 <data name="ZoomVerticalOut" xml:space="preserve"><value>تصغير رأسي</value></data>
-<data name="NoteEditorHint" xml:space="preserve"><value>اسحب النوتة رأسياً لتغيير درجتها واسحب حافتها اليمنى لتغيير طولها. والنقر على مفتاح ينقل النوتة المحددة إلى تلك الدرجة. مفتاح Ctrl مع العجلة يقرّب أفقياً، وCtrl مع Shift والعجلة يقرّب رأسياً، وShift مع العجلة يمرر أفقياً.</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>اسحب النوتة رأسياً لتغيير درجتها واسحب حافتها اليمنى لتغيير طولها. والنقر مع Ctrl يضيف النوتة إلى التحديد أو يزيلها، والنقر مع Shift يحدد نطاقاً، والسحب فوق مساحة فارغة يحدد النوتات داخل الإطار. والنقر على مفتاح ينقل النوتة الرئيسية إلى تلك الدرجة وينقل بقية التحديد بالمقدار نفسه. مفتاح Ctrl مع العجلة يقرّب أفقياً، وCtrl مع Shift والعجلة يقرّب رأسياً، وShift مع العجلة يمرر أفقياً.</value></data>
 <data name="FitToWindow" xml:space="preserve"><value>ملاءمة العرض</value></data>
 <data name="InfoTabInformation" xml:space="preserve"><value>المعلومات</value></data>
 <data name="InfoTabPortrait" xml:space="preserve"><value>الصورة</value></data>
@@ -191,4 +191,6 @@
 <data name="NoteGroupPortamento" xml:space="preserve"><value>الانزلاق</value></data>
 <data name="PitchPointTimeDescription" xml:space="preserve"><value>الموضع من بداية النوتة. 480 نبضة تساوي نوتة ربعية.</value></data>
 <data name="PitchPointCentsDescription" xml:space="preserve"><value>الانحراف عن درجة النوتة. 100 سنت تساوي نصف نغمة.</value></data>
+<data name="SelectAllNotes" xml:space="preserve"><value>تحديد كل النوتات</value></data>
+<data name="SelectionCountFormat" xml:space="preserve"><value>تم تحديد {0} نوتة</value></data>
 </root>
