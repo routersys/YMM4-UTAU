@@ -50,6 +50,8 @@
                             Content="{DynamicResource {x:Static icons:IconKeys.Plus}}"/>
                     <Button Width="26" Height="26" Command="{Binding RemoveNoteCommand}" ToolTip="{x:Static root:Texts.RemoveNote}"
                             Content="{DynamicResource {x:Static icons:IconKeys.Delete}}"/>
+                    <Button Width="26" Height="26" Command="{Binding SelectAllCommand}" ToolTip="{x:Static root:Texts.SelectAllNotes}"
+                            Content="{DynamicResource {x:Static icons:IconKeys.SelectAll}}"/>
                     <TextBlock Text="{x:Static root:Texts.SnapLabel}" VerticalAlignment="Center" Margin="6,0,3,0"/>
                     <ComboBox Width="88" VerticalAlignment="Center"
                               ItemsSource="{Binding SnapDivisions}"
@@ -62,6 +64,7 @@
                               DisplayMemberPath="Name"/>
                     <Button Width="26" Height="26" Command="{Binding ResetExpressionCommand}" ToolTip="{x:Static root:Texts.ResetExpression}"
                             Content="{DynamicResource {x:Static icons:IconKeys.Restore}}"/>
+                    <TextBlock Text="{Binding SelectionText}" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.75"/>
                     <TextBlock Text="{Binding GuideText}" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.75"/>
                 </StackPanel>
 
@@ -201,9 +204,22 @@
                                                         </Style>
                                                     </Border.Style>
                                                 </Border>
-                                                <Border BorderThickness="2" IsHitTestVisible="False"
+                                                <Border IsHitTestVisible="False"
                                                         BorderBrush="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"
-                                                        Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibility}}"/>
+                                                        Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibility}}">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Setter Property="BorderThickness" Value="1"/>
+                                                            <Setter Property="Opacity" Value="0.55"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsPrimary}" Value="True">
+                                                                    <Setter Property="BorderThickness" Value="2"/>
+                                                                    <Setter Property="Opacity" Value="1"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                </Border>
                                                 <TextBlock Text="{Binding Display}" FontSize="10" Margin="4,0,0,0"
                                                            VerticalAlignment="Center" ClipToBounds="True" IsHitTestVisible="False"
                                                            Foreground="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
@@ -250,6 +266,15 @@
                                            Opacity="0.6"
                                            IsHitTestVisible="False"
                                            Visibility="{Binding IsGuideVisible, Converter={StaticResource BooleanToVisibility}}"/>
+
+                                <Rectangle Panel.ZIndex="5" IsHitTestVisible="False" StrokeThickness="1" Opacity="0.35"
+                                           Canvas.Left="{Binding SelectionBoxLeft}"
+                                           Canvas.Top="{Binding SelectionBoxTop}"
+                                           Width="{Binding SelectionBoxWidth}"
+                                           Height="{Binding SelectionBoxHeight}"
+                                           Fill="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"
+                                           Stroke="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"
+                                           Visibility="{Binding IsSelectionBoxVisible, Converter={StaticResource BooleanToVisibility}}"/>
                             </Canvas>
                         </ScrollViewer>
                     </Grid>
@@ -343,7 +368,7 @@
                     </Grid.RowDefinitions>
                     <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                         <StackPanel>
-                            <c:PropertiesEditor Target="{Binding SelectedNote.Note}" IsScrollViewerEnabled="False"/>
+                            <c:PropertiesEditor Targets="{Binding SelectedNoteTargets}" IsScrollViewerEnabled="False"/>
                             <c:PropertiesEditor Target="{Binding SelectedPitchPoint}" IsScrollViewerEnabled="False"/>
                         </StackPanel>
                     </ScrollViewer>
