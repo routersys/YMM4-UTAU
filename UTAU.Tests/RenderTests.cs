@@ -112,12 +112,12 @@ public sealed class UtauRendererTests : IDisposable
 
     public void Dispose() => TestVoiceBank.DeleteDirectory(directory);
 
-    RenderResult Render(VoiceBank bank, string text, RenderSettings? settings = null, double tempo = 120.0, double speed = 1.0)
+    RenderResult Render(VoiceBank bank, string text, RenderSettings? settings = null, RenderCurves? curves = null, double tempo = 120.0, double speed = 1.0)
     {
         var notes = NoteSequenceBuilder.Build(text, NoteBuildOptions.Create(60));
         var units = Phonemizer.Phonemize(bank, notes, null, PhonemizeOptions.Default, new TimeBase(tempo, speed));
         using var arena = new WorldArena();
-        return new UtauRenderer(settings ?? RenderSettings.Default with { Estimator = F0Estimator.Dio }, cache).Render(units, arena);
+        return new UtauRenderer(settings ?? RenderSettings.Default with { Estimator = F0Estimator.Dio }, curves ?? RenderCurves.Empty, cache).Render(units, arena);
     }
 
     static double Peak(double[] samples) => samples.Length == 0 ? 0.0 : samples.Max(Math.Abs);
@@ -282,7 +282,7 @@ public sealed class UtauRendererTests : IDisposable
     public void UnitsWithoutAnyRenderableEntryProduceAnEmptyResult()
     {
         using var arena = new WorldArena();
-        var result = new UtauRenderer(RenderSettings.Default with { Estimator = F0Estimator.Dio }, cache).Render([], arena);
+        var result = new UtauRenderer(RenderSettings.Default with { Estimator = F0Estimator.Dio }, RenderCurves.Empty, cache).Render([], arena);
 
         Assert.Empty(result.Samples);
         Assert.Empty(result.Timings);

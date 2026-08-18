@@ -374,34 +374,34 @@ public sealed class VibratoAndPitchTests
     public void PortamentoHoldsTheFirstAndLastValueOutsideTheControlPoints()
     {
         var note = new UTAUNote();
-        note.PitchPoints.Add(new PitchPoint(100.0, -200.0, PitchPointShape.Linear));
-        note.PitchPoints.Add(new PitchPoint(300.0, 0.0, PitchPointShape.Linear));
+        note.PitchPoints.Add(new PitchPoint(100, -200.0, PitchPointShape.Linear));
+        note.PitchPoints.Add(new PitchPoint(300, 0.0, PitchPointShape.Linear));
 
-        Assert.Equal(-200.0, note.EvaluatePortamentoCents(0.0), 9);
-        Assert.Equal(-100.0, note.EvaluatePortamentoCents(200.0), 9);
-        Assert.Equal(0.0, note.EvaluatePortamentoCents(400.0), 9);
+        Assert.Equal(-200.0, note.EvaluatePortamentoCents(0), 9);
+        Assert.Equal(-100.0, note.EvaluatePortamentoCents(200), 9);
+        Assert.Equal(0.0, note.EvaluatePortamentoCents(400), 9);
     }
 
     [Fact]
     public void NoControlPointsMeansNoPortamento()
-        => Assert.Equal(0.0, new UTAUNote().EvaluatePortamentoCents(50.0));
+        => Assert.Equal(0.0, new UTAUNote().EvaluatePortamentoCents(50));
 
     [Fact]
     public void ASingleControlPointIsConstant()
     {
         var note = new UTAUNote();
-        note.PitchPoints.Add(new PitchPoint(100.0, 25.0));
-        Assert.Equal(25.0, note.EvaluatePortamentoCents(0.0));
-        Assert.Equal(25.0, note.EvaluatePortamentoCents(1000.0));
+        note.PitchPoints.Add(new PitchPoint(100, 25.0));
+        Assert.Equal(25.0, note.EvaluatePortamentoCents(0));
+        Assert.Equal(25.0, note.EvaluatePortamentoCents(1000));
     }
 
     [Fact]
     public void CoincidentControlPointsDoNotDivideByZero()
     {
         var note = new UTAUNote();
-        note.PitchPoints.Add(new PitchPoint(100.0, 0.0, PitchPointShape.Linear));
-        note.PitchPoints.Add(new PitchPoint(100.0, 100.0, PitchPointShape.Linear));
-        Assert.Equal(100.0, note.EvaluatePortamentoCents(100.0), 9);
+        note.PitchPoints.Add(new PitchPoint(100, 0.0, PitchPointShape.Linear));
+        note.PitchPoints.Add(new PitchPoint(100, 100.0, PitchPointShape.Linear));
+        Assert.Equal(100.0, note.EvaluatePortamentoCents(100), 9);
     }
 }
 

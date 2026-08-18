@@ -23,7 +23,10 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public const int PitchCurveIntervalTicks = 10;
     public const double FitMarginRatio = 0.98;
     public const double ViewportChangeThreshold = 2.0;
+    public const double StripHeight = 72.0;
+    public const double PitchHandleSize = 8.0;
 
+    readonly UTAUVoicePronounce pronounce;
     readonly ObservableCollection<UTAUNote> source;
     double pixelsPerTick = DefaultPixelsPerTick;
     double semitoneHeight = DefaultSemitoneHeight;
@@ -34,6 +37,9 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     ObservableCollection<PitchPoint>? observedPitchPoints;
     PitchPoint? selectedPitchPoint;
     PointCollection pitchCurve = [];
+    PointCollection expressionCurvePoints = [];
+    ExpressionItem selectedExpression = ExpressionItem.All[1];
+    double[]? workingCurve;
     double guideLeft;
     bool isGuideVisible;
     string guideText = string.Empty;
@@ -41,10 +47,11 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     double lastFitWidth;
     double lastFitHeight;
 
-    public NoteEditorViewModel(ObservableCollection<UTAUNote> notes)
+    public NoteEditorViewModel(UTAUVoicePronounce pronounce)
     {
-        source = notes;
-        Notes = [.. notes.Select(x => new NoteViewModel(x, this))];
+        this.pronounce = pronounce;
+        source = pronounce.Notes;
+        Notes = [.. source.Select(x => new NoteViewModel(x, this))];
         ZoomInCommand = new ActionCommand(_ => pixelsPerTick < MaximumPixelsPerTick, _ => ZoomHorizontally(ZoomStep));
         ZoomOutCommand = new ActionCommand(_ => pixelsPerTick > MinimumPixelsPerTick, _ => ZoomHorizontally(1.0 / ZoomStep));
         ZoomVerticalInCommand = new ActionCommand(_ => semitoneHeight < MaximumSemitoneHeight, _ => ZoomVertically(ZoomStep));
@@ -52,8 +59,9 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         InsertRestCommand = new ActionCommand(_ => SelectedNote is not null, _ => InsertRest());
         RemoveNoteCommand = new ActionCommand(_ => SelectedNote is not null && Notes.Count > 1, _ => RemoveSelected());
         AddPitchPointCommand = new ActionCommand(_ => SelectedNote is not null, _ => AddPitchPoint());
-        RemovePitchPointCommand = new ActionCommand(_ => SelectedPitchPoint is not null, _ => RemovePitchPoint());
+        RemovePitchPointCommand = new ActionCommand(_ => SelectedPitchPoint is not null, _ => RemoveSelectedPitchPoint());
         ResetPitchCommand = new ActionCommand(_ => SelectedNote is not null, _ => ResetPitch());
+        ResetExpressionCommand = new ActionCommand(_ => true, _ => ResetExpression());
         SelectToneCommand = new ActionCommand(_ => SelectedNote is not null, ApplyTone);
         FitCommand = new ActionCommand(_ => true, _ => EnableAutoFit());
         InvalidateLayout();
@@ -80,17 +88,47 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     public ICommand ResetPitchCommand { get; }
 
+    public ICommand ResetExpressionCommand { get; }
+
     public ICommand SelectToneCommand { get; }
 
     public ICommand FitCommand { get; }
 
+    public TimeBase Time => pronounce.TimeBase;
+
     public IReadOnlyList<NoteDivision> SnapDivisions => NoteDivision.All;
+
+    public IReadOnlyList<ExpressionItem> Expressions => ExpressionItem.All;
+
+    public static IReadOnlyList<PitchShapeItem> PitchShapes { get; } =
+    [
+        new(Texts.PitchShapeSCurve, PitchPointShape.SCurve),
+        new(Texts.PitchShapeLinear, PitchPointShape.Linear),
+        new(Texts.PitchShapeRCurve, PitchPointShape.RCurve),
+        new(Texts.PitchShapeJCurve, PitchPointShape.JCurve),
+    ];
 
     public NoteDivision SnapDivision
     {
         get => snapDivision;
         set => Set(ref snapDivision, value);
     }
+
+    public ExpressionItem SelectedExpression
+    {
+        get => selectedExpression;
+        set
+        {
+            if (!Set(ref selectedExpression, value ?? ExpressionItem.All[0]))
+                return;
+
+            workingCurve = null;
+            OnPropertyChanged(nameof(IsCurveExpression));
+            UpdateExpression();
+        }
+    }
+
+    public bool IsCurveExpression => SelectedExpression.IsCurve;
 
     public PitchPoint? SelectedPitchPoint
     {
@@ -141,19 +179,27 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
             ObservePitchPoints(selectedNote?.Note.PitchPoints);
             SelectedPitchPoint = null;
             OnPropertyChanged(nameof(HasSelection));
-            OnPropertyChanged(nameof(PitchPoints));
+            UpdatePitchHandles();
         }
     }
 
     public bool HasSelection => SelectedNote is not null;
-
-    public ObservableCollection<PitchPoint>? PitchPoints => SelectedNote?.Note.PitchPoints;
 
     public PointCollection PitchCurve
     {
         get => pitchCurve;
         private set => Set(ref pitchCurve, value);
     }
+
+    public PointCollection ExpressionCurvePoints
+    {
+        get => expressionCurvePoints;
+        private set => Set(ref expressionCurvePoints, value);
+    }
+
+    public IReadOnlyList<ExpressionBarViewModel> ExpressionBars { get; private set; } = [];
+
+    public IReadOnlyList<PitchHandleViewModel> PitchHandles { get; private set; } = [];
 
     public double GuideLeft
     {
@@ -177,19 +223,13 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     public double CanvasHeight => (MaximumTone - MinimumTone + 1) * SemitoneHeight;
 
+    public double StripCanvasHeight => StripHeight;
+
     public int TotalTicks => Notes.Sum(x => x.Note.LengthTicks);
 
     public IReadOnlyList<KeyRowViewModel> Keyboard { get; private set; } = [];
 
     public IReadOnlyList<GridLineViewModel> TimeGridLines { get; private set; } = [];
-
-    public static IReadOnlyList<PitchShapeItem> PitchShapes { get; } =
-    [
-        new(Texts.PitchShapeSCurve, PitchPointShape.SCurve),
-        new(Texts.PitchShapeLinear, PitchPointShape.Linear),
-        new(Texts.PitchShapeRCurve, PitchPointShape.RCurve),
-        new(Texts.PitchShapeJCurve, PitchPointShape.JCurve),
-    ];
 
     public void InvalidateLayout()
     {
@@ -210,6 +250,8 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         OnPropertyChanged(nameof(CanvasHeight));
         OnPropertyChanged(nameof(TotalTicks));
         UpdatePitchCurve();
+        UpdatePitchHandles();
+        UpdateExpression();
     }
 
     public void OnNoteChanged(string? propertyName)
@@ -219,6 +261,11 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
             case nameof(UTAUNote.Tone):
             case nameof(UTAUNote.LengthTicks):
                 InvalidateLayout();
+                break;
+            case nameof(UTAUNote.Velocity):
+            case nameof(UTAUNote.Intensity):
+            case nameof(UTAUNote.Modulation):
+                UpdateExpression();
                 break;
             default:
                 UpdatePitchCurve();
@@ -240,9 +287,10 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
                 continue;
             }
 
+            var lengthMilliseconds = Time.ToMilliseconds(length);
             for (var elapsed = 0; elapsed <= length; elapsed += PitchCurveIntervalTicks)
             {
-                var cents = note.Note.EvaluatePitchOffsetCents(elapsed, length);
+                var cents = note.Note.EvaluatePitchOffsetCents(elapsed / (double)length, lengthMilliseconds);
                 points.Add(ToCanvasPoint(position + elapsed, note.Note.Tone + cents / 100.0));
             }
 
@@ -253,38 +301,92 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         PitchCurve = points;
     }
 
+    public void UpdatePitchHandles()
+    {
+        if (SelectedNote is not { } selected || selected.IsRest)
+        {
+            PitchHandles = [];
+            OnPropertyChanged(nameof(PitchHandles));
+            return;
+        }
+
+        var handles = new List<PitchHandleViewModel>(selected.Note.PitchPoints.Count);
+        foreach (var point in selected.Note.PitchPoints)
+        {
+            var position = ToCanvasPoint(selected.StartTicks + point.Ticks, selected.Note.Tone + point.Cents / 100.0);
+            handles.Add(new PitchHandleViewModel(
+                point,
+                position.X - PitchHandleSize / 2.0,
+                position.Y - PitchHandleSize / 2.0,
+                PitchHandleSize));
+        }
+
+        PitchHandles = handles;
+        OnPropertyChanged(nameof(PitchHandles));
+    }
+
+    public void UpdateExpression()
+    {
+        if (SelectedExpression.IsCurve)
+        {
+            ExpressionBars = [];
+            ExpressionCurvePoints = BuildExpressionCurve(workingCurve);
+        }
+        else
+        {
+            ExpressionCurvePoints = [];
+            ExpressionBars = BuildExpressionBars();
+        }
+
+        OnPropertyChanged(nameof(ExpressionBars));
+    }
+
     public Point ToCanvasPoint(double ticks, double tone)
         => new(ticks * PixelsPerTick, (MaximumTone - tone + 0.5) * SemitoneHeight);
 
     public int ToneFromCanvasY(double y)
         => Math.Clamp((int)Math.Round(MaximumTone - y / SemitoneHeight + 0.5), 0, 127);
 
+    public double CentsFromCanvasY(double y, int tone)
+        => Math.Clamp((MaximumTone - y / SemitoneHeight + 0.5 - tone) * 100.0, PitchPoint.MinimumCents, PitchPoint.MaximumCents);
+
     public int TicksFromCanvasX(double x) => (int)Math.Round(x / PixelsPerTick);
-
-    public void UpdateGuide(Point position)
-    {
-        var ticks = Math.Max(TicksFromCanvasX(position.X), 0);
-        var snapped = SnapDivision.IsFree ? ticks : SnapDivision.Snap(ticks);
-        GuideLeft = snapped * PixelsPerTick;
-        GuideText = FormatPosition(snapped, ToneFromCanvasY(position.Y));
-        IsGuideVisible = true;
-    }
-
-    public void HideGuide()
-    {
-        IsGuideVisible = false;
-        GuideText = string.Empty;
-    }
-
-    static string FormatPosition(int ticks, int tone)
-    {
-        var bar = ticks / TimeBase.TicksPerWholeNote + 1;
-        var beat = ticks % TimeBase.TicksPerWholeNote / TimeBase.TicksPerQuarterNote + 1;
-        return $"{new MusicalTone(tone).Name}  {bar}:{beat}";
-    }
 
     public int SnapLength(int ticks)
         => Math.Clamp(SnapDivision.Snap(ticks), UTAUNote.MinimumLengthTicks, UTAUNote.MaximumLengthTicks);
+
+    public NoteViewModel? FindNoteAt(int ticks)
+        => Notes.FirstOrDefault(x => ticks >= x.StartTicks && ticks < x.EndTicks);
+
+    public void SetExpressionAt(int ticks, double ratio)
+    {
+        if (SelectedExpression.IsCurve)
+        {
+            PaintCurve(ticks, SelectedExpression.FromRatio(ratio));
+            return;
+        }
+
+        if (FindNoteAt(ticks) is not { } note || note.IsRest)
+            return;
+
+        var value = SelectedExpression.FromRatio(ratio);
+        switch (SelectedExpression.NoteExpression)
+        {
+            case NoteExpression.Velocity: note.Note.Velocity = value; break;
+            case NoteExpression.Intensity: note.Note.Intensity = value; break;
+            case NoteExpression.Modulation: note.Note.Modulation = value; break;
+        }
+    }
+
+    public void CommitExpression()
+    {
+        if (workingCurve is null)
+            return;
+
+        CurrentCurve.Commit(workingCurve);
+        workingCurve = null;
+        UpdateExpression();
+    }
 
     public void ZoomHorizontally(double factor)
     {
@@ -301,16 +403,10 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     }
 
     public static double CalculatePixelsPerTick(double viewportWidth, int totalTicks)
-        => Math.Clamp(
-            viewportWidth * FitMarginRatio / Math.Max(totalTicks, 1),
-            MinimumPixelsPerTick,
-            MaximumPixelsPerTick);
+        => Math.Clamp(viewportWidth * FitMarginRatio / Math.Max(totalTicks, 1), MinimumPixelsPerTick, MaximumPixelsPerTick);
 
     public static double CalculateSemitoneHeight(double viewportHeight, int visibleSemitones)
-        => Math.Clamp(
-            viewportHeight * FitMarginRatio / Math.Max(visibleSemitones, 1),
-            MinimumSemitoneHeight,
-            MaximumSemitoneHeight);
+        => Math.Clamp(viewportHeight * FitMarginRatio / Math.Max(visibleSemitones, 1), MinimumSemitoneHeight, MaximumSemitoneHeight);
 
     public bool FitToViewport(double viewportWidth, double viewportHeight)
     {
@@ -335,6 +431,50 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         lastFitHeight = 0.0;
     }
 
+    public void UpdateGuide(Point position)
+    {
+        var ticks = Math.Max(TicksFromCanvasX(position.X), 0);
+        var snapped = SnapDivision.IsFree ? ticks : SnapDivision.Snap(ticks);
+        GuideLeft = snapped * PixelsPerTick;
+        GuideText = FormatPosition(snapped, ToneFromCanvasY(position.Y));
+        IsGuideVisible = true;
+    }
+
+    public void HideGuide()
+    {
+        IsGuideVisible = false;
+        GuideText = string.Empty;
+    }
+
+    public void AddPitchPointAt(int ticksFromNoteStart, double cents)
+    {
+        if (SelectedNote is not { } selected || selected.IsRest)
+            return;
+
+        var point = new PitchPoint(ticksFromNoteStart, cents);
+        var index = 0;
+        while (index < selected.Note.PitchPoints.Count && selected.Note.PitchPoints[index].Ticks <= point.Ticks)
+            index++;
+        selected.Note.PitchPoints.Insert(index, point);
+        SelectedPitchPoint = point;
+    }
+
+    public void MovePitchPoint(PitchPoint point, int ticksFromNoteStart, double cents)
+    {
+        point.Ticks = ticksFromNoteStart;
+        point.Cents = cents;
+    }
+
+    public void RemovePitchPoint(PitchPoint point)
+    {
+        if (SelectedNote is not { } selected)
+            return;
+
+        selected.Note.PitchPoints.Remove(point);
+        if (ReferenceEquals(SelectedPitchPoint, point))
+            SelectedPitchPoint = selected.Note.PitchPoints.LastOrDefault();
+    }
+
     public void Dispose()
     {
         ObservePitchPoints(null);
@@ -343,38 +483,68 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         Notes.Clear();
     }
 
-    void ObservePitchPoints(ObservableCollection<PitchPoint>? points)
+    ExpressionCurve CurrentCurve
+        => SelectedExpression.CurveExpression == CurveExpression.Formant
+            ? pronounce.FormantCurve
+            : pronounce.BreathinessCurve;
+
+    void PaintCurve(int ticks, double value)
     {
-        if (ReferenceEquals(observedPitchPoints, points))
+        workingCurve ??= CurrentCurve.CreateWorkingCopy(TotalTicks);
+        var index = ExpressionCurve.ToIndex(ticks);
+        if (index < 0 || index >= workingCurve.Length)
             return;
 
-        if (observedPitchPoints is not null)
+        workingCurve[index] = value;
+        ExpressionCurvePoints = BuildExpressionCurve(workingCurve);
+    }
+
+    PointCollection BuildExpressionCurve(double[]? samples)
+    {
+        var values = samples ?? CurrentCurve.Values;
+        var expression = SelectedExpression;
+        var points = new PointCollection();
+        var total = Math.Max(TotalTicks, ExpressionCurve.IntervalTicks);
+
+        for (var ticks = 0; ticks <= total; ticks += ExpressionCurve.IntervalTicks)
         {
-            observedPitchPoints.CollectionChanged -= OnPitchPointsChanged;
-            foreach (var point in observedPitchPoints)
-                point.PropertyChanged -= OnPitchPointChanged;
+            var index = ticks / ExpressionCurve.IntervalTicks;
+            var value = values.Length == 0 ? 0.0 : values[Math.Clamp(index, 0, values.Length - 1)];
+            points.Add(new Point(ticks * PixelsPerTick, (1.0 - expression.ToRatio(value)) * StripHeight));
         }
 
-        observedPitchPoints = points;
-
-        if (observedPitchPoints is null)
-            return;
-
-        observedPitchPoints.CollectionChanged += OnPitchPointsChanged;
-        foreach (var point in observedPitchPoints)
-            point.PropertyChanged += OnPitchPointChanged;
+        points.Freeze();
+        return points;
     }
 
-    void OnPitchPointsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    IReadOnlyList<ExpressionBarViewModel> BuildExpressionBars()
     {
-        foreach (var point in e.OldItems?.OfType<PitchPoint>() ?? [])
-            point.PropertyChanged -= OnPitchPointChanged;
-        foreach (var point in e.NewItems?.OfType<PitchPoint>() ?? [])
-            point.PropertyChanged += OnPitchPointChanged;
-        UpdatePitchCurve();
-    }
+        var expression = SelectedExpression;
+        var baseline = (1.0 - expression.Baseline) * StripHeight;
+        var bars = new List<ExpressionBarViewModel>(Notes.Count);
 
-    void OnPitchPointChanged(object? sender, PropertyChangedEventArgs e) => UpdatePitchCurve();
+        foreach (var note in Notes)
+        {
+            if (note.IsRest)
+                continue;
+
+            var value = expression.NoteExpression switch
+            {
+                NoteExpression.Velocity => note.Note.Velocity,
+                NoteExpression.Modulation => note.Note.Modulation,
+                _ => note.Note.Intensity,
+            };
+            var y = (1.0 - expression.ToRatio(value)) * StripHeight;
+            bars.Add(new ExpressionBarViewModel(
+                note,
+                note.Left,
+                note.Width,
+                Math.Min(y, baseline),
+                Math.Max(Math.Abs(baseline - y), 1.0)));
+        }
+
+        return bars;
+    }
 
     IReadOnlyList<KeyRowViewModel> BuildKeyboard()
     {
@@ -452,21 +622,16 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
             return;
 
         var points = selected.Note.PitchPoints;
-        var milliseconds = points.Count == 0 ? 0.0 : points[^1].Milliseconds + 100.0;
-        var point = new PitchPoint(milliseconds, points.Count == 0 ? 0.0 : points[^1].Cents);
-        points.Add(point);
-        SelectedPitchPoint = point;
-        UpdatePitchCurve();
+        var ticks = points.Count == 0
+            ? 0
+            : Math.Min(points[^1].Ticks + selected.Note.LengthTicks / 4, selected.Note.LengthTicks);
+        AddPitchPointAt(ticks, points.Count == 0 ? 0.0 : points[^1].Cents);
     }
 
-    void RemovePitchPoint()
+    void RemoveSelectedPitchPoint()
     {
-        if (SelectedNote is not { } selected || SelectedPitchPoint is not { } point)
-            return;
-
-        selected.Note.PitchPoints.Remove(point);
-        SelectedPitchPoint = selected.Note.PitchPoints.LastOrDefault();
-        UpdatePitchCurve();
+        if (SelectedPitchPoint is { } point)
+            RemovePitchPoint(point);
     }
 
     void ResetPitch()
@@ -476,6 +641,71 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
         selected.Note.PitchPoints.Clear();
         SelectedPitchPoint = null;
+    }
+
+    void ResetExpression()
+    {
+        if (SelectedExpression.IsCurve)
+        {
+            workingCurve = null;
+            CurrentCurve.Values = [];
+            UpdateExpression();
+            return;
+        }
+
+        foreach (var note in Notes)
+        {
+            switch (SelectedExpression.NoteExpression)
+            {
+                case NoteExpression.Velocity: note.Note.Velocity = 100.0; break;
+                case NoteExpression.Intensity: note.Note.Intensity = 100.0; break;
+                case NoteExpression.Modulation: note.Note.Modulation = 0.0; break;
+            }
+        }
+    }
+
+    void ObservePitchPoints(ObservableCollection<PitchPoint>? points)
+    {
+        if (ReferenceEquals(observedPitchPoints, points))
+            return;
+
+        if (observedPitchPoints is not null)
+        {
+            observedPitchPoints.CollectionChanged -= OnPitchPointsChanged;
+            foreach (var point in observedPitchPoints)
+                point.PropertyChanged -= OnPitchPointChanged;
+        }
+
+        observedPitchPoints = points;
+
+        if (observedPitchPoints is null)
+            return;
+
+        observedPitchPoints.CollectionChanged += OnPitchPointsChanged;
+        foreach (var point in observedPitchPoints)
+            point.PropertyChanged += OnPitchPointChanged;
+    }
+
+    void OnPitchPointsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        foreach (var point in e.OldItems?.OfType<PitchPoint>() ?? [])
+            point.PropertyChanged -= OnPitchPointChanged;
+        foreach (var point in e.NewItems?.OfType<PitchPoint>() ?? [])
+            point.PropertyChanged += OnPitchPointChanged;
         UpdatePitchCurve();
+        UpdatePitchHandles();
+    }
+
+    void OnPitchPointChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        UpdatePitchCurve();
+        UpdatePitchHandles();
+    }
+
+    static string FormatPosition(int ticks, int tone)
+    {
+        var bar = ticks / TimeBase.TicksPerWholeNote + 1;
+        var beat = ticks % TimeBase.TicksPerWholeNote / TimeBase.TicksPerQuarterNote + 1;
+        return $"{new MusicalTone(tone).Name}  {bar}:{beat}";
     }
 }

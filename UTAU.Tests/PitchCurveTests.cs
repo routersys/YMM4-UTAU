@@ -1,19 +1,28 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using UTAU.Notes;
+using UTAU;
 using UTAU.ViewModels;
 
 namespace UTAU.Tests;
 
 public sealed class PitchCurveTests
 {
+    static UTAUVoicePronounce CreatePronounce(ObservableCollection<UTAUNote> notes)
+    {
+        var pronounce = new UTAUVoicePronounce();
+        foreach (var note in notes)
+            pronounce.Notes.Add(note);
+        return pronounce;
+    }
+
     static NoteEditorViewModel CreateViewModel()
     {
         var notes = new ObservableCollection<UTAUNote>
         {
             new() { Lyric = "あ", Tone = 60, LengthTicks = 480 },
         };
-        var viewModel = new NoteEditorViewModel(notes);
+        var viewModel = new NoteEditorViewModel(CreatePronounce(notes));
         viewModel.FitToViewport(800.0, 400.0);
         return viewModel;
     }
@@ -24,7 +33,7 @@ public sealed class PitchCurveTests
         var viewModel = CreateViewModel();
         var before = viewModel.PitchCurve;
 
-        viewModel.SelectedNote!.Note.PitchPoints.Add(new PitchPoint(0.0, -200.0));
+        viewModel.SelectedNote!.Note.PitchPoints.Add(new PitchPoint(0, -200.0));
 
         Assert.NotSame(before, viewModel.PitchCurve);
     }
@@ -33,7 +42,7 @@ public sealed class PitchCurveTests
     public void EditingAControlPointRedrawsTheCurve()
     {
         var viewModel = CreateViewModel();
-        var point = new PitchPoint(0.0, 0.0);
+        var point = new PitchPoint(0, 0.0);
         viewModel.SelectedNote!.Note.PitchPoints.Add(point);
         var before = viewModel.PitchCurve;
 
@@ -47,8 +56,8 @@ public sealed class PitchCurveTests
     {
         var viewModel = CreateViewModel();
         var note = viewModel.SelectedNote!.Note;
-        note.PitchPoints.Add(new PitchPoint(0.0, -200.0, PitchPointShape.SCurve));
-        note.PitchPoints.Add(new PitchPoint(200.0, 0.0, PitchPointShape.SCurve));
+        note.PitchPoints.Add(new PitchPoint(0, -200.0, PitchPointShape.SCurve));
+        note.PitchPoints.Add(new PitchPoint(200, 0.0, PitchPointShape.SCurve));
         var before = viewModel.PitchCurve;
 
         note.PitchPoints[0].Shape = PitchPointShape.Linear;
@@ -60,7 +69,7 @@ public sealed class PitchCurveTests
     public void RemovingAControlPointRedrawsTheCurve()
     {
         var viewModel = CreateViewModel();
-        var point = new PitchPoint(0.0, -200.0);
+        var point = new PitchPoint(0, -200.0);
         viewModel.SelectedNote!.Note.PitchPoints.Add(point);
         var before = viewModel.PitchCurve;
 
@@ -77,9 +86,9 @@ public sealed class PitchCurveTests
             new() { Lyric = "あ", Tone = 60, LengthTicks = 480 },
             new() { Lyric = "か", Tone = 62, LengthTicks = 480 },
         };
-        var viewModel = new NoteEditorViewModel(notes);
+        var viewModel = new NoteEditorViewModel(CreatePronounce(notes));
         var first = viewModel.Notes[0];
-        var point = new PitchPoint(0.0, 0.0);
+        var point = new PitchPoint(0, 0.0);
         first.Note.PitchPoints.Add(point);
 
         viewModel.SelectedNote = viewModel.Notes[1];
@@ -97,11 +106,11 @@ public sealed class PitchCurveTests
             new() { Lyric = "あ", Tone = 60, LengthTicks = 480 },
             new() { Lyric = "か", Tone = 62, LengthTicks = 480 },
         };
-        var viewModel = new NoteEditorViewModel(notes);
+        var viewModel = new NoteEditorViewModel(CreatePronounce(notes));
         viewModel.SelectedNote = viewModel.Notes[1];
         var before = viewModel.PitchCurve;
 
-        viewModel.Notes[1].Note.PitchPoints.Add(new PitchPoint(0.0, 250.0));
+        viewModel.Notes[1].Note.PitchPoints.Add(new PitchPoint(0, 250.0));
 
         Assert.NotSame(before, viewModel.PitchCurve);
     }
@@ -110,14 +119,14 @@ public sealed class PitchCurveTests
     public void DisposingStopsObserving()
     {
         var viewModel = CreateViewModel();
-        var point = new PitchPoint(0.0, 0.0);
+        var point = new PitchPoint(0, 0.0);
         viewModel.SelectedNote!.Note.PitchPoints.Add(point);
         var note = viewModel.SelectedNote.Note;
 
         viewModel.Dispose();
         var before = viewModel.PitchCurve;
         point.Cents = -500.0;
-        note.PitchPoints.Add(new PitchPoint(100.0, 0.0));
+        note.PitchPoints.Add(new PitchPoint(100, 0.0));
 
         Assert.Same(before, viewModel.PitchCurve);
     }
@@ -128,7 +137,7 @@ public sealed class PitchCurveTests
         var viewModel = CreateViewModel();
         Assert.False(viewModel.HasPitchPoint);
 
-        var point = new PitchPoint(0.0, 0.0);
+        var point = new PitchPoint(0, 0.0);
         viewModel.SelectedNote!.Note.PitchPoints.Add(point);
         viewModel.SelectedPitchPoint = point;
 
@@ -144,8 +153,8 @@ public sealed class PitchCurveTests
             new() { Lyric = "あ", Tone = 60, LengthTicks = 480 },
             new() { Lyric = "か", Tone = 62, LengthTicks = 480 },
         };
-        var viewModel = new NoteEditorViewModel(notes);
-        var point = new PitchPoint(0.0, 0.0);
+        var viewModel = new NoteEditorViewModel(CreatePronounce(notes));
+        var point = new PitchPoint(0, 0.0);
         viewModel.Notes[0].Note.PitchPoints.Add(point);
         viewModel.SelectedPitchPoint = point;
 

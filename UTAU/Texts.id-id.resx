@@ -130,7 +130,6 @@
 <data name="NoteGroupBasic" xml:space="preserve"><value>Dasar</value></data>
 <data name="NoteGroupExpression" xml:space="preserve"><value>Ekspresi</value></data>
 <data name="NoteGroupTiming" xml:space="preserve"><value>Waktu</value></data>
-<data name="NoteGroupPortamento" xml:space="preserve"><value>Portamento</value></data>
 <data name="NoteGroupVibrato" xml:space="preserve"><value>Vibrato</value></data>
 <data name="NoteLyric" xml:space="preserve"><value>Lirik</value></data>
 <data name="NoteTone" xml:space="preserve"><value>Nada</value></data>
@@ -143,8 +142,6 @@
 <data name="NoteStartPoint" xml:space="preserve"><value>Titik awal</value></data>
 <data name="NoteFadeIn" xml:space="preserve"><value>Fade in</value></data>
 <data name="NoteFadeOut" xml:space="preserve"><value>Fade out</value></data>
-<data name="PitchPointTime" xml:space="preserve"><value>Waktu</value></data>
-<data name="PitchPointCents" xml:space="preserve"><value>Sen</value></data>
 <data name="PitchPointShape" xml:space="preserve"><value>Kurva</value></data>
 <data name="PitchShapeSCurve" xml:space="preserve"><value>Kurva S</value></data>
 <data name="PitchShapeLinear" xml:space="preserve"><value>Linear</value></data>
@@ -184,4 +181,8 @@
 <data name="FitToWindow" xml:space="preserve"><value>Sesuaikan tampilan</value></data>
 <data name="InfoTabInformation" xml:space="preserve"><value>Informasi</value></data>
 <data name="InfoTabPortrait" xml:space="preserve"><value>Potret</value></data>
+<data name="ExpressionLabel" xml:space="preserve"><value>Ekspresi</value></data>
+<data name="ResetExpression" xml:space="preserve"><value>Setel ulang ekspresi</value></data>
+<data name="ExpressionHint" xml:space="preserve"><value>Seret vertikal untuk mengubah nilai. Item per not digambar sebagai batang dan item kurva sebagai garis.</value></data>
+<data name="PitchHandleHint" xml:space="preserve"><value>Seret untuk mengubah nada. Klik kanan untuk menghapus.</value></data>
 </root>

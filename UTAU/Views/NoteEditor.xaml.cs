@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -17,12 +16,15 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         None,
         Tone,
         Length,
+        PitchHandle,
+        Expression,
     }
 
     const double WheelScrollStep = 64.0;
 
     DragMode dragMode;
     NoteViewModel? dragTarget;
+    PitchPoint? dragPoint;
     Point dragOrigin;
     int dragOriginLengthTicks;
     int dragOriginTone;
@@ -41,35 +43,35 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         Loaded += (_, _) => RequestFit();
     }
 
-    internal ObservableCollection<UTAUNote>? Notes
+    internal UTAUVoicePronounce? Pronounce
     {
-        get => (ObservableCollection<UTAUNote>?)GetValue(NotesProperty);
-        set => SetValue(NotesProperty, value);
+        get => (UTAUVoicePronounce?)GetValue(PronounceProperty);
+        set => SetValue(PronounceProperty, value);
     }
 
-    internal static readonly DependencyProperty NotesProperty = DependencyProperty.Register(
-        nameof(Notes),
-        typeof(ObservableCollection<UTAUNote>),
+    internal static readonly DependencyProperty PronounceProperty = DependencyProperty.Register(
+        nameof(Pronounce),
+        typeof(UTAUVoicePronounce),
         typeof(NoteEditor),
-        new PropertyMetadata(null, OnNotesChanged));
+        new PropertyMetadata(null, OnPronounceChanged));
 
-    static void OnNotesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    static void OnPronounceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is not NoteEditor editor)
             return;
 
         editor.ViewModel?.Dispose();
-        editor.DataContext = editor.Notes is null ? null : new NoteEditorViewModel(editor.Notes);
+        editor.DataContext = editor.Pronounce is null ? null : new NoteEditorViewModel(editor.Pronounce);
         editor.RequestFit();
     }
+
+    NoteEditorViewModel? ViewModel => DataContext as NoteEditorViewModel;
 
     void RequestFit() => Dispatcher.BeginInvoke(UpdateFit, DispatcherPriority.Loaded);
 
     void UpdateFit() => ViewModel?.FitToViewport(HorizontalScroller.ActualWidth, VerticalScroller.ActualHeight);
 
     void Scroller_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateFit();
-
-    NoteEditorViewModel? ViewModel => DataContext as NoteEditorViewModel;
 
     void PopupButton_BeginEdit(object sender, EventArgs e) => BeginEdit?.Invoke(this, e);
 
@@ -82,6 +84,7 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         HorizontalBar.LargeChange = e.ViewportWidth;
         HorizontalBar.SmallChange = WheelScrollStep;
         HorizontalBar.Value = e.HorizontalOffset;
+        StripScroller.ScrollToHorizontalOffset(e.HorizontalOffset);
     }
 
     void HorizontalBar_Scroll(object sender, ScrollEventArgs e)
@@ -136,6 +139,21 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         e.Handled = true;
     }
 
+    void RollCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (ViewModel is not { } viewModel || e.ClickCount < 2)
+            return;
+        if (viewModel.SelectedNote is not { } selected || selected.IsRest)
+            return;
+
+        var position = e.GetPosition(RollCanvas);
+        var ticks = viewModel.TicksFromCanvasX(position.X) - selected.StartTicks;
+        viewModel.AddPitchPointAt(
+            Math.Clamp(ticks, 0, selected.Note.LengthTicks),
+            viewModel.CentsFromCanvasY(position.Y, selected.Note.Tone));
+        e.Handled = true;
+    }
+
     void EndPan()
     {
         if (!isPanning)
@@ -174,6 +192,27 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         e.Handled = true;
     }
 
+    void PitchHandle_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not FrameworkElement { DataContext: PitchHandleViewModel handle } || ViewModel is not { } viewModel)
+            return;
+
+        viewModel.SelectedPitchPoint = handle.Point;
+        dragMode = DragMode.PitchHandle;
+        dragPoint = handle.Point;
+        RollCanvas.CaptureMouse();
+        e.Handled = true;
+    }
+
+    void PitchHandle_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not FrameworkElement { DataContext: PitchHandleViewModel handle } || ViewModel is not { } viewModel)
+            return;
+
+        viewModel.RemovePitchPoint(handle.Point);
+        e.Handled = true;
+    }
+
     void BeginDrag(NoteViewModel note, DragMode mode, MouseButtonEventArgs e)
     {
         dragMode = mode;
@@ -196,6 +235,16 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         {
             HorizontalScroller.ScrollToHorizontalOffset(panHorizontalOffset - (position.X - panOrigin.X));
             VerticalScroller.ScrollToVerticalOffset(panVerticalOffset - (position.Y - panOrigin.Y));
+            return;
+        }
+
+        if (dragMode == DragMode.PitchHandle && dragPoint is not null && viewModel.SelectedNote is { } owner)
+        {
+            var ticks = viewModel.TicksFromCanvasX(position.X) - owner.StartTicks;
+            viewModel.MovePitchPoint(
+                dragPoint,
+                Math.Clamp(ticks, 0, owner.Note.LengthTicks),
+                viewModel.CentsFromCanvasY(position.Y, owner.Note.Tone));
             return;
         }
 
@@ -226,12 +275,61 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
 
     void EndDrag()
     {
-        if (dragMode == DragMode.None)
+        if (dragMode is DragMode.None or DragMode.Expression)
+            return;
+
+        var shouldRelayout = dragMode is DragMode.Tone or DragMode.Length;
+        dragMode = DragMode.None;
+        dragTarget = null;
+        dragPoint = null;
+        RollCanvas.ReleaseMouseCapture();
+        if (shouldRelayout)
+            ViewModel?.InvalidateLayout();
+    }
+
+    void StripCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (ViewModel is null)
+            return;
+
+        dragMode = DragMode.Expression;
+        StripCanvas.CaptureMouse();
+        ApplyExpression(e.GetPosition(StripCanvas));
+        e.Handled = true;
+    }
+
+    void StripCanvas_MouseMove(object sender, MouseEventArgs e)
+    {
+        if (dragMode != DragMode.Expression || e.LeftButton != MouseButtonState.Pressed)
+            return;
+
+        ApplyExpression(e.GetPosition(StripCanvas));
+    }
+
+    void StripCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) => EndExpressionDrag();
+
+    void StripCanvas_MouseLeave(object sender, MouseEventArgs e)
+    {
+        if (e.LeftButton != MouseButtonState.Pressed)
+            EndExpressionDrag();
+    }
+
+    void EndExpressionDrag()
+    {
+        if (dragMode != DragMode.Expression)
             return;
 
         dragMode = DragMode.None;
-        dragTarget = null;
-        RollCanvas.ReleaseMouseCapture();
-        ViewModel?.InvalidateLayout();
+        StripCanvas.ReleaseMouseCapture();
+        ViewModel?.CommitExpression();
+    }
+
+    void ApplyExpression(Point position)
+    {
+        if (ViewModel is not { } viewModel)
+            return;
+
+        var ticks = Math.Max(viewModel.TicksFromCanvasX(position.X), 0);
+        viewModel.SetExpressionAt(ticks, 1.0 - position.Y / NoteEditorViewModel.StripHeight);
     }
 }

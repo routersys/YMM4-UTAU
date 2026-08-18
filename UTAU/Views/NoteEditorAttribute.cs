@@ -15,12 +15,12 @@ internal sealed class NoteEditorAttribute : PropertyEditorAttribute
         if (propertyOwner is not UTAUVoicePronounce pronounce)
             return;
 
-        editor.Notes = pronounce.Notes;
+        editor.Pronounce = pronounce;
     }
 
     public override void ClearBindings(FrameworkElement control)
     {
         if (control is NoteEditor editor)
-            editor.Notes = null;
+            editor.Pronounce = null;
     }
 }

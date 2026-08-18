@@ -130,7 +130,6 @@
 <data name="NoteGroupBasic" xml:space="preserve"><value>基本</value></data>
 <data name="NoteGroupExpression" xml:space="preserve"><value>表現</value></data>
 <data name="NoteGroupTiming" xml:space="preserve"><value>時間</value></data>
-<data name="NoteGroupPortamento" xml:space="preserve"><value>滑音</value></data>
 <data name="NoteGroupVibrato" xml:space="preserve"><value>顫音</value></data>
 <data name="NoteLyric" xml:space="preserve"><value>歌詞</value></data>
 <data name="NoteTone" xml:space="preserve"><value>音高</value></data>
@@ -143,8 +142,6 @@
 <data name="NoteStartPoint" xml:space="preserve"><value>起始位置</value></data>
 <data name="NoteFadeIn" xml:space="preserve"><value>淡入</value></data>
 <data name="NoteFadeOut" xml:space="preserve"><value>淡出</value></data>
-<data name="PitchPointTime" xml:space="preserve"><value>時間</value></data>
-<data name="PitchPointCents" xml:space="preserve"><value>音分</value></data>
 <data name="PitchPointShape" xml:space="preserve"><value>曲線</value></data>
 <data name="PitchShapeSCurve" xml:space="preserve"><value>S 曲線</value></data>
 <data name="PitchShapeLinear" xml:space="preserve"><value>直線</value></data>
@@ -184,4 +181,8 @@
 <data name="FitToWindow" xml:space="preserve"><value>適應視圖</value></data>
 <data name="InfoTabInformation" xml:space="preserve"><value>資訊</value></data>
 <data name="InfoTabPortrait" xml:space="preserve"><value>立繪</value></data>
+<data name="ExpressionLabel" xml:space="preserve"><value>表現</value></data>
+<data name="ResetExpression" xml:space="preserve"><value>重設表現</value></data>
+<data name="ExpressionHint" xml:space="preserve"><value>上下拖曳可改變數值。音符單位的項目繪製為柱，曲線項目繪製為線。</value></data>
+<data name="PitchHandleHint" xml:space="preserve"><value>拖曳可改變音高。右鍵點擊可刪除。</value></data>
 </root>

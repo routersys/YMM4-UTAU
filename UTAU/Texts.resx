@@ -130,7 +130,6 @@
 <data name="NoteGroupBasic" xml:space="preserve"><value>基本</value></data>
 <data name="NoteGroupExpression" xml:space="preserve"><value>表現</value></data>
 <data name="NoteGroupTiming" xml:space="preserve"><value>時間</value></data>
-<data name="NoteGroupPortamento" xml:space="preserve"><value>ポルタメント</value></data>
 <data name="NoteGroupVibrato" xml:space="preserve"><value>ビブラート</value></data>
 <data name="NoteLyric" xml:space="preserve"><value>歌詞</value></data>
 <data name="NoteTone" xml:space="preserve"><value>音程</value></data>
@@ -143,8 +142,6 @@
 <data name="NoteStartPoint" xml:space="preserve"><value>開始位置</value></data>
 <data name="NoteFadeIn" xml:space="preserve"><value>フェードイン</value></data>
 <data name="NoteFadeOut" xml:space="preserve"><value>フェードアウト</value></data>
-<data name="PitchPointTime" xml:space="preserve"><value>時間</value></data>
-<data name="PitchPointCents" xml:space="preserve"><value>セント</value></data>
 <data name="PitchPointShape" xml:space="preserve"><value>曲線</value></data>
 <data name="PitchShapeSCurve" xml:space="preserve"><value>S字</value></data>
 <data name="PitchShapeLinear" xml:space="preserve"><value>直線</value></data>
@@ -184,4 +181,8 @@
 <data name="FitToWindow" xml:space="preserve"><value>表示範囲に合わせる</value></data>
 <data name="InfoTabInformation" xml:space="preserve"><value>情報</value></data>
 <data name="InfoTabPortrait" xml:space="preserve"><value>立ち絵</value></data>
+<data name="ExpressionLabel" xml:space="preserve"><value>表現</value></data>
+<data name="ResetExpression" xml:space="preserve"><value>表現を戻す</value></data>
+<data name="ExpressionHint" xml:space="preserve"><value>上下に引くと値が変わります。ノート単位の項目は棒、曲線の項目は線として描かれます。</value></data>
+<data name="PitchHandleHint" xml:space="preserve"><value>引くと音程が変わります。右押しで削除します。</value></data>
 </root>

@@ -130,7 +130,6 @@
 <data name="NoteGroupBasic" xml:space="preserve"><value>أساسي</value></data>
 <data name="NoteGroupExpression" xml:space="preserve"><value>التعبير</value></data>
 <data name="NoteGroupTiming" xml:space="preserve"><value>التوقيت</value></data>
-<data name="NoteGroupPortamento" xml:space="preserve"><value>الانزلاق</value></data>
 <data name="NoteGroupVibrato" xml:space="preserve"><value>الفيبراتو</value></data>
 <data name="NoteLyric" xml:space="preserve"><value>الكلمة</value></data>
 <data name="NoteTone" xml:space="preserve"><value>الدرجة</value></data>
@@ -143,8 +142,6 @@
 <data name="NoteStartPoint" xml:space="preserve"><value>نقطة البدء</value></data>
 <data name="NoteFadeIn" xml:space="preserve"><value>التلاشي الداخل</value></data>
 <data name="NoteFadeOut" xml:space="preserve"><value>التلاشي الخارج</value></data>
-<data name="PitchPointTime" xml:space="preserve"><value>الزمن</value></data>
-<data name="PitchPointCents" xml:space="preserve"><value>السنت</value></data>
 <data name="PitchPointShape" xml:space="preserve"><value>المنحنى</value></data>
 <data name="PitchShapeSCurve" xml:space="preserve"><value>منحنى S</value></data>
 <data name="PitchShapeLinear" xml:space="preserve"><value>خطي</value></data>
@@ -184,4 +181,8 @@
 <data name="FitToWindow" xml:space="preserve"><value>ملاءمة العرض</value></data>
 <data name="InfoTabInformation" xml:space="preserve"><value>المعلومات</value></data>
 <data name="InfoTabPortrait" xml:space="preserve"><value>الصورة</value></data>
+<data name="ExpressionLabel" xml:space="preserve"><value>التعبير</value></data>
+<data name="ResetExpression" xml:space="preserve"><value>إعادة ضبط التعبير</value></data>
+<data name="ExpressionHint" xml:space="preserve"><value>اسحب رأسياً لتغيير القيمة. تُرسم عناصر مستوى النوتة كأعمدة وعناصر المنحنى كخط.</value></data>
+<data name="PitchHandleHint" xml:space="preserve"><value>اسحب لتغيير الدرجة. انقر بالزر الأيمن لحذفها.</value></data>
 </root>

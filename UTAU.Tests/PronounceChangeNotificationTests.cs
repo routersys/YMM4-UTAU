@@ -90,7 +90,7 @@ public sealed class PronounceChangeNotificationTests
         var note = new UTAUNote { Lyric = "あ" };
         pronounce.Notes.Add(note);
 
-        var point = new PitchPoint(50.0, 0.0);
+        var point = new PitchPoint(50, 0.0);
         note.PitchPoints.Add(point);
         var afterAdd = count();
 
@@ -139,7 +139,7 @@ public sealed class PronounceChangeNotificationTests
         };
         note.Vibrato.LengthPercent = 60.0;
         note.Vibrato.DepthCents = 80.0;
-        note.PitchPoints.Add(new PitchPoint(30.0, -50.0, PitchPointShape.Linear));
+        note.PitchPoints.Add(new PitchPoint(30, -50.0, PitchPointShape.Linear));
 
         var clone = note.Clone();
 
@@ -164,7 +164,7 @@ public sealed class PronounceChangeNotificationTests
     public void EditingTheCloneDoesNotTouchTheOriginal()
     {
         var note = new UTAUNote { Lyric = "あ" };
-        note.PitchPoints.Add(new PitchPoint(10.0, 0.0));
+        note.PitchPoints.Add(new PitchPoint(10, 0.0));
 
         var clone = note.Clone();
         clone.Vibrato.DepthCents = 200.0;

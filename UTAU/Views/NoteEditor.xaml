@@ -31,6 +31,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="26"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="72"/>
                     <RowDefinition Height="14"/>
                 </Grid.RowDefinitions>
 
@@ -54,6 +55,13 @@
                               ItemsSource="{Binding SnapDivisions}"
                               SelectedItem="{Binding SnapDivision}"
                               DisplayMemberPath="Name"/>
+                    <TextBlock Text="{x:Static root:Texts.ExpressionLabel}" VerticalAlignment="Center" Margin="12,0,3,0"/>
+                    <ComboBox Width="110" VerticalAlignment="Center"
+                              ItemsSource="{Binding Expressions}"
+                              SelectedItem="{Binding SelectedExpression}"
+                              DisplayMemberPath="Name"/>
+                    <Button Width="26" Height="26" Command="{Binding ResetExpressionCommand}" ToolTip="{x:Static root:Texts.ResetExpression}"
+                            Content="{DynamicResource {x:Static icons:IconKeys.Restore}}"/>
                     <TextBlock Text="{Binding GuideText}" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.75"/>
                 </StackPanel>
 
@@ -100,6 +108,7 @@
                                     Background="Transparent"
                                     ToolTip="{x:Static root:Texts.NoteEditorHint}"
                                     MouseMove="RollCanvas_MouseMove"
+                                    MouseLeftButtonDown="RollCanvas_MouseLeftButtonDown"
                                     MouseLeftButtonUp="RollCanvas_MouseLeftButtonUp"
                                     MouseLeave="RollCanvas_MouseLeave"
                                     MouseDown="RollCanvas_MouseDown"
@@ -210,7 +219,32 @@
                                           Opacity="0.85"
                                           IsHitTestVisible="False"/>
 
-                                <Rectangle Width="1" Height="{Binding CanvasHeight}" Panel.ZIndex="3"
+                                <ItemsControl ItemsSource="{Binding PitchHandles}" Panel.ZIndex="3">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemContainerStyle>
+                                        <Style TargetType="ContentPresenter">
+                                            <Setter Property="Canvas.Left" Value="{Binding Left}"/>
+                                            <Setter Property="Canvas.Top" Value="{Binding Top}"/>
+                                        </Style>
+                                    </ItemsControl.ItemContainerStyle>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Rectangle Width="{Binding Size}" Height="{Binding Size}" Cursor="SizeAll"
+                                                       Fill="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"
+                                                       Stroke="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"
+                                                       StrokeThickness="1"
+                                                       ToolTip="{x:Static root:Texts.PitchHandleHint}"
+                                                       MouseLeftButtonDown="PitchHandle_MouseLeftButtonDown"
+                                                       MouseRightButtonDown="PitchHandle_MouseRightButtonDown"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <Rectangle Width="1" Height="{Binding CanvasHeight}" Panel.ZIndex="4"
                                            Canvas.Left="{Binding GuideLeft}"
                                            Fill="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"
                                            Opacity="0.6"
@@ -221,64 +255,115 @@
                     </Grid>
                 </ScrollViewer>
 
-                <ScrollBar x:Name="HorizontalBar" Grid.Row="2" Grid.Column="0" Orientation="Horizontal"
+
+                <Grid Grid.Row="2" Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="42"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding SelectedExpression.Name}" FontSize="9" Opacity="0.75"
+                               VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,3,0"
+                               TextTrimming="CharacterEllipsis"/>
+                    <ScrollViewer x:Name="StripScroller" Grid.Column="1"
+                                  HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
+                        <Canvas x:Name="StripCanvas"
+                                Width="{Binding CanvasWidth}"
+                                Height="{Binding StripCanvasHeight}"
+                                Background="Transparent"
+                                ToolTip="{x:Static root:Texts.ExpressionHint}"
+                                MouseLeftButtonDown="StripCanvas_MouseLeftButtonDown"
+                                MouseLeftButtonUp="StripCanvas_MouseLeftButtonUp"
+                                MouseMove="StripCanvas_MouseMove"
+                                MouseLeave="StripCanvas_MouseLeave">
+                            <ItemsControl ItemsSource="{Binding TimeGridLines}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style TargetType="ContentPresenter">
+                                        <Setter Property="Canvas.Left" Value="{Binding Left}"/>
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Rectangle Width="1" Height="72" Opacity="0.4"
+                                                   Fill="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <ItemsControl ItemsSource="{Binding ExpressionBars}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style TargetType="ContentPresenter">
+                                        <Setter Property="Canvas.Left" Value="{Binding Left}"/>
+                                        <Setter Property="Canvas.Top" Value="{Binding Top}"/>
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Width="{Binding Width}" Height="{Binding Height}"
+                                                Background="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"
+                                                IsHitTestVisible="False">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Opacity" Value="0.6"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Note.IsSelected}" Value="True">
+                                                            <Setter Property="Opacity" Value="1"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <Polyline Points="{Binding ExpressionCurvePoints}" StrokeThickness="1.5"
+                                      Stroke="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"
+                                      IsHitTestVisible="False"/>
+                        </Canvas>
+                    </ScrollViewer>
+                </Grid>
+
+                <ScrollBar x:Name="HorizontalBar" Grid.Row="3" Grid.Column="0" Orientation="Horizontal"
                            Margin="42,0,0,0" Scroll="HorizontalBar_Scroll"/>
 
-                <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" IsEnabled="{Binding HasSelection}">
+                <Grid Grid.Row="1" Grid.RowSpan="3" Grid.Column="1" IsEnabled="{Binding HasSelection}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="26"/>
                     </Grid.RowDefinitions>
                     <c:PropertiesEditor Grid.Row="0" Target="{Binding SelectedNote.Note}" IsScrollViewerEnabled="True"/>
-                    <Expander Grid.Row="1" Header="{x:Static root:Texts.NoteGroupPortamento}" IsExpanded="False">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="26"/>
-                                <RowDefinition Height="108"/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="48"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{x:Static root:Texts.PitchPointShape}" VerticalAlignment="Center"/>
-                                <c:CommonComboBox Grid.Column="1" Margin="0"
-                                                  IsEnabled="{Binding HasPitchPoint}"
-                                                  ItemsSource="{Binding Source={x:Static vm:NoteEditorViewModel.PitchShapes}}"
-                                                  DisplayMemberPath="Name"
-                                                  SelectedValuePath="Value"
-                                                  Value="{Binding SelectedPitchPoint.Shape}"/>
-                                <StackPanel Grid.Column="2" Orientation="Horizontal">
-                                    <Button Width="26" Height="26" Command="{Binding AddPitchPointCommand}" ToolTip="{x:Static root:Texts.AddPitchPoint}"
-                                            Content="{DynamicResource {x:Static icons:IconKeys.Plus}}"/>
-                                    <Button Width="26" Height="26" Command="{Binding RemovePitchPointCommand}" ToolTip="{x:Static root:Texts.RemovePitchPoint}"
-                                            Content="{DynamicResource {x:Static icons:IconKeys.Minus}}"/>
-                                    <Button Width="26" Height="26" Command="{Binding ResetPitchCommand}" ToolTip="{x:Static root:Texts.ResetPitch}"
-                                            Content="{DynamicResource {x:Static icons:IconKeys.Restore}}"/>
-                                </StackPanel>
-                            </Grid>
-                            <DataGrid Grid.Row="1" ItemsSource="{Binding PitchPoints}"
-                                      SelectedItem="{Binding SelectedPitchPoint}"
-                                      Margin="0"
-                                      AutoGenerateColumns="False"
-                                      CanUserAddRows="False"
-                                      CanUserDeleteRows="False"
-                                      CanUserReorderColumns="False"
-                                      CanUserResizeRows="False"
-                                      RowHeight="24"
-                                      SelectionMode="Single"
-                                      SelectionUnit="FullRow"
-                                      HeadersVisibility="Column">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="{x:Static root:Texts.PitchPointTime}" Width="*"
-                                                        Binding="{Binding Milliseconds, StringFormat=F0}"/>
-                                    <DataGridTextColumn Header="{x:Static root:Texts.PitchPointCents}" Width="*"
-                                                        Binding="{Binding Cents, StringFormat=F0}"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </Grid>
-                    </Expander>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="48"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{x:Static root:Texts.PitchPointShape}" VerticalAlignment="Center"/>
+                        <c:CommonComboBox Grid.Column="1" Margin="0"
+                                          IsEnabled="{Binding HasPitchPoint}"
+                                          ItemsSource="{Binding Source={x:Static vm:NoteEditorViewModel.PitchShapes}}"
+                                          DisplayMemberPath="Name"
+                                          SelectedValuePath="Value"
+                                          Value="{Binding SelectedPitchPoint.Shape}"/>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <Button Width="26" Height="26" Command="{Binding AddPitchPointCommand}" ToolTip="{x:Static root:Texts.AddPitchPoint}"
+                                    Content="{DynamicResource {x:Static icons:IconKeys.Plus}}"/>
+                            <Button Width="26" Height="26" Command="{Binding RemovePitchPointCommand}" ToolTip="{x:Static root:Texts.RemovePitchPoint}"
+                                    Content="{DynamicResource {x:Static icons:IconKeys.Minus}}"/>
+                            <Button Width="26" Height="26" Command="{Binding ResetPitchCommand}" ToolTip="{x:Static root:Texts.ResetPitch}"
+                                    Content="{DynamicResource {x:Static icons:IconKeys.Restore}}"/>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
             </Grid>
         </c:PopupButton.PopupContent>

@@ -88,7 +88,7 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
             parameter.Brightness);
 
         using var arena = new WorldArena();
-        var renderer = new UtauRenderer(settings, AnalysisCache.Shared);
+        var renderer = new UtauRenderer(settings, BuildCurves(pronounce, timeBase), AnalysisCache.Shared);
         var result = renderer.Render(units, arena);
         if (result.Samples.Length == 0)
             throw new InvalidOperationException(Texts.NoRenderableNoteMessage);
@@ -96,6 +96,17 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
         WaveIo.Write(filePath, result.Samples, result.SampleRate);
         pronounce.SourceText = normalized;
         pronounce.LipSyncFrames = BuildLipSyncFrames(notes, timeBase, result.OffsetMilliseconds);
+    }
+
+    static RenderCurves BuildCurves(UTAUVoicePronounce pronounce, TimeBase timeBase)
+    {
+        if (pronounce.FormantCurve.IsEmpty && pronounce.BreathinessCurve.IsEmpty)
+            return RenderCurves.Empty;
+
+        return new RenderCurves(
+            pronounce.FormantCurve.Values,
+            pronounce.BreathinessCurve.Values,
+            timeBase.ToMilliseconds(ExpressionCurve.IntervalTicks));
     }
 
     static void ThrowIfUnresolved(IReadOnlyList<PhonemeUnit> units)

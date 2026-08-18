@@ -4,7 +4,12 @@ namespace UTAU.Notes;
 
 internal sealed class PitchPoint : UndoRedoable
 {
-    double milliseconds;
+    public const int MinimumTicks = -TimeBase.TicksPerWholeNote;
+    public const int MaximumTicks = TimeBase.TicksPerWholeNote * 16;
+    public const double MinimumCents = -2400.0;
+    public const double MaximumCents = 2400.0;
+
+    int ticks;
     double cents;
     PitchPointShape shape = PitchPointShape.SCurve;
 
@@ -12,23 +17,23 @@ internal sealed class PitchPoint : UndoRedoable
     {
     }
 
-    public PitchPoint(double milliseconds, double cents, PitchPointShape shape = PitchPointShape.SCurve)
+    public PitchPoint(int ticks, double cents, PitchPointShape shape = PitchPointShape.SCurve)
     {
-        this.milliseconds = milliseconds;
-        this.cents = cents;
+        this.ticks = Math.Clamp(ticks, MinimumTicks, MaximumTicks);
+        this.cents = Math.Clamp(cents, MinimumCents, MaximumCents);
         this.shape = shape;
     }
 
-    public double Milliseconds
+    public int Ticks
     {
-        get => milliseconds;
-        set => Set(ref milliseconds, value);
+        get => ticks;
+        set => Set(ref ticks, Math.Clamp(value, MinimumTicks, MaximumTicks));
     }
 
     public double Cents
     {
         get => cents;
-        set => Set(ref cents, value);
+        set => Set(ref cents, Math.Clamp(value, MinimumCents, MaximumCents));
     }
 
     public PitchPointShape Shape
@@ -37,7 +42,7 @@ internal sealed class PitchPoint : UndoRedoable
         set => Set(ref shape, value);
     }
 
-    public PitchPoint Clone() => new(milliseconds, cents, shape);
+    public PitchPoint Clone() => new(ticks, cents, shape);
 
     public static double Interpolate(double from, double to, double progress, PitchPointShape shape)
     {

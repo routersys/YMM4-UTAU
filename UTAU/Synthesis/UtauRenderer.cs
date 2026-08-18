@@ -8,7 +8,7 @@ namespace UTAU.Synthesis;
 
 internal sealed record RenderResult(double[] Samples, int SampleRate, IReadOnlyList<UnitTiming> Timings, double OffsetMilliseconds);
 
-internal sealed class UtauRenderer(RenderSettings settings, AnalysisCache cache)
+internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves, AnalysisCache cache)
 {
     sealed record UnitSource(
         WorldFeatures Features,
@@ -122,6 +122,9 @@ internal sealed class UtauRenderer(RenderSettings settings, AnalysisCache cache)
         var startFrame = Math.Max((int)Math.Floor((timing.AudioStartMilliseconds - offset) / framePeriod), 0);
         var endFrame = Math.Min((int)Math.Ceiling((timing.AudioEndMilliseconds - offset) / framePeriod), frameCount - 1);
         var gain = settings.Gain * Math.Clamp(note.Intensity, 0.0, 200.0) / 100.0;
+        var baseFormantRatio = settings.FormantRatio;
+        var hasFormantCurve = curves.HasFormant;
+        var hasBreathinessCurve = curves.HasBreathiness;
         var map = TimeMap.Create(source.RegionStart, source.ConsonantEnd, source.RegionEnd, timing.RenderLengthMilliseconds, note.Velocity, settings.StretchMode);
         var modulation = Math.Clamp(note.Modulation, -200.0, 200.0) / 100.0;
 
@@ -137,10 +140,18 @@ internal sealed class UtauRenderer(RenderSettings settings, AnalysisCache cache)
             var frameIndex = source.Features.GetFrameIndex(sourceMilliseconds);
             SampleFeatures(source.Features, frameIndex, frameSpectrum, frameAperiodicity, out var sourceF0);
 
-            SpectrumTransform.WarpFormant(frameSpectrum, warpedSpectrum, settings.FormantRatio);
+            var formantRatio = hasFormantCurve
+                ? SpectrumTransform.FormantRatioFromSemitones(
+                    Math.Clamp(settings.FormantSemitones + curves.Formant(absolute), RenderSettings.MinimumFormant, RenderSettings.MaximumFormant))
+                : baseFormantRatio;
+            var breathiness = hasBreathinessCurve
+                ? Math.Clamp(settings.Breathiness + curves.Breathiness(absolute), RenderSettings.MinimumBreathiness, RenderSettings.MaximumBreathiness)
+                : settings.Breathiness;
+
+            SpectrumTransform.WarpFormant(frameSpectrum, warpedSpectrum, formantRatio);
             SpectrumTransform.ApplyBrightness(warpedSpectrum, settings.Brightness);
             SpectrumTransform.ApplyGain(warpedSpectrum, gain);
-            SpectrumTransform.ApplyBreathiness(frameAperiodicity, settings.Breathiness);
+            SpectrumTransform.ApplyBreathiness(frameAperiodicity, breathiness);
 
             var baseIndex = (long)frame * spectrumSize;
             for (var k = 0; k < spectrumSize; k++)
@@ -153,7 +164,10 @@ internal sealed class UtauRenderer(RenderSettings settings, AnalysisCache cache)
             if (sourceF0 <= 0.0)
                 continue;
 
-            var cents = note.EvaluatePitchOffsetCents(absolute - unit.NoteStartMilliseconds, unit.NoteLengthMilliseconds);
+            var progress = unit.NoteLengthMilliseconds > 0.0
+                ? (absolute - unit.NoteStartMilliseconds) / unit.NoteLengthMilliseconds
+                : 0.0;
+            var cents = note.EvaluatePitchOffsetCents(progress, unit.NoteLengthMilliseconds);
             var targetF0 = MusicalTone.FrequencyOf(unit.Tone + cents / 100.0);
             var ratio = source.MeanF0 > 0.0 ? sourceF0 / source.MeanF0 : 1.0;
             var value = targetF0 * Math.Pow(ratio, modulation);

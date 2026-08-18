@@ -130,7 +130,6 @@
 <data name="NoteGroupBasic" xml:space="preserve"><value>Básico</value></data>
 <data name="NoteGroupExpression" xml:space="preserve"><value>Expresión</value></data>
 <data name="NoteGroupTiming" xml:space="preserve"><value>Tiempo</value></data>
-<data name="NoteGroupPortamento" xml:space="preserve"><value>Portamento</value></data>
 <data name="NoteGroupVibrato" xml:space="preserve"><value>Vibrato</value></data>
 <data name="NoteLyric" xml:space="preserve"><value>Letra</value></data>
 <data name="NoteTone" xml:space="preserve"><value>Tono</value></data>
@@ -143,8 +142,6 @@
 <data name="NoteStartPoint" xml:space="preserve"><value>Punto de inicio</value></data>
 <data name="NoteFadeIn" xml:space="preserve"><value>Aparición gradual</value></data>
 <data name="NoteFadeOut" xml:space="preserve"><value>Desvanecimiento</value></data>
-<data name="PitchPointTime" xml:space="preserve"><value>Tiempo</value></data>
-<data name="PitchPointCents" xml:space="preserve"><value>Centésimas</value></data>
 <data name="PitchPointShape" xml:space="preserve"><value>Curva</value></data>
 <data name="PitchShapeSCurve" xml:space="preserve"><value>Curva en S</value></data>
 <data name="PitchShapeLinear" xml:space="preserve"><value>Lineal</value></data>
@@ -184,4 +181,8 @@
 <data name="FitToWindow" xml:space="preserve"><value>Ajustar a la vista</value></data>
 <data name="InfoTabInformation" xml:space="preserve"><value>Información</value></data>
 <data name="InfoTabPortrait" xml:space="preserve"><value>Retrato</value></data>
+<data name="ExpressionLabel" xml:space="preserve"><value>Expresión</value></data>
+<data name="ResetExpression" xml:space="preserve"><value>Restablecer la expresión</value></data>
+<data name="ExpressionHint" xml:space="preserve"><value>Arrastre verticalmente para cambiar el valor. Los elementos por nota se dibujan como barras y los de curva como una línea.</value></data>
+<data name="PitchHandleHint" xml:space="preserve"><value>Arrastre para cambiar el tono. Haga clic derecho para quitarlo.</value></data>
 </root>

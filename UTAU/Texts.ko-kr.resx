@@ -130,7 +130,6 @@
 <data name="NoteGroupBasic" xml:space="preserve"><value>기본</value></data>
 <data name="NoteGroupExpression" xml:space="preserve"><value>표현</value></data>
 <data name="NoteGroupTiming" xml:space="preserve"><value>시간</value></data>
-<data name="NoteGroupPortamento" xml:space="preserve"><value>포르타멘토</value></data>
 <data name="NoteGroupVibrato" xml:space="preserve"><value>비브라토</value></data>
 <data name="NoteLyric" xml:space="preserve"><value>가사</value></data>
 <data name="NoteTone" xml:space="preserve"><value>음정</value></data>
@@ -143,8 +142,6 @@
 <data name="NoteStartPoint" xml:space="preserve"><value>시작 위치</value></data>
 <data name="NoteFadeIn" xml:space="preserve"><value>페이드 인</value></data>
 <data name="NoteFadeOut" xml:space="preserve"><value>페이드 아웃</value></data>
-<data name="PitchPointTime" xml:space="preserve"><value>시간</value></data>
-<data name="PitchPointCents" xml:space="preserve"><value>센트</value></data>
 <data name="PitchPointShape" xml:space="preserve"><value>곡선</value></data>
 <data name="PitchShapeSCurve" xml:space="preserve"><value>S자</value></data>
 <data name="PitchShapeLinear" xml:space="preserve"><value>직선</value></data>
@@ -184,4 +181,8 @@
 <data name="FitToWindow" xml:space="preserve"><value>보기에 맞추기</value></data>
 <data name="InfoTabInformation" xml:space="preserve"><value>정보</value></data>
 <data name="InfoTabPortrait" xml:space="preserve"><value>일러스트</value></data>
+<data name="ExpressionLabel" xml:space="preserve"><value>표현</value></data>
+<data name="ResetExpression" xml:space="preserve"><value>표현 되돌리기</value></data>
+<data name="ExpressionHint" xml:space="preserve"><value>위아래로 끌면 값이 바뀝니다. 노트 단위 항목은 막대로, 곡선 항목은 선으로 그려집니다.</value></data>
+<data name="PitchHandleHint" xml:space="preserve"><value>끌면 음정이 바뀝니다. 오른쪽 클릭으로 삭제합니다.</value></data>
 </root>

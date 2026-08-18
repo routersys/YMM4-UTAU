@@ -70,7 +70,6 @@ RestLabel,,休符,Rest,休止符,休止符,쉼표,Silencio,سكتة,Istirahat
 NoteGroupBasic,,基本,Basic,基本,基本,기본,Básico,أساسي,Dasar
 NoteGroupExpression,,表現,Expression,表现,表現,표현,Expresión,التعبير,Ekspresi
 NoteGroupTiming,,時間,Timing,时间,時間,시간,Tiempo,التوقيت,Waktu
-NoteGroupPortamento,,ポルタメント,Portamento,滑音,滑音,포르타멘토,Portamento,الانزلاق,Portamento
 NoteGroupVibrato,,ビブラート,Vibrato,颤音,顫音,비브라토,Vibrato,الفيبراتو,Vibrato
 NoteLyric,,歌詞,Lyric,歌词,歌詞,가사,Letra,الكلمة,Lirik
 NoteTone,,音程,Pitch,音高,音高,음정,Tono,الدرجة,Nada
@@ -83,8 +82,6 @@ NoteOverlap,,オーバーラップ,Overlap,重叠,重疊,오버랩,Solapamiento,
 NoteStartPoint,,開始位置,Start point,起始位置,起始位置,시작 위치,Punto de inicio,نقطة البدء,Titik awal
 NoteFadeIn,,フェードイン,Fade in,淡入,淡入,페이드 인,Aparición gradual,التلاشي الداخل,Fade in
 NoteFadeOut,,フェードアウト,Fade out,淡出,淡出,페이드 아웃,Desvanecimiento,التلاشي الخارج,Fade out
-PitchPointTime,,時間,Time,时间,時間,시간,Tiempo,الزمن,Waktu
-PitchPointCents,,セント,Cents,音分,音分,센트,Centésimas,السنت,Sen
 PitchPointShape,,曲線,Curve,曲线,曲線,곡선,Curva,المنحنى,Kurva
 PitchShapeSCurve,,S字,S curve,S 曲线,S 曲線,S자,Curva en S,منحنى S,Kurva S
 PitchShapeLinear,,直線,Linear,直线,直線,직선,Lineal,خطي,Linear
@@ -124,3 +121,7 @@ NoteEditorHint,,ノートを上下に動かすと音程が、右端を動かす�
 FitToWindow,,表示範囲に合わせる,Fit to the view,适应视图,適應視圖,보기에 맞추기,Ajustar a la vista,ملاءمة العرض,Sesuaikan tampilan
 InfoTabInformation,,情報,Information,信息,資訊,정보,Información,المعلومات,Informasi
 InfoTabPortrait,,立ち絵,Portrait,立绘,立繪,일러스트,Retrato,الصورة,Potret
+ExpressionLabel,,表現,Expression,表现,表現,표현,Expresión,التعبير,Ekspresi
+ResetExpression,,表現を戻す,Reset the expression,重置表现,重設表現,표현 되돌리기,Restablecer la expresión,إعادة ضبط التعبير,Setel ulang ekspresi
+ExpressionHint,,上下に引くと値が変わります。ノート単位の項目は棒、曲線の項目は線として描かれます。,Drag vertically to change the value. Note level items are drawn as bars and curve items as a line.,上下拖动可改变数值。音符单位的项目绘制为柱，曲线项目绘制为线。,上下拖曳可改變數值。音符單位的項目繪製為柱，曲線項目繪製為線。,"위아래로 끌면 값이 바뀝니다. 노트 단위 항목은 막대로, 곡선 항목은 선으로 그려집니다.",Arrastre verticalmente para cambiar el valor. Los elementos por nota se dibujan como barras y los de curva como una línea.,اسحب رأسياً لتغيير القيمة. تُرسم عناصر مستوى النوتة كأعمدة وعناصر المنحنى كخط.,Seret vertikal untuk mengubah nilai. Item per not digambar sebagai batang dan item kurva sebagai garis.
+PitchHandleHint,,引くと音程が変わります。右押しで削除します。,Drag to change the pitch. Right click to remove it.,拖动可改变音高。右键点击可删除。,拖曳可改變音高。右鍵點擊可刪除。,끌면 음정이 바뀝니다. 오른쪽 클릭으로 삭제합니다.,Arrastre para cambiar el tono. Haga clic derecho para quitarlo.,اسحب لتغيير الدرجة. انقر بالزر الأيمن لحذفها.,Seret untuk mengubah nada. Klik kanan untuk menghapus.

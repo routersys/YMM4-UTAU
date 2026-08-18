@@ -1,12 +1,21 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using UTAU.Notes;
+using UTAU;
 using UTAU.ViewModels;
 
 namespace UTAU.Tests;
 
 public sealed class NoteEditorLayoutTests
 {
+    static UTAUVoicePronounce CreatePronounce(ObservableCollection<UTAUNote> notes)
+    {
+        var pronounce = new UTAUVoicePronounce();
+        foreach (var note in notes)
+            pronounce.Notes.Add(note);
+        return pronounce;
+    }
+
     static ObservableCollection<UTAUNote> CreateNotes(int count, int lengthTicks = UTAUNote.DefaultLengthTicks)
     {
         var notes = new ObservableCollection<UTAUNote>();
@@ -18,7 +27,7 @@ public sealed class NoteEditorLayoutTests
     [Fact]
     public void ShortPhrasesFillTheViewportWidth()
     {
-        var viewModel = new NoteEditorViewModel(CreateNotes(8));
+        var viewModel = new NoteEditorViewModel(CreatePronounce(CreateNotes(8)));
         Assert.True(viewModel.FitToViewport(800.0, 400.0));
         Assert.InRange(viewModel.CanvasWidth, 800.0 * 0.9, 800.0);
     }
@@ -26,7 +35,7 @@ public sealed class NoteEditorLayoutTests
     [Fact]
     public void LongPhrasesAreNotZoomedBelowTheLowerBound()
     {
-        var viewModel = new NoteEditorViewModel(CreateNotes(400));
+        var viewModel = new NoteEditorViewModel(CreatePronounce(CreateNotes(400)));
         viewModel.FitToViewport(800.0, 400.0);
         Assert.Equal(NoteEditorViewModel.MinimumPixelsPerTick, viewModel.PixelsPerTick, 12);
     }
@@ -34,7 +43,7 @@ public sealed class NoteEditorLayoutTests
     [Fact]
     public void VeryShortPhrasesAreNotZoomedAboveTheUpperBound()
     {
-        var viewModel = new NoteEditorViewModel(CreateNotes(1, 60));
+        var viewModel = new NoteEditorViewModel(CreatePronounce(CreateNotes(1, 60)));
         viewModel.FitToViewport(2000.0, 400.0);
         Assert.Equal(NoteEditorViewModel.MaximumPixelsPerTick, viewModel.PixelsPerTick, 12);
     }
@@ -42,7 +51,7 @@ public sealed class NoteEditorLayoutTests
     [Fact]
     public void TheToneRangeFillsTheViewportHeight()
     {
-        var viewModel = new NoteEditorViewModel(CreateNotes(4));
+        var viewModel = new NoteEditorViewModel(CreatePronounce(CreateNotes(4)));
         viewModel.FitToViewport(800.0, 400.0);
         Assert.InRange(viewModel.CanvasHeight, 400.0 * 0.9, 400.0);
     }
@@ -53,7 +62,7 @@ public sealed class NoteEditorLayoutTests
         var notes = CreateNotes(2);
         notes[0].Tone = 24;
         notes[1].Tone = 96;
-        var viewModel = new NoteEditorViewModel(notes);
+        var viewModel = new NoteEditorViewModel(CreatePronounce(notes));
         viewModel.FitToViewport(800.0, 200.0);
         Assert.Equal(NoteEditorViewModel.MinimumSemitoneHeight, viewModel.SemitoneHeight, 12);
     }
@@ -61,7 +70,7 @@ public sealed class NoteEditorLayoutTests
     [Fact]
     public void FittingIsSkippedWhenTheViewportBarelyChanges()
     {
-        var viewModel = new NoteEditorViewModel(CreateNotes(8));
+        var viewModel = new NoteEditorViewModel(CreatePronounce(CreateNotes(8)));
         Assert.True(viewModel.FitToViewport(800.0, 400.0));
         Assert.False(viewModel.FitToViewport(801.0, 400.0));
         Assert.True(viewModel.FitToViewport(900.0, 400.0));
@@ -70,7 +79,7 @@ public sealed class NoteEditorLayoutTests
     [Fact]
     public void ManualZoomStopsAutomaticFitting()
     {
-        var viewModel = new NoteEditorViewModel(CreateNotes(8));
+        var viewModel = new NoteEditorViewModel(CreatePronounce(CreateNotes(8)));
         viewModel.FitToViewport(800.0, 400.0);
         viewModel.ZoomHorizontally(NoteEditorViewModel.ZoomStep);
         var zoomed = viewModel.PixelsPerTick;
@@ -82,7 +91,7 @@ public sealed class NoteEditorLayoutTests
     [Fact]
     public void FittingResumesAfterItIsRequestedAgain()
     {
-        var viewModel = new NoteEditorViewModel(CreateNotes(8));
+        var viewModel = new NoteEditorViewModel(CreatePronounce(CreateNotes(8)));
         viewModel.FitToViewport(800.0, 400.0);
         viewModel.ZoomHorizontally(NoteEditorViewModel.ZoomStep);
         viewModel.EnableAutoFit();
@@ -94,7 +103,7 @@ public sealed class NoteEditorLayoutTests
     [Fact]
     public void EmptyNoteListsDoNotDivideByZero()
     {
-        var viewModel = new NoteEditorViewModel([]);
+        var viewModel = new NoteEditorViewModel(new UTAUVoicePronounce());
         viewModel.FitToViewport(800.0, 400.0);
 
         Assert.True(double.IsFinite(viewModel.PixelsPerTick));
@@ -106,7 +115,7 @@ public sealed class NoteEditorLayoutTests
     [Fact]
     public void ZeroSizedViewportsAreIgnored()
     {
-        var viewModel = new NoteEditorViewModel(CreateNotes(8));
+        var viewModel = new NoteEditorViewModel(CreatePronounce(CreateNotes(8)));
         var before = viewModel.PixelsPerTick;
 
         Assert.False(viewModel.FitToViewport(0.0, 400.0));
@@ -121,7 +130,7 @@ public sealed class NoteEditorLayoutTests
         notes[0].Tone = 60;
         notes[1].Tone = 64;
         notes[2].Tone = 67;
-        var viewModel = new NoteEditorViewModel(notes);
+        var viewModel = new NoteEditorViewModel(CreatePronounce(notes));
         viewModel.FitToViewport(800.0, 400.0);
 
         foreach (var note in viewModel.Notes)
@@ -137,7 +146,7 @@ public sealed class NoteEditorLayoutTests
     [Fact]
     public void NotesAreLaidOutBackToBackInTicks()
     {
-        var viewModel = new NoteEditorViewModel(CreateNotes(4));
+        var viewModel = new NoteEditorViewModel(CreatePronounce(CreateNotes(4)));
         viewModel.FitToViewport(800.0, 400.0);
 
         var expected = 0;

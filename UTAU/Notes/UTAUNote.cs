@@ -176,28 +176,29 @@ internal sealed class UTAUNote : UndoRedoable
         return clone;
     }
 
-    public double EvaluatePitchOffsetCents(double millisecondsFromNoteStart, double noteLengthMilliseconds)
-        => EvaluatePortamentoCents(millisecondsFromNoteStart) + Vibrato.Evaluate(millisecondsFromNoteStart, noteLengthMilliseconds);
+    public double EvaluatePitchOffsetCents(double progress, double noteLengthMilliseconds)
+        => EvaluatePortamentoCents(progress * LengthTicks)
+            + Vibrato.Evaluate(progress * noteLengthMilliseconds, noteLengthMilliseconds);
 
-    public double EvaluatePortamentoCents(double millisecondsFromNoteStart)
+    public double EvaluatePortamentoCents(double ticksFromNoteStart)
     {
         if (PitchPoints.Count == 0)
             return 0.0;
         if (PitchPoints.Count == 1)
             return PitchPoints[0].Cents;
 
-        if (millisecondsFromNoteStart < PitchPoints[0].Milliseconds)
+        if (ticksFromNoteStart < PitchPoints[0].Ticks)
             return PitchPoints[0].Cents;
 
         for (var i = 0; i < PitchPoints.Count - 1; i++)
         {
             var current = PitchPoints[i];
             var next = PitchPoints[i + 1];
-            if (millisecondsFromNoteStart > next.Milliseconds)
+            if (ticksFromNoteStart > next.Ticks)
                 continue;
 
-            var span = next.Milliseconds - current.Milliseconds;
-            var progress = span <= 0.0 ? 1.0 : (millisecondsFromNoteStart - current.Milliseconds) / span;
+            var span = (double)next.Ticks - current.Ticks;
+            var progress = span <= 0.0 ? 1.0 : (ticksFromNoteStart - current.Ticks) / span;
             return PitchPoint.Interpolate(current.Cents, next.Cents, progress, current.Shape);
         }
 
