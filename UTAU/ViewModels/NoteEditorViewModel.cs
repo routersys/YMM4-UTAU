@@ -800,7 +800,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     {
         var lowest = Notes.Count == 0 ? MusicalTone.MiddleC.NoteNumber : Notes.Min(x => x.Note.Tone);
         var highest = Notes.Count == 0 ? MusicalTone.MiddleC.NoteNumber : Notes.Max(x => x.Note.Tone);
-        var span = Math.Max(highest - lowest + 12, MinimumVisibleSemitones);
+        var span = Math.Clamp(highest - lowest + 12, MinimumVisibleSemitones, 127);
         var center = (lowest + highest) / 2;
         MinimumTone = Math.Clamp(center - span / 2, 0, 127 - span);
         MaximumTone = MinimumTone + span;
