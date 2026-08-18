@@ -228,7 +228,8 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="26"/>
-                        <RowDefinition Height="134"/>
+                        <RowDefinition Height="26"/>
+                        <RowDefinition Height="108"/>
                     </Grid.RowDefinitions>
                     <c:PropertiesEditor Grid.Row="0" Target="{Binding SelectedNote.Note}" IsScrollViewerEnabled="True"/>
                     <Grid Grid.Row="1">
@@ -242,7 +243,19 @@
                                     Content="{DynamicResource {x:Static icons:IconKeys.Restore}}"/>
                         </StackPanel>
                     </Grid>
-                    <DataGrid Grid.Row="2" ItemsSource="{Binding PitchPoints}"
+                    <Grid Grid.Row="2" IsEnabled="{Binding HasPitchPoint}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="92"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{x:Static root:Texts.PitchPointShape}" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                        <c:CommonComboBox Grid.Column="1" Margin="0"
+                                          ItemsSource="{Binding Source={x:Static vm:NoteEditorViewModel.PitchShapes}}"
+                                          DisplayMemberPath="Name"
+                                          SelectedValuePath="Value"
+                                          Value="{Binding SelectedPitchPoint.Shape}"/>
+                    </Grid>
+                    <DataGrid Grid.Row="3" ItemsSource="{Binding PitchPoints}"
                               SelectedItem="{Binding SelectedPitchPoint}"
                               Margin="0"
                               AutoGenerateColumns="False"
@@ -259,17 +272,6 @@
                                                 Binding="{Binding Milliseconds, StringFormat=F0}"/>
                             <DataGridTextColumn Header="{x:Static root:Texts.PitchPointCents}" Width="*"
                                                 Binding="{Binding Cents, StringFormat=F0}"/>
-                            <DataGridTemplateColumn Header="{x:Static root:Texts.PitchPointShape}" Width="*">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <c:CommonComboBox Margin="0"
-                                                          ItemsSource="{Binding Source={x:Static vm:NoteEditorViewModel.PitchShapes}}"
-                                                          DisplayMemberPath="Name"
-                                                          SelectedValuePath="Value"
-                                                          Value="{Binding Shape}"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>

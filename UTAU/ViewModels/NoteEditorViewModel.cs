@@ -95,8 +95,14 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public PitchPoint? SelectedPitchPoint
     {
         get => selectedPitchPoint;
-        set => Set(ref selectedPitchPoint, value);
+        set
+        {
+            if (Set(ref selectedPitchPoint, value))
+                OnPropertyChanged(nameof(HasPitchPoint));
+        }
     }
+
+    public bool HasPitchPoint => SelectedPitchPoint is not null;
 
     public double PixelsPerTick
     {

@@ -123,6 +123,60 @@ public sealed class PitchCurveTests
     }
 
     [Fact]
+    public void SelectingAPointExposesItForEditing()
+    {
+        var viewModel = CreateViewModel();
+        Assert.False(viewModel.HasPitchPoint);
+
+        var point = new PitchPoint(0.0, 0.0);
+        viewModel.SelectedNote!.Note.PitchPoints.Add(point);
+        viewModel.SelectedPitchPoint = point;
+
+        Assert.True(viewModel.HasPitchPoint);
+        Assert.Same(point, viewModel.SelectedPitchPoint);
+    }
+
+    [Fact]
+    public void SwitchingNotesClearsTheSelectedPoint()
+    {
+        var notes = new ObservableCollection<UTAUNote>
+        {
+            new() { Lyric = "あ", Tone = 60, LengthTicks = 480 },
+            new() { Lyric = "か", Tone = 62, LengthTicks = 480 },
+        };
+        var viewModel = new NoteEditorViewModel(notes);
+        var point = new PitchPoint(0.0, 0.0);
+        viewModel.Notes[0].Note.PitchPoints.Add(point);
+        viewModel.SelectedPitchPoint = point;
+
+        viewModel.SelectedNote = viewModel.Notes[1];
+
+        Assert.Null(viewModel.SelectedPitchPoint);
+        Assert.False(viewModel.HasPitchPoint);
+    }
+
+    [Fact]
+    public void AddingAPointSelectsIt()
+    {
+        var viewModel = CreateViewModel();
+        viewModel.AddPitchPointCommand.Execute(null);
+
+        Assert.True(viewModel.HasPitchPoint);
+        Assert.Same(Assert.Single(viewModel.SelectedNote!.Note.PitchPoints), viewModel.SelectedPitchPoint);
+    }
+
+    [Fact]
+    public void ResettingClearsThePointsAndTheSelection()
+    {
+        var viewModel = CreateViewModel();
+        viewModel.AddPitchPointCommand.Execute(null);
+        viewModel.ResetPitchCommand.Execute(null);
+
+        Assert.Empty(viewModel.SelectedNote!.Note.PitchPoints);
+        Assert.False(viewModel.HasPitchPoint);
+    }
+
+    [Fact]
     public void EverySelectableCurveShapeIsOffered()
     {
         var offered = NoteEditorViewModel.PitchShapes.Select(x => x.Value).ToArray();
