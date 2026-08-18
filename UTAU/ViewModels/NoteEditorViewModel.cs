@@ -25,15 +25,23 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public const double ViewportChangeThreshold = 2.0;
     public const double StripHeight = 72.0;
     public const double PitchHandleSize = 8.0;
+    public const double SelectionBoxThreshold = 3.0;
 
     readonly UTAUVoicePronounce pronounce;
     readonly ObservableCollection<UTAUNote> source;
+    readonly List<NoteViewModel> selectedNotes = [];
+    readonly List<NoteViewModel> transformTargets = [];
     double pixelsPerTick = DefaultPixelsPerTick;
     double semitoneHeight = DefaultSemitoneHeight;
     int minimumTone = 48;
     int maximumTone = 72;
     NoteDivision snapDivision = new(16);
     NoteViewModel? selectedNote;
+    int[] transformOriginTones = [];
+    int[] transformOriginLengths = [];
+    Rect selectionBox;
+    bool isSelectionBoxVisible;
+    bool isBatching;
     ObservableCollection<PitchPoint>? observedPitchPoints;
     PitchPoint? selectedPitchPoint;
     PointCollection pitchCurve = [];
@@ -56,8 +64,9 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         ZoomOutCommand = new ActionCommand(_ => pixelsPerTick > MinimumPixelsPerTick, _ => ZoomHorizontally(1.0 / ZoomStep));
         ZoomVerticalInCommand = new ActionCommand(_ => semitoneHeight < MaximumSemitoneHeight, _ => ZoomVertically(ZoomStep));
         ZoomVerticalOutCommand = new ActionCommand(_ => semitoneHeight > MinimumSemitoneHeight, _ => ZoomVertically(1.0 / ZoomStep));
-        InsertRestCommand = new ActionCommand(_ => SelectedNote is not null, _ => InsertRest());
-        RemoveNoteCommand = new ActionCommand(_ => SelectedNote is not null && Notes.Count > 1, _ => RemoveSelected());
+        InsertRestCommand = new ActionCommand(_ => selectedNotes.Count > 0, _ => InsertRest());
+        RemoveNoteCommand = new ActionCommand(_ => selectedNotes.Count > 0 && Notes.Count > selectedNotes.Count, _ => RemoveSelected());
+        SelectAllCommand = new ActionCommand(_ => Notes.Count > 0, _ => SelectAll());
         AddPitchPointCommand = new ActionCommand(_ => SelectedNote is not null, _ => AddPitchPoint());
         RemovePitchPointCommand = new ActionCommand(_ => SelectedPitchPoint is not null, _ => RemoveSelectedPitchPoint());
         ResetPitchCommand = new ActionCommand(_ => SelectedNote is not null, _ => ResetPitch());
@@ -81,6 +90,8 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public ICommand InsertRestCommand { get; }
 
     public ICommand RemoveNoteCommand { get; }
+
+    public ICommand SelectAllCommand { get; }
 
     public ICommand AddPitchPointCommand { get; }
 
@@ -161,21 +172,35 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public NoteViewModel? SelectedNote
     {
         get => selectedNote;
-        set
-        {
-            if (selectedNote is not null)
-                selectedNote.IsSelected = false;
-            Set(ref selectedNote, value);
-            if (selectedNote is not null)
-                selectedNote.IsSelected = true;
-            ObservePitchPoints(selectedNote?.Note.PitchPoints);
-            SelectedPitchPoint = null;
-            OnPropertyChanged(nameof(HasSelection));
-            UpdatePitchHandles();
-        }
+        set => Select(value);
     }
 
-    public bool HasSelection => SelectedNote is not null;
+    public IReadOnlyList<NoteViewModel> SelectedNotes => selectedNotes;
+
+    public IReadOnlyList<UTAUNote> SelectedNoteTargets { get; private set; } = [];
+
+    public int SelectedCount => selectedNotes.Count;
+
+    public bool HasSelection => selectedNote is not null;
+
+    public bool HasMultipleSelection => selectedNotes.Count > 1;
+
+    public string SelectionText
+        => selectedNotes.Count > 1 ? string.Format(Texts.SelectionCountFormat, selectedNotes.Count) : string.Empty;
+
+    public double SelectionBoxLeft => selectionBox.X;
+
+    public double SelectionBoxTop => selectionBox.Y;
+
+    public double SelectionBoxWidth => selectionBox.Width;
+
+    public double SelectionBoxHeight => selectionBox.Height;
+
+    public bool IsSelectionBoxVisible
+    {
+        get => isSelectionBoxVisible;
+        private set => Set(ref isSelectionBoxVisible, value);
+    }
 
     public PointCollection PitchCurve
     {
@@ -248,6 +273,9 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     public void OnNoteChanged(string? propertyName)
     {
+        if (isBatching)
+            return;
+
         switch (propertyName)
         {
             case nameof(UTAUNote.Tone):
@@ -349,6 +377,138 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     public NoteViewModel? FindNoteAt(int ticks)
         => Notes.FirstOrDefault(x => ticks >= x.StartTicks && ticks < x.EndTicks);
+
+    public void Select(NoteViewModel? note)
+    {
+        ClearSelection();
+        if (note is not null)
+            AddToSelection(note);
+        SetPrimary(note);
+    }
+
+    public void MakePrimary(NoteViewModel note)
+    {
+        if (selectedNotes.Contains(note))
+            SetPrimary(note);
+        else
+            Select(note);
+    }
+
+    public void ToggleSelection(NoteViewModel note)
+    {
+        if (!selectedNotes.Remove(note))
+        {
+            AddToSelection(note);
+            SetPrimary(note);
+            return;
+        }
+
+        note.IsSelected = false;
+        SetPrimary(ReferenceEquals(selectedNote, note) ? selectedNotes.LastOrDefault() : selectedNote);
+    }
+
+    public void SelectRange(NoteViewModel note)
+    {
+        var target = Notes.IndexOf(note);
+        if (target < 0)
+            return;
+
+        var anchor = selectedNote is null ? target : Notes.IndexOf(selectedNote);
+        if (anchor < 0)
+            anchor = target;
+
+        ClearSelection();
+        for (var index = Math.Min(anchor, target); index <= Math.Max(anchor, target); index++)
+            AddToSelection(Notes[index]);
+        SetPrimary(note);
+    }
+
+    public void SelectAll()
+    {
+        var primary = selectedNote;
+        ClearSelection();
+        foreach (var note in Notes)
+            AddToSelection(note);
+        SetPrimary(primary ?? Notes.FirstOrDefault());
+    }
+
+    public void SelectInBox(Rect box, bool add)
+    {
+        if (!add)
+            ClearSelection();
+
+        foreach (var note in Notes)
+        {
+            if (box.IntersectsWith(new Rect(note.Left, note.Top, note.Width, note.Height)))
+                AddToSelection(note);
+        }
+
+        SetPrimary(selectedNote is not null && selectedNotes.Contains(selectedNote)
+            ? selectedNote
+            : selectedNotes.LastOrDefault());
+    }
+
+    public void UpdateSelectionBox(Point origin, Point current)
+    {
+        SetSelectionBox(new Rect(origin, current));
+        IsSelectionBoxVisible = true;
+    }
+
+    public void CommitSelectionBox(bool add)
+    {
+        var box = selectionBox;
+        HideSelectionBox();
+        if (box.Width < SelectionBoxThreshold && box.Height < SelectionBoxThreshold)
+            return;
+
+        SelectInBox(box, add);
+    }
+
+    public void HideSelectionBox()
+    {
+        SetSelectionBox(default);
+        IsSelectionBoxVisible = false;
+    }
+
+    public void BeginTransform()
+    {
+        transformTargets.Clear();
+        transformTargets.AddRange(selectedNotes);
+        transformOriginTones = [.. transformTargets.Select(x => x.Note.Tone)];
+        transformOriginLengths = [.. transformTargets.Select(x => x.Note.LengthTicks)];
+    }
+
+    public void TransformTones(int deltaSemitones)
+    {
+        if (transformTargets.Count == 0)
+            return;
+
+        var shift = Math.Clamp(deltaSemitones, -transformOriginTones.Min(), 127 - transformOriginTones.Max());
+        Batch(() =>
+        {
+            for (var index = 0; index < transformTargets.Count; index++)
+                transformTargets[index].Tone = transformOriginTones[index] + shift;
+        });
+    }
+
+    public void TransformLengths(int deltaTicks)
+    {
+        if (transformTargets.Count == 0)
+            return;
+
+        Batch(() =>
+        {
+            for (var index = 0; index < transformTargets.Count; index++)
+                transformTargets[index].LengthTicks = SnapLength(transformOriginLengths[index] + deltaTicks);
+        });
+    }
+
+    public void EndTransform()
+    {
+        transformTargets.Clear();
+        transformOriginTones = [];
+        transformOriginLengths = [];
+    }
 
     public void SetExpressionAt(int ticks, double ratio)
     {
@@ -477,9 +637,77 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public void Dispose()
     {
         ObservePitchPoints(null);
+        selectedNotes.Clear();
+        transformTargets.Clear();
         foreach (var note in Notes)
             note.Dispose();
         Notes.Clear();
+    }
+
+    void ClearSelection()
+    {
+        foreach (var note in selectedNotes)
+            note.IsSelected = false;
+        selectedNotes.Clear();
+    }
+
+    void AddToSelection(NoteViewModel note)
+    {
+        if (selectedNotes.Contains(note))
+            return;
+
+        note.IsSelected = true;
+        selectedNotes.Add(note);
+    }
+
+    void SetPrimary(NoteViewModel? note)
+    {
+        if (selectedNote is not null)
+            selectedNote.IsPrimary = false;
+        Set(ref selectedNote, note);
+        if (selectedNote is not null)
+            selectedNote.IsPrimary = true;
+
+        SelectedNoteTargets = [.. selectedNotes.Select(x => x.Note)];
+        ObservePitchPoints(selectedNote?.Note.PitchPoints);
+        SelectedPitchPoint = null;
+        OnPropertyChanged(nameof(SelectedNotes));
+        OnPropertyChanged(nameof(SelectedNoteTargets));
+        OnPropertyChanged(nameof(SelectedCount));
+        OnPropertyChanged(nameof(HasSelection));
+        OnPropertyChanged(nameof(HasMultipleSelection));
+        OnPropertyChanged(nameof(SelectionText));
+        UpdatePitchHandles();
+    }
+
+    void SetSelectionBox(Rect box)
+    {
+        selectionBox = box;
+        OnPropertyChanged(nameof(SelectionBoxLeft));
+        OnPropertyChanged(nameof(SelectionBoxTop));
+        OnPropertyChanged(nameof(SelectionBoxWidth));
+        OnPropertyChanged(nameof(SelectionBoxHeight));
+    }
+
+    void Batch(Action action)
+    {
+        if (isBatching)
+        {
+            action();
+            return;
+        }
+
+        isBatching = true;
+        try
+        {
+            action();
+        }
+        finally
+        {
+            isBatching = false;
+        }
+
+        InvalidateLayout();
     }
 
     ExpressionCurve CurrentCurve
@@ -580,21 +808,33 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     void ApplyTone(object? parameter)
     {
-        if (SelectedNote is not { } selected || parameter is not KeyRowViewModel row)
+        if (parameter is not KeyRowViewModel row || selectedNote is null || selectedNotes.Count == 0)
             return;
-        selected.Tone = row.NoteNumber;
+
+        var shift = Math.Clamp(
+            row.NoteNumber - selectedNote.Note.Tone,
+            -selectedNotes.Min(x => x.Note.Tone),
+            127 - selectedNotes.Max(x => x.Note.Tone));
+        if (shift == 0)
+            return;
+
+        Batch(() =>
+        {
+            foreach (var note in selectedNotes)
+                note.Tone += shift;
+        });
     }
 
     void InsertRest()
     {
-        if (SelectedNote is not { } selected)
+        if (selectedNotes.Count == 0)
             return;
 
-        var index = Notes.IndexOf(selected);
+        var index = selectedNotes.Max(Notes.IndexOf);
         var rest = new UTAUNote
         {
             Lyric = UTAUNote.RestLyric,
-            Tone = selected.Note.Tone,
+            Tone = selectedNote?.Note.Tone ?? MusicalTone.MiddleC.NoteNumber,
             LengthTicks = SnapDivision.IsFree ? UTAUNote.DefaultLengthTicks : SnapDivision.Ticks,
         };
         source.Insert(index + 1, rest);
@@ -604,14 +844,21 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     void RemoveSelected()
     {
-        if (SelectedNote is not { } selected)
+        if (selectedNotes.Count == 0 || Notes.Count <= selectedNotes.Count)
             return;
 
-        var index = Notes.IndexOf(selected);
-        source.Remove(selected.Note);
-        selected.Dispose();
-        Notes.RemoveAt(index);
-        SelectedNote = Notes.Count == 0 ? null : Notes[Math.Min(index, Notes.Count - 1)];
+        var removing = selectedNotes.OrderBy(Notes.IndexOf).ToArray();
+        var index = Notes.IndexOf(removing[0]);
+        Select(null);
+
+        foreach (var note in removing)
+        {
+            source.Remove(note.Note);
+            Notes.Remove(note);
+            note.Dispose();
+        }
+
+        Select(Notes[Math.Min(index, Notes.Count - 1)]);
         InvalidateLayout();
     }
 
@@ -635,11 +882,14 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     void ResetPitch()
     {
-        if (SelectedNote is not { } selected)
+        if (selectedNotes.Count == 0)
             return;
 
-        selected.Note.PitchPoints.Clear();
+        foreach (var note in selectedNotes)
+            note.Note.PitchPoints.Clear();
         SelectedPitchPoint = null;
+        UpdatePitchCurve();
+        UpdatePitchHandles();
     }
 
     void ResetExpression()
@@ -652,15 +902,18 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
             return;
         }
 
-        foreach (var note in Notes)
+        Batch(() =>
         {
-            switch (SelectedExpression.NoteExpression)
+            foreach (var note in Notes)
             {
-                case NoteExpression.Velocity: note.Note.Velocity = 100.0; break;
-                case NoteExpression.Intensity: note.Note.Intensity = 100.0; break;
-                case NoteExpression.Modulation: note.Note.Modulation = 0.0; break;
+                switch (SelectedExpression.NoteExpression)
+                {
+                    case NoteExpression.Velocity: note.Note.Velocity = 100.0; break;
+                    case NoteExpression.Intensity: note.Note.Intensity = 100.0; break;
+                    case NoteExpression.Modulation: note.Note.Modulation = 0.0; break;
+                }
             }
-        }
+        });
     }
 
     void ObservePitchPoints(ObservableCollection<PitchPoint>? points)
