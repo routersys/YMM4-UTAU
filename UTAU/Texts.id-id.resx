@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+<data name="CurrentCulture" xml:space="preserve"><value>id-id</value></data>
+<data name="UTAU" xml:space="preserve"><value>UTAU</value></data>
+<data name="UpdateAvailableMessage" xml:space="preserve"><value>Versi baru {0} telah tersedia.</value></data>
+<data name="F0EstimatorLabel" xml:space="preserve"><value>Estimasi frekuensi dasar</value></data>
+<data name="F0EstimatorHarvest" xml:space="preserve"><value>Harvest</value></data>
+<data name="F0EstimatorHarvestDescription" xml:space="preserve"><value>Lebih akurat tetapi analisis lebih lambat.</value></data>
+<data name="F0EstimatorDio" xml:space="preserve"><value>Dio</value></data>
+<data name="F0EstimatorDioDescription" xml:space="preserve"><value>Analisis lebih cepat tetapi kurang akurat.</value></data>
+<data name="StretchModeLabel" xml:space="preserve"><value>Metode peregangan</value></data>
+<data name="StretchModeLoop" xml:space="preserve"><value>Ulang</value></data>
+<data name="StretchModeLoopDescription" xml:space="preserve"><value>Mengulang bagian sustain bolak-balik.</value></data>
+<data name="StretchModeStretch" xml:space="preserve"><value>Regang</value></data>
+<data name="StretchModeStretchDescription" xml:space="preserve"><value>Meregangkan waktu bagian sustain secara seragam.</value></data>
+<data name="EngineSettings" xml:space="preserve"><value>Pengaturan mesin</value></data>
+<data name="AnalysisCacheLabel" xml:space="preserve"><value>Cache analisis</value></data>
+<data name="ClearCache" xml:space="preserve"><value>Hapus cache</value></data>
+<data name="SearchDirectories" xml:space="preserve"><value>Folder pencarian</value></data>
+<data name="AddDirectory" xml:space="preserve"><value>Tambah folder</value></data>
+<data name="RemoveDirectory" xml:space="preserve"><value>Hapus folder</value></data>
+<data name="OpenDefaultDirectory" xml:space="preserve"><value>Buka folder bawaan</value></data>
+<data name="Refresh" xml:space="preserve"><value>Muat ulang</value></data>
+<data name="VoiceBankList" xml:space="preserve"><value>Daftar bank suara</value></data>
+<data name="VoiceBankCount" xml:space="preserve"><value>{0} bank suara</value></data>
+<data name="DefaultColor" xml:space="preserve"><value>Bawaan</value></data>
+<data name="InfoKey" xml:space="preserve"><value>Item</value></data>
+<data name="InfoValue" xml:space="preserve"><value>Nilai</value></data>
+<data name="InfoName" xml:space="preserve"><value>Nama</value></data>
+<data name="InfoAuthor" xml:space="preserve"><value>Pembuat</value></data>
+<data name="InfoVersion" xml:space="preserve"><value>Versi</value></data>
+<data name="InfoWeb" xml:space="preserve"><value>Web</value></data>
+<data name="InfoSample" xml:space="preserve"><value>Audio sampel</value></data>
+<data name="InfoAliasCount" xml:space="preserve"><value>Jumlah alias</value></data>
+<data name="InfoOtoCount" xml:space="preserve"><value>Jumlah oto.ini</value></data>
+<data name="InfoSampleCount" xml:space="preserve"><value>Jumlah berkas audio</value></data>
+<data name="InfoOtoSet" xml:space="preserve"><value>oto.ini</value></data>
+<data name="InfoPrefixMap" xml:space="preserve"><value>Entri prefix.map</value></data>
+<data name="InfoSubBank" xml:space="preserve"><value>Jumlah warna suara</value></data>
+<data name="InfoSubBankDetail" xml:space="preserve"><value>Warna suara</value></data>
+<data name="InfoColors" xml:space="preserve"><value>Warna suara yang tersedia</value></data>
+<data name="InfoPath" xml:space="preserve"><value>Lokasi</value></data>
+<data name="InfoReadme" xml:space="preserve"><value>Readme</value></data>
+<data name="LicenseAuthorFormat" xml:space="preserve"><value>Pembuat: {0}</value></data>
+<data name="LicenseVersionFormat" xml:space="preserve"><value>Versi: {0}</value></data>
+<data name="ParameterColor" xml:space="preserve"><value>Warna suara</value></data>
+<data name="ParameterColorDescription" xml:space="preserve"><value>Memilih warna suara yang didefinisikan pada subbanks di character.yaml.</value></data>
+<data name="ParameterBaseTone" xml:space="preserve"><value>Nada dasar</value></data>
+<data name="ParameterBaseToneDescription" xml:space="preserve"><value>Nada yang dipakai di bagian tanpa notasi nada.</value></data>
+<data name="ParameterSpeed" xml:space="preserve"><value>Kecepatan bicara</value></data>
+<data name="ParameterSpeedDescription" xml:space="preserve"><value>Nilai lebih besar memperpendek tiap mora.</value></data>
+<data name="ParameterTempo" xml:space="preserve"><value>Tempo</value></data>
+<data name="ParameterTempoDescription" xml:space="preserve"><value>Dipakai saat panjang not ditulis sebagai pecahan seperti 1/4.</value></data>
+<data name="ParameterVolume" xml:space="preserve"><value>Volume</value></data>
+<data name="ParameterVolumeDescription" xml:space="preserve"><value>Volume seluruh keluaran. Nilai 100 mempertahankan level asli.</value></data>
+<data name="ParameterModulation" xml:space="preserve"><value>Modulasi</value></data>
+<data name="ParameterModulationDescription" xml:space="preserve"><value>Seberapa banyak gerak nada asli dipertahankan. Nilai 0 mengikuti nada yang ditentukan.</value></data>
+<data name="ParameterFormant" xml:space="preserve"><value>Forman</value></data>
+<data name="ParameterFormantDescription" xml:space="preserve"><value>Menggeser selubung spektral dalam satuan seminada. Nilai positif membuat suara lebih tipis.</value></data>
+<data name="ParameterBreathiness" xml:space="preserve"><value>Napas suara</value></data>
+<data name="ParameterBreathinessDescription" xml:space="preserve"><value>Menaikkan aperiodisitas sehingga komponen napas bertambah.</value></data>
+<data name="ParameterBrightness" xml:space="preserve"><value>Penekanan frekuensi tinggi</value></data>
+<data name="ParameterBrightnessDescription" xml:space="preserve"><value>Memiringkan spektrum sebesar penguatan pada frekuensi Nyquist.</value></data>
+<data name="PronounceNotes" xml:space="preserve"><value>Not</value></data>
+<data name="PronounceNotesDescription" xml:space="preserve"><value>Menyunting urutan not yang dibangun dari pelafalan.</value></data>
+<data name="EditNotes" xml:space="preserve"><value>Sunting not</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>Seret not secara vertikal untuk mengubah nada dan seret tepi kanannya untuk mengubah panjangnya.</value></data>
+<data name="ZoomIn" xml:space="preserve"><value>Perbesar</value></data>
+<data name="ZoomOut" xml:space="preserve"><value>Perkecil</value></data>
+<data name="InsertRest" xml:space="preserve"><value>Sisipkan istirahat</value></data>
+<data name="RemoveNote" xml:space="preserve"><value>Hapus not</value></data>
+<data name="RestLabel" xml:space="preserve"><value>Istirahat</value></data>
+<data name="NoteGroupBasic" xml:space="preserve"><value>Dasar</value></data>
+<data name="NoteGroupExpression" xml:space="preserve"><value>Ekspresi</value></data>
+<data name="NoteGroupTiming" xml:space="preserve"><value>Waktu</value></data>
+<data name="NoteGroupPortamento" xml:space="preserve"><value>Portamento</value></data>
+<data name="NoteGroupVibrato" xml:space="preserve"><value>Vibrato</value></data>
+<data name="NoteLyric" xml:space="preserve"><value>Lirik</value></data>
+<data name="NoteTone" xml:space="preserve"><value>Nada</value></data>
+<data name="NoteLength" xml:space="preserve"><value>Panjang</value></data>
+<data name="NoteVelocity" xml:space="preserve"><value>Kecepatan konsonan</value></data>
+<data name="NoteIntensity" xml:space="preserve"><value>Intensitas</value></data>
+<data name="NoteModulation" xml:space="preserve"><value>Modulasi</value></data>
+<data name="NotePreutterance" xml:space="preserve"><value>Praucap</value></data>
+<data name="NoteOverlap" xml:space="preserve"><value>Tumpang tindih</value></data>
+<data name="NoteStartPoint" xml:space="preserve"><value>Titik awal</value></data>
+<data name="NoteFadeIn" xml:space="preserve"><value>Fade in</value></data>
+<data name="NoteFadeOut" xml:space="preserve"><value>Fade out</value></data>
+<data name="PitchPointTime" xml:space="preserve"><value>Waktu</value></data>
+<data name="PitchPointCents" xml:space="preserve"><value>Sen</value></data>
+<data name="PitchPointShape" xml:space="preserve"><value>Kurva</value></data>
+<data name="PitchShapeSCurve" xml:space="preserve"><value>Kurva S</value></data>
+<data name="PitchShapeLinear" xml:space="preserve"><value>Linear</value></data>
+<data name="PitchShapeRCurve" xml:space="preserve"><value>Kurva R</value></data>
+<data name="PitchShapeJCurve" xml:space="preserve"><value>Kurva J</value></data>
+<data name="AddPitchPoint" xml:space="preserve"><value>Tambah titik kendali</value></data>
+<data name="RemovePitchPoint" xml:space="preserve"><value>Hapus titik kendali</value></data>
+<data name="ResetPitch" xml:space="preserve"><value>Setel ulang kurva nada</value></data>
+<data name="VibratoLength" xml:space="preserve"><value>Panjang</value></data>
+<data name="VibratoPeriod" xml:space="preserve"><value>Periode</value></data>
+<data name="VibratoDepth" xml:space="preserve"><value>Kedalaman</value></data>
+<data name="VibratoFadeIn" xml:space="preserve"><value>Awal</value></data>
+<data name="VibratoFadeOut" xml:space="preserve"><value>Akhir</value></data>
+<data name="VibratoPhase" xml:space="preserve"><value>Fase</value></data>
+<data name="VibratoOffset" xml:space="preserve"><value>Geseran pusat</value></data>
+<data name="EmptyTextMessage" xml:space="preserve"><value>Pelafalan kosong.</value></data>
+<data name="AliasNotFoundMessage" xml:space="preserve"><value>{0} tidak ditemukan pada oto.ini bank suara ini.</value></data>
+<data name="NoRenderableNoteMessage" xml:space="preserve"><value>Tidak ada not yang dapat disintesis.</value></data>
+<data name="TextTooLongMessage" xml:space="preserve"><value>Pelafalan terlalu panjang. Silakan bagi menjadi beberapa bagian.</value></data>
+<data name="AboutUTAU" xml:space="preserve"><value>Tentang UTAU</value></data>
+<data name="AboutUTAUDescription" xml:space="preserve"><value>Plugin ini membaca oto.ini bank suara UTAU apa adanya dan mensintesis ulang dengan WORLD. Bank kana tunggal, VCV, dan CVVC semuanya didukung.</value></data>
+<data name="AboutUTAUHowTo" xml:space="preserve"><value>Letakkan folder bank suara di user/resources/utau atau tambahkan ke folder pencarian. Pelafalan ditulis dengan kana.</value></data>
+<data name="AboutUTAUNotation" xml:space="preserve"><value>Menulis &lt;!nada:panjang&gt; di dalam pelafalan menentukan nada dan panjang kana yang mengikutinya. Panjang ditulis dalam milidetik atau sebagai not seperti 1/4.</value></data>
+<data name="AboutUTAUNotationExample" xml:space="preserve"><value>Contoh: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  Istirahat ditulis sebagai &lt;!R:200&gt;.</value></data>
+<data name="AboutUTAUCredit" xml:space="preserve"><value>Analisis dan sintesis menggunakan WorldNet, hasil porting WORLD karya M. Morise.</value></data>
+</root>

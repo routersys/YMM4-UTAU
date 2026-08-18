@@ -1,0 +1,113 @@
+Key,Parameter,ja-jp,en-us,zh-cn,zh-tw,ko-kr,es-es,ar-sa,id-id
+UTAU,,UTAU,UTAU,UTAU,UTAU,UTAU,UTAU,UTAU,UTAU
+UpdateAvailableMessage,,新しいバージョン {0} が公開されています。,A new version {0} is available.,已发布新版本 {0}。,已發布新版本 {0}。,새 버전 {0}이(가) 공개되었습니다.,La nueva versión {0} está disponible.,الإصدار الجديد {0} متاح الآن.,Versi baru {0} telah tersedia.
+F0EstimatorLabel,,基本周波数の推定,Fundamental frequency estimation,基频估计,基頻估計,기본 주파수 추정,Estimación de frecuencia fundamental,تقدير التردد الأساسي,Estimasi frekuensi dasar
+F0EstimatorHarvest,,Harvest,Harvest,Harvest,Harvest,Harvest,Harvest,Harvest,Harvest
+F0EstimatorHarvestDescription,,精度が高い代わりに解析が重くなります。,More accurate but slower to analyse.,精度更高但解析更慢。,精度更高但解析更慢。,정확도가 높은 대신 해석이 무겁습니다.,Más preciso pero el análisis es más lento.,أدق لكن التحليل أبطأ.,Lebih akurat tetapi analisis lebih lambat.
+F0EstimatorDio,,Dio,Dio,Dio,Dio,Dio,Dio,Dio,Dio
+F0EstimatorDioDescription,,解析が軽い代わりに精度が下がります。,Faster to analyse but less accurate.,解析更快但精度较低。,解析更快但精度較低。,해석이 가벼운 대신 정확도가 낮습니다.,Análisis más rápido pero menos preciso.,تحليل أسرع لكن أقل دقة.,Analisis lebih cepat tetapi kurang akurat.
+StretchModeLabel,,伸縮方式,Stretching method,伸缩方式,伸縮方式,신축 방식,Método de estiramiento,طريقة التمديد,Metode peregangan
+StretchModeLoop,,ループ,Loop,循环,循環,루프,Bucle,تكرار,Ulang
+StretchModeLoopDescription,,伸ばす区間を折り返して繰り返します。,Repeats the sustained region back and forth.,将延长区间往返循环。,將延長區間往返循環。,늘리는 구간을 되돌려 반복합니다.,Repite la región sostenida de ida y vuelta.,يكرر المقطع الممتد ذهاباً وإياباً.,Mengulang bagian sustain bolak-balik.
+StretchModeStretch,,ストレッチ,Stretch,拉伸,拉伸,스트레치,Estiramiento,تمديد,Regang
+StretchModeStretchDescription,,伸ばす区間の時間を一様に引き伸ばします。,Scales the sustained region uniformly in time.,将延长区间的时间均匀拉伸。,將延長區間的時間均勻拉伸。,늘리는 구간의 시간을 균일하게 늘립니다.,Escala la región sostenida de forma uniforme en el tiempo.,يمدد زمن المقطع الممتد بشكل منتظم.,Meregangkan waktu bagian sustain secara seragam.
+EngineSettings,,エンジン設定,Engine settings,引擎设置,引擎設定,엔진 설정,Ajustes del motor,إعدادات المحرك,Pengaturan mesin
+AnalysisCacheLabel,,解析キャッシュ,Analysis cache,解析缓存,解析快取,해석 캐시,Caché de análisis,ذاكرة التحليل المؤقتة,Cache analisis
+ClearCache,,キャッシュを破棄,Clear the cache,清除缓存,清除快取,캐시 삭제,Vaciar la caché,مسح الذاكرة المؤقتة,Hapus cache
+SearchDirectories,,探索フォルダ,Search folders,搜索文件夹,搜尋資料夾,탐색 폴더,Carpetas de búsqueda,مجلدات البحث,Folder pencarian
+AddDirectory,,フォルダを追加,Add a folder,添加文件夹,新增資料夾,폴더 추가,Añadir una carpeta,إضافة مجلد,Tambah folder
+RemoveDirectory,,フォルダを削除,Remove the folder,删除文件夹,移除資料夾,폴더 삭제,Quitar la carpeta,إزالة المجلد,Hapus folder
+OpenDefaultDirectory,,既定のフォルダを開く,Open the default folder,打开默认文件夹,開啟預設資料夾,기본 폴더 열기,Abrir la carpeta predeterminada,فتح المجلد الافتراضي,Buka folder bawaan
+Refresh,,再読み込み,Reload,重新载入,重新載入,다시 읽기,Recargar,إعادة التحميل,Muat ulang
+VoiceBankList,,音源一覧,Voicebanks,音源列表,音源清單,음원 목록,Bancos de voz,قائمة بنوك الصوت,Daftar bank suara
+VoiceBankCount,,{0} 音源,{0} voicebank(s),{0} 个音源,{0} 個音源,{0}개 음원,{0} banco(s) de voz,{0} بنك صوت,{0} bank suara
+DefaultColor,,既定,Default,默认,預設,기본,Predeterminado,افتراضي,Bawaan
+InfoKey,,項目,Item,项目,項目,항목,Elemento,العنصر,Item
+InfoValue,,内容,Value,内容,內容,내용,Valor,القيمة,Nilai
+InfoName,,名前,Name,名称,名稱,이름,Nombre,الاسم,Nama
+InfoAuthor,,作者,Author,作者,作者,제작자,Autor,المؤلف,Pembuat
+InfoVersion,,バージョン,Version,版本,版本,버전,Versión,الإصدار,Versi
+InfoWeb,,ウェブ,Web,网站,網站,웹,Web,الموقع,Web
+InfoSample,,サンプル音声,Sample audio,示例音频,範例音訊,샘플 음성,Audio de muestra,عينة صوتية,Audio sampel
+InfoAliasCount,,エイリアス数,Aliases,别名数,別名數,에일리어스 수,Alias,عدد الأسماء البديلة,Jumlah alias
+InfoOtoCount,,原音設定の数,oto.ini files,原音设定数量,原音設定數量,원음 설정 수,oto.ini files,عدد ملفات oto.ini,Jumlah oto.ini
+InfoSampleCount,,音声ファイル数,Audio files,音频文件数,音訊檔案數,음성 파일 수,Archivos de audio,عدد الملفات الصوتية,Jumlah berkas audio
+InfoOtoSet,,原音設定,oto.ini,原音设定,原音設定,원음 설정,oto.ini,oto.ini,oto.ini
+InfoPrefixMap,,prefix.map の行数,prefix.map entries,prefix.map 行数,prefix.map 行數,prefix.map 행 수,Entradas de prefix.map,إدخالات prefix.map,Entri prefix.map
+InfoSubBank,,声色の数,Voice colours,音色数量,音色數量,음색 수,Colores de voz,عدد ألوان الصوت,Jumlah warna suara
+InfoSubBankDetail,,声色,Voice colour,音色,音色,음색,Color de voz,لون الصوت,Warna suara
+InfoColors,,選択できる声色,Selectable voice colours,可选音色,可選音色,선택 가능한 음색,Colores de voz seleccionables,ألوان الصوت المتاحة,Warna suara yang tersedia
+InfoPath,,場所,Location,位置,位置,위치,Ubicación,الموقع,Lokasi
+InfoReadme,,説明書,Readme,说明文件,說明文件,설명서,Léame,الدليل,Readme
+LicenseAuthorFormat,,作者: {0},Author: {0},作者：{0},作者：{0},제작자: {0},Autor: {0},المؤلف: {0},Pembuat: {0}
+LicenseVersionFormat,,バージョン: {0},Version: {0},版本：{0},版本：{0},버전: {0},Versión: {0},الإصدار: {0},Versi: {0}
+ParameterColor,,声色,Voice colour,音色,音色,음색,Color de voz,لون الصوت,Warna suara
+ParameterColorDescription,,character.yaml の subbanks で定義された声色を選びます。,Selects a voice colour declared in the subbanks of character.yaml.,选择 character.yaml 的 subbanks 中定义的音色。,選擇 character.yaml 的 subbanks 中定義的音色。,character.yaml의 subbanks에 정의된 음색을 선택합니다.,Selecciona un color de voz declarado en subbanks de character.yaml.,يختار لون صوت معرفاً في subbanks داخل ملف character.yaml.,Memilih warna suara yang didefinisikan pada subbanks di character.yaml.
+ParameterBaseTone,,基準の音程,Base pitch,基准音高,基準音高,기준 음정,Tono base,درجة الصوت الأساسية,Nada dasar
+ParameterBaseToneDescription,,音程記法を書かなかった箇所で使う音程です。,The pitch used wherever no pitch notation is written.,未书写音高记法处所使用的音高。,未書寫音高記法處所使用的音高。,음정 기법을 쓰지 않은 곳에서 사용하는 음정입니다.,El tono utilizado donde no se escribe ninguna notación de tono.,درجة الصوت المستخدمة حيث لا تُكتب أي صيغة للدرجة.,Nada yang dipakai di bagian tanpa notasi nada.
+ParameterSpeed,,話速,Speaking rate,语速,語速,말하기 속도,Velocidad del habla,سرعة النطق,Kecepatan bicara
+ParameterSpeedDescription,,値を大きくすると各モーラが短くなります。,Larger values shorten each mora.,值越大每个音拍越短。,值越大每個音拍越短。,값이 클수록 각 모라가 짧아집니다.,Valores mayores acortan cada mora.,القيم الأكبر تقصّر كل مقطع.,Nilai lebih besar memperpendek tiap mora.
+ParameterTempo,,テンポ,Tempo,速度,速度,템포,Tempo,الإيقاع,Tempo
+ParameterTempoDescription,,音程記法で 1/4 のように音符の長さを書いたときに使います。,Used when a note length is written as a fraction such as 1/4 in the pitch notation.,在音高记法中以 1/4 之类的分数书写音符长度时使用。,在音高記法中以 1/4 之類的分數書寫音符長度時使用。,음정 기법에서 1/4처럼 음표 길이를 분수로 쓸 때 사용합니다.,Se usa cuando la duración de una nota se escribe como una fracción tal como 1/4.,يُستخدم عند كتابة طول النوتة ككسر مثل 1/4 في صيغة الدرجة.,Dipakai saat panjang not ditulis sebagai pecahan seperti 1/4.
+ParameterVolume,,音量,Volume,音量,音量,음량,Volumen,مستوى الصوت,Volume
+ParameterVolumeDescription,,出力全体の音量です。100 が原音のままです。,The volume of the whole output. 100 keeps the original level.,整体输出音量。100 表示保持原始音量。,整體輸出音量。100 表示保持原始音量。,출력 전체의 음량입니다. 100이 원음 그대로입니다.,El volumen de toda la salida. 100 conserva el nivel original.,مستوى صوت الخرج كاملاً. القيمة 100 تحافظ على المستوى الأصلي.,Volume seluruh keluaran. Nilai 100 mempertahankan level asli.
+ParameterModulation,,モジュレーション,Modulation,调制,調變,모듈레이션,Modulación,التعديل,Modulasi
+ParameterModulationDescription,,原音の音程の揺れをどれだけ残すかです。0 で完全に指定した音程になります。,How much of the original pitch movement is kept. 0 follows the specified pitch exactly.,保留多少原始音高的起伏。0 表示完全按照指定音高。,保留多少原始音高的起伏。0 表示完全依照指定音高。,원음의 음정 흔들림을 얼마나 남길지입니다. 0이면 지정한 음정이 그대로 됩니다.,Cuánto del movimiento de tono original se conserva. 0 sigue exactamente el tono indicado.,مقدار ما يبقى من تغير درجة الصوت الأصلية. القيمة 0 تتبع الدرجة المحددة تماماً.,Seberapa banyak gerak nada asli dipertahankan. Nilai 0 mengikuti nada yang ditentukan.
+ParameterFormant,,フォルマント,Formant,共振峰,共振峰,포먼트,Formante,الرنين,Forman
+ParameterFormantDescription,,スペクトル包絡を半音単位で周波数方向へ移します。正の値で声が細くなります。,Shifts the spectral envelope along frequency in semitones. Positive values make the voice thinner.,以半音为单位沿频率方向移动谱包络。正值使声音变细。,以半音為單位沿頻率方向移動頻譜包絡。正值使聲音變細。,스펙트럼 포락선을 반음 단위로 주파수 방향으로 옮깁니다. 양수면 목소리가 가늘어집니다.,Desplaza la envolvente espectral en semitonos. Los valores positivos afinan la voz.,يزيح الغلاف الطيفي بوحدات نصف النغمة. القيم الموجبة تجعل الصوت أرفع.,Menggeser selubung spektral dalam satuan seminada. Nilai positif membuat suara lebih tipis.
+ParameterBreathiness,,息の量,Breathiness,气声量,氣聲量,숨소리,Aire en la voz,نفَس الصوت,Napas suara
+ParameterBreathinessDescription,,非周期性指標を強めて息の成分を増やします。,Raises the aperiodicity so that the breath component increases.,增强非周期性指标以增加气声成分。,增強非週期性指標以增加氣聲成分。,비주기성 지표를 높여 숨 성분을 늘립니다.,Aumenta la aperiodicidad para reforzar el componente de aire.,يرفع مؤشر اللادورية لزيادة مكوّن النفَس.,Menaikkan aperiodisitas sehingga komponen napas bertambah.
+ParameterBrightness,,高域の強調,High frequency emphasis,高频强调,高頻強調,고역 강조,Énfasis de agudos,تعزيز الترددات العالية,Penekanan frekuensi tinggi
+ParameterBrightnessDescription,,ナイキスト周波数における利得を指定して周波数特性を傾けます。,Tilts the spectrum by the gain given at the Nyquist frequency.,按奈奎斯特频率处的增益倾斜频率特性。,按奈奎斯特頻率處的增益傾斜頻率特性。,나이퀴스트 주파수에서의 이득을 지정해 주파수 특성을 기울입니다.,Inclina el espectro según la ganancia indicada en la frecuencia de Nyquist.,يميل الطيف بمقدار الكسب المحدد عند تردد نايكويست.,Memiringkan spektrum sebesar penguatan pada frekuensi Nyquist.
+PronounceNotes,,ノート,Notes,音符,音符,노트,Notas,النوتات,Not
+PronounceNotesDescription,,発音から組み立てたノート列を編集します。,Edits the note sequence built from the pronunciation.,编辑由发音生成的音符序列。,編輯由發音生成的音符序列。,발음에서 만든 노트 열을 편집합니다.,Edita la secuencia de notas construida a partir de la pronunciación.,يحرر تسلسل النوتات المبني من النطق.,Menyunting urutan not yang dibangun dari pelafalan.
+EditNotes,,ノートを編集,Edit the notes,编辑音符,編輯音符,노트 편집,Editar las notas,تحرير النوتات,Sunting not
+NoteEditorHint,,ノートを上下に動かすと音程が、右端を動かすと長さが変わります。,Drag a note vertically to change its pitch and drag its right edge to change its length.,上下拖动音符可改变音高，拖动右端可改变长度。,上下拖曳音符可改變音高，拖曳右端可改變長度。,"노트를 위아래로 옮기면 음정이, 오른쪽 끝을 옮기면 길이가 바뀝니다.",Arrastre una nota verticalmente para cambiar su tono y arrastre su borde derecho para cambiar su duración.,اسحب النوتة رأسياً لتغيير درجتها واسحب حافتها اليمنى لتغيير طولها.,Seret not secara vertikal untuk mengubah nada dan seret tepi kanannya untuk mengubah panjangnya.
+ZoomIn,,拡大,Zoom in,放大,放大,확대,Acercar,تكبير,Perbesar
+ZoomOut,,縮小,Zoom out,缩小,縮小,축소,Alejar,تصغير,Perkecil
+InsertRest,,休符を挿入,Insert a rest,插入休止符,插入休止符,쉼표 삽입,Insertar un silencio,إدراج سكتة,Sisipkan istirahat
+RemoveNote,,ノートを削除,Remove the note,删除音符,刪除音符,노트 삭제,Quitar la nota,حذف النوتة,Hapus not
+RestLabel,,休符,Rest,休止符,休止符,쉼표,Silencio,سكتة,Istirahat
+NoteGroupBasic,,基本,Basic,基本,基本,기본,Básico,أساسي,Dasar
+NoteGroupExpression,,表現,Expression,表现,表現,표현,Expresión,التعبير,Ekspresi
+NoteGroupTiming,,時間,Timing,时间,時間,시간,Tiempo,التوقيت,Waktu
+NoteGroupPortamento,,ポルタメント,Portamento,滑音,滑音,포르타멘토,Portamento,الانزلاق,Portamento
+NoteGroupVibrato,,ビブラート,Vibrato,颤音,顫音,비브라토,Vibrato,الفيبراتو,Vibrato
+NoteLyric,,歌詞,Lyric,歌词,歌詞,가사,Letra,الكلمة,Lirik
+NoteTone,,音程,Pitch,音高,音高,음정,Tono,الدرجة,Nada
+NoteLength,,長さ,Length,长度,長度,길이,Duración,الطول,Panjang
+NoteVelocity,,子音速度,Consonant velocity,辅音速度,子音速度,자음 속도,Velocidad de consonante,سرعة الحرف الساكن,Kecepatan konsonan
+NoteIntensity,,音量,Intensity,音量,音量,음량,Intensidad,الشدة,Intensitas
+NoteModulation,,モジュレーション,Modulation,调制,調變,모듈레이션,Modulación,التعديل,Modulasi
+NotePreutterance,,先行発声,Preutterance,先行发声,先行發聲,선행 발성,Preenunciación,النطق المسبق,Praucap
+NoteOverlap,,オーバーラップ,Overlap,重叠,重疊,오버랩,Solapamiento,التداخل,Tumpang tindih
+NoteStartPoint,,開始位置,Start point,起始位置,起始位置,시작 위치,Punto de inicio,نقطة البدء,Titik awal
+NoteFadeIn,,フェードイン,Fade in,淡入,淡入,페이드 인,Aparición gradual,التلاشي الداخل,Fade in
+NoteFadeOut,,フェードアウト,Fade out,淡出,淡出,페이드 아웃,Desvanecimiento,التلاشي الخارج,Fade out
+PitchPointTime,,時間,Time,时间,時間,시간,Tiempo,الزمن,Waktu
+PitchPointCents,,セント,Cents,音分,音分,센트,Centésimas,السنت,Sen
+PitchPointShape,,曲線,Curve,曲线,曲線,곡선,Curva,المنحنى,Kurva
+PitchShapeSCurve,,S字,S curve,S 曲线,S 曲線,S자,Curva en S,منحنى S,Kurva S
+PitchShapeLinear,,直線,Linear,直线,直線,직선,Lineal,خطي,Linear
+PitchShapeRCurve,,R字,R curve,R 曲线,R 曲線,R자,Curva en R,منحنى R,Kurva R
+PitchShapeJCurve,,J字,J curve,J 曲线,J 曲線,J자,Curva en J,منحنى J,Kurva J
+AddPitchPoint,,制御点を追加,Add a control point,添加控制点,新增控制點,제어점 추가,Añadir un punto de control,إضافة نقطة تحكم,Tambah titik kendali
+RemovePitchPoint,,制御点を削除,Remove the control point,删除控制点,刪除控制點,제어점 삭제,Quitar el punto de control,حذف نقطة التحكم,Hapus titik kendali
+ResetPitch,,音程曲線を戻す,Reset the pitch curve,重置音高曲线,重設音高曲線,음정 곡선 되돌리기,Restablecer la curva de tono,إعادة ضبط منحنى الدرجة,Setel ulang kurva nada
+VibratoLength,,長さ,Length,长度,長度,길이,Duración,الطول,Panjang
+VibratoPeriod,,周期,Period,周期,週期,주기,Periodo,الدور,Periode
+VibratoDepth,,深さ,Depth,深度,深度,깊이,Profundidad,العمق,Kedalaman
+VibratoFadeIn,,立ち上がり,Fade in,起始,起始,시작,Entrada,البداية,Awal
+VibratoFadeOut,,終わり,Fade out,结束,結束,끝,Salida,النهاية,Akhir
+VibratoPhase,,位相,Phase,相位,相位,위상,Fase,الطور,Fase
+VibratoOffset,,中心のずれ,Centre offset,中心偏移,中心偏移,중심 이동,Desfase del centro,إزاحة المركز,Geseran pusat
+EmptyTextMessage,,発音が空です。,The pronunciation is empty.,发音为空。,發音為空。,발음이 비어 있습니다.,La pronunciación está vacía.,النطق فارغ.,Pelafalan kosong.
+AliasNotFoundMessage,,原音設定に {0} が見つかりません。,{0} was not found in the oto.ini of this voicebank.,在该音源的原音设定中找不到 {0}。,在該音源的原音設定中找不到 {0}。,이 음원의 원음 설정에서 {0}을(를) 찾을 수 없습니다.,No se encontró {0} en el oto.ini de este banco de voz.,لم يتم العثور على {0} في ملف oto.ini لبنك الصوت هذا.,{0} tidak ditemukan pada oto.ini bank suara ini.
+NoRenderableNoteMessage,,合成できるノートがありません。,There is no note that can be synthesised.,没有可合成的音符。,沒有可合成的音符。,합성할 수 있는 노트가 없습니다.,No hay ninguna nota que se pueda sintetizar.,لا توجد نوتة يمكن توليفها.,Tidak ada not yang dapat disintesis.
+TextTooLongMessage,,発音が長すぎます。分割してください。,The pronunciation is too long. Please split it.,发音过长，请分割。,發音過長，請分割。,발음이 너무 깁니다. 나누어 주세요.,La pronunciación es demasiado larga. Divídala.,النطق طويل جداً. يرجى تقسيمه.,Pelafalan terlalu panjang. Silakan bagi menjadi beberapa bagian.
+AboutUTAU,,UTAUについて,About UTAU,关于 UTAU,關於 UTAU,UTAU 정보,Acerca de UTAU,حول UTAU,Tentang UTAU
+AboutUTAUDescription,,UTAU音源の原音設定をそのまま読み込み、WORLDで再合成します。単独音・連続音・CVVCのいずれにも対応します。,"This plugin reads the oto.ini of a UTAU voicebank as it is and resynthesises it with WORLD. Single kana, VCV and CVVC voicebanks are all supported.",本插件直接读取 UTAU 音源的原音设定，并使用 WORLD 重新合成。单独音、连续音与 CVVC 均受支持。,本外掛直接讀取 UTAU 音源的原音設定，並使用 WORLD 重新合成。單獨音、連續音與 CVVC 均受支援。,"UTAU 음원의 원음 설정을 그대로 읽어 WORLD로 재합성합니다. 단독음, 연속음, CVVC를 모두 지원합니다.","Este complemento lee el oto.ini de un banco de voz UTAU tal cual y lo resintetiza con WORLD. Admite bancos de kana simple, VCV y CVVC.",تقرأ هذه الإضافة ملف oto.ini الخاص ببنك صوت UTAU كما هو وتعيد توليفه باستخدام WORLD. وهي تدعم بنوك الكانا المفردة وVCV وCVVC.,"Plugin ini membaca oto.ini bank suara UTAU apa adanya dan mensintesis ulang dengan WORLD. Bank kana tunggal, VCV, dan CVVC semuanya didukung."
+AboutUTAUHowTo,,音源フォルダは user/resources/utau に置くか、探索フォルダに追加してください。発音はかなで書きます。,Put the voicebank folders under user/resources/utau or add them to the search folders. The pronunciation is written in kana.,请将音源文件夹放在 user/resources/utau，或添加到搜索文件夹。发音以假名书写。,請將音源資料夾放在 user/resources/utau，或新增至搜尋資料夾。發音以假名書寫。,음원 폴더는 user/resources/utau에 두거나 탐색 폴더에 추가하세요. 발음은 가나로 씁니다.,Coloque las carpetas de bancos de voz en user/resources/utau o añádalas a las carpetas de búsqueda. La pronunciación se escribe en kana.,ضع مجلدات بنوك الصوت في user/resources/utau أو أضفها إلى مجلدات البحث. يُكتب النطق بحروف الكانا.,Letakkan folder bank suara di user/resources/utau atau tambahkan ke folder pencarian. Pelafalan ditulis dengan kana.
+AboutUTAUNotation,,発音の中に <!音名:長さ> と書くと、その直後のかなの音程と長さが決まります。長さはミリ秒か 1/4 のような音符で書けます。,Writing <!note:length> in the pronunciation sets the pitch and the length of the kana that follows it. The length is written in milliseconds or as a note such as 1/4.,在发音中书写 <!音名:长度> 可决定其后假名的音高与长度。长度可用毫秒或 1/4 之类的音符书写。,在發音中書寫 <!音名:長度> 可決定其後假名的音高與長度。長度可用毫秒或 1/4 之類的音符書寫。,발음 안에 <!음이름:길이> 라고 쓰면 그 뒤 가나의 음정과 길이가 정해집니다. 길이는 밀리초나 1/4 같은 음표로 쓸 수 있습니다.,Escribir <!nota:duración> en la pronunciación fija el tono y la duración del kana que le sigue. La duración se escribe en milisegundos o como una nota tal como 1/4.,كتابة <!النغمة:الطول> داخل النطق تحدد درجة وطول الكانا التي تليها. ويُكتب الطول بالميلي ثانية أو كنوتة مثل 1/4.,Menulis <!nada:panjang> di dalam pelafalan menentukan nada dan panjang kana yang mengikutinya. Panjang ditulis dalam milidetik atau sebagai not seperti 1/4.
+AboutUTAUNotationExample,,例: <!C4:1/4>ど<!D4>れ<!E4>み  休符は <!R:200> と書きます。,Example: <!C4:1/4>ど<!D4>れ<!E4>み  A rest is written as <!R:200>.,例：<!C4:1/4>ど<!D4>れ<!E4>み　休止符写作 <!R:200>。,例：<!C4:1/4>ど<!D4>れ<!E4>み　休止符寫作 <!R:200>。,예: <!C4:1/4>ど<!D4>れ<!E4>み  쉼표는 <!R:200> 이라고 씁니다.,Ejemplo: <!C4:1/4>ど<!D4>れ<!E4>み  Un silencio se escribe como <!R:200>.,مثال: <!C4:1/4>ど<!D4>れ<!E4>み  وتُكتب السكتة هكذا <!R:200>.,Contoh: <!C4:1/4>ど<!D4>れ<!E4>み  Istirahat ditulis sebagai <!R:200>.
+AboutUTAUCredit,,音声の分析と合成には M. Morise 氏の WORLD を移植した WorldNet を使用しています。,"WorldNet, a port of WORLD by M. Morise, is used for the analysis and the synthesis.",语音的分析与合成使用了 M. Morise 的 WORLD 的移植版 WorldNet。,語音的分析與合成使用了 M. Morise 的 WORLD 的移植版 WorldNet。,음성 분석과 합성에는 M. Morise의 WORLD를 이식한 WorldNet을 사용합니다.,"Para el análisis y la síntesis se utiliza WorldNet, una adaptación de WORLD de M. Morise.",يُستخدم WorldNet، وهو نقل لمكتبة WORLD من إعداد M. Morise، في التحليل والتوليف.,"Analisis dan sintesis menggunakan WorldNet, hasil porting WORLD karya M. Morise."

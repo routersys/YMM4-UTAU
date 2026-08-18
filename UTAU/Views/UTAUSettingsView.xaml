@@ -1,0 +1,179 @@
+<UserControl x:Class="UTAU.Views.UTAUSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:root="clr-namespace:UTAU"
+             xmlns:vm="clr-namespace:UTAU.ViewModels"
+             xmlns:syn="clr-namespace:UTAU.Synthesis"
+             xmlns:c="clr-namespace:YukkuriMovieMaker.Controls;assembly=YukkuriMovieMaker.Controls"
+             xmlns:ps="clr-namespace:YukkuriMovieMaker.Settings;assembly=YukkuriMovieMaker.Plugin"
+             xmlns:icons="clr-namespace:YukkuriMovieMaker.Resources.Icons;assembly=YukkuriMovieMaker.Plugin"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance Type={x:Type vm:UTAUSettingsViewModel}}">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibility"/>
+    </UserControl.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel>
+            <Expander Header="{x:Static root:Texts.UTAU}" IsExpanded="True">
+                <StackPanel>
+                    <Grid>
+                        <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Width="26" Command="{Binding OpenDefaultDirectoryCommand}" ToolTip="{x:Static root:Texts.OpenDefaultDirectory}"
+                                    Content="{DynamicResource {x:Static icons:IconKeys.FolderOpenOutline}}"/>
+                            <Button Width="26" Command="{Binding RefreshCommand}" ToolTip="{x:Static root:Texts.Refresh}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                        <Setter Property="Content" Value="{DynamicResource {x:Static icons:IconKeys.Refresh}}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                                                <Setter Property="Content" Value="{DynamicResource {x:Static icons:IconKeys.LoadingAnimation}}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Expander>
+
+            <Expander Header="{x:Static root:Texts.SearchDirectories}" IsExpanded="True">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="26"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="26"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                               Text="{Binding DefaultDirectory}" ToolTip="{Binding DefaultDirectory}"/>
+                    <ListBox Grid.Row="1" MinHeight="60" MaxHeight="120"
+                             ItemsSource="{Binding Settings.SearchDirectories}"
+                             SelectedItem="{Binding SelectedDirectory}"/>
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Width="26" Command="{Binding AddDirectoryCommand}" ToolTip="{x:Static root:Texts.AddDirectory}"
+                                Content="{DynamicResource {x:Static icons:IconKeys.Plus}}"/>
+                        <Button Width="26" Command="{Binding RemoveDirectoryCommand}" ToolTip="{x:Static root:Texts.RemoveDirectory}"
+                                Content="{DynamicResource {x:Static icons:IconKeys.Minus}}"/>
+                    </StackPanel>
+                </Grid>
+            </Expander>
+
+            <Expander Header="{x:Static root:Texts.VoiceBankList}" IsExpanded="True">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ListBox Grid.Column="0" MinHeight="180" MaxHeight="360"
+                             ItemsSource="{Binding Banks}"
+                             SelectedItem="{Binding SelectedBank}"
+                             HorizontalContentAlignment="Stretch">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Image Grid.Column="0" Width="32" Height="32" Stretch="Uniform" Source="{Binding Image}"/>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding Author}" FontSize="10" TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Grid Grid.Column="1" DataContext="{Binding SelectedBank}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Image Grid.Column="0" MaxWidth="128" MaxHeight="128" Stretch="Uniform" Source="{Binding Portrait}"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Top">
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock TextWrapping="Wrap" Visibility="{Binding HasWeb, Converter={StaticResource BooleanToVisibility}}">
+                                    <Hyperlink Command="{Binding Source={x:Static ps:CommandSettings.Default}, Path=[OpenUri]}" CommandParameter="{Binding Web}">
+                                        <Run Text="{Binding Web, Mode=OneWay}"/>
+                                    </Hyperlink>
+                                </TextBlock>
+                            </StackPanel>
+                        </Grid>
+                        <DataGrid Grid.Row="1" ItemsSource="{Binding Information}"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  CanUserDeleteRows="False"
+                                  CanUserReorderColumns="False"
+                                  IsReadOnly="True"
+                                  SelectionMode="Single"
+                                  HeadersVisibility="Column"
+                                  MinHeight="120"
+                                  MaxHeight="260">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="{x:Static root:Texts.InfoKey}" Binding="{Binding Key}" Width="140"/>
+                                <DataGridTextColumn Header="{x:Static root:Texts.InfoValue}" Binding="{Binding Value}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <Expander Grid.Row="2" Header="{x:Static root:Texts.InfoReadme}" IsExpanded="False"
+                                  Visibility="{Binding HasReadme, Converter={StaticResource BooleanToVisibility}}">
+                            <TextBox Text="{Binding Readme, Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap"
+                                     MaxHeight="200" VerticalScrollBarVisibility="Auto" AcceptsReturn="True"/>
+                        </Expander>
+                    </Grid>
+                </Grid>
+            </Expander>
+
+            <Expander Header="{x:Static root:Texts.EngineSettings}" IsExpanded="True">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="160"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="26"/>
+                        <RowDefinition Height="26"/>
+                        <RowDefinition Height="26"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static root:Texts.F0EstimatorLabel}" VerticalAlignment="Center"/>
+                    <c:EnumComboBox Grid.Row="0" Grid.Column="1" EnumType="{x:Type syn:F0Estimator}"
+                                    Value="{Binding Settings.F0Estimator}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{x:Static root:Texts.StretchModeLabel}" VerticalAlignment="Center"/>
+                    <c:EnumComboBox Grid.Row="1" Grid.Column="1" EnumType="{x:Type syn:StretchMode}"
+                                    Value="{Binding Settings.StretchMode}"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{x:Static root:Texts.AnalysisCacheLabel}" VerticalAlignment="Center"/>
+                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                        <c:TextBoxSlider Width="160" Value="{Binding Settings.AnalysisCacheMegabytes}"
+                                         StringFormat="F0" Unit="MB" DefaultValue="512" Min="64" Max="4096" Delay="-1"/>
+                        <Button Width="26" Command="{Binding ClearCacheCommand}" ToolTip="{x:Static root:Texts.ClearCache}"
+                                Content="{DynamicResource {x:Static icons:IconKeys.Delete}}"/>
+                    </StackPanel>
+                </Grid>
+            </Expander>
+
+            <GroupBox Header="{x:Static root:Texts.AboutUTAU}">
+                <TextBlock TextWrapping="Wrap">
+                    <Run Text="{x:Static root:Texts.AboutUTAUDescription}"/>
+                    <LineBreak/>
+                    <Run Text="{x:Static root:Texts.AboutUTAUHowTo}"/>
+                    <LineBreak/>
+                    <Run Text="{x:Static root:Texts.AboutUTAUNotation}"/>
+                    <LineBreak/>
+                    <Run Text="{x:Static root:Texts.AboutUTAUNotationExample}"/>
+                    <LineBreak/>
+                    <Run Text="{x:Static root:Texts.AboutUTAUCredit}"/>
+                </TextBlock>
+            </GroupBox>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

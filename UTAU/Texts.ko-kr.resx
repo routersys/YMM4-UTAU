@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+<data name="CurrentCulture" xml:space="preserve"><value>ko-kr</value></data>
+<data name="UTAU" xml:space="preserve"><value>UTAU</value></data>
+<data name="UpdateAvailableMessage" xml:space="preserve"><value>새 버전 {0}이(가) 공개되었습니다.</value></data>
+<data name="F0EstimatorLabel" xml:space="preserve"><value>기본 주파수 추정</value></data>
+<data name="F0EstimatorHarvest" xml:space="preserve"><value>Harvest</value></data>
+<data name="F0EstimatorHarvestDescription" xml:space="preserve"><value>정확도가 높은 대신 해석이 무겁습니다.</value></data>
+<data name="F0EstimatorDio" xml:space="preserve"><value>Dio</value></data>
+<data name="F0EstimatorDioDescription" xml:space="preserve"><value>해석이 가벼운 대신 정확도가 낮습니다.</value></data>
+<data name="StretchModeLabel" xml:space="preserve"><value>신축 방식</value></data>
+<data name="StretchModeLoop" xml:space="preserve"><value>루프</value></data>
+<data name="StretchModeLoopDescription" xml:space="preserve"><value>늘리는 구간을 되돌려 반복합니다.</value></data>
+<data name="StretchModeStretch" xml:space="preserve"><value>스트레치</value></data>
+<data name="StretchModeStretchDescription" xml:space="preserve"><value>늘리는 구간의 시간을 균일하게 늘립니다.</value></data>
+<data name="EngineSettings" xml:space="preserve"><value>엔진 설정</value></data>
+<data name="AnalysisCacheLabel" xml:space="preserve"><value>해석 캐시</value></data>
+<data name="ClearCache" xml:space="preserve"><value>캐시 삭제</value></data>
+<data name="SearchDirectories" xml:space="preserve"><value>탐색 폴더</value></data>
+<data name="AddDirectory" xml:space="preserve"><value>폴더 추가</value></data>
+<data name="RemoveDirectory" xml:space="preserve"><value>폴더 삭제</value></data>
+<data name="OpenDefaultDirectory" xml:space="preserve"><value>기본 폴더 열기</value></data>
+<data name="Refresh" xml:space="preserve"><value>다시 읽기</value></data>
+<data name="VoiceBankList" xml:space="preserve"><value>음원 목록</value></data>
+<data name="VoiceBankCount" xml:space="preserve"><value>{0}개 음원</value></data>
+<data name="DefaultColor" xml:space="preserve"><value>기본</value></data>
+<data name="InfoKey" xml:space="preserve"><value>항목</value></data>
+<data name="InfoValue" xml:space="preserve"><value>내용</value></data>
+<data name="InfoName" xml:space="preserve"><value>이름</value></data>
+<data name="InfoAuthor" xml:space="preserve"><value>제작자</value></data>
+<data name="InfoVersion" xml:space="preserve"><value>버전</value></data>
+<data name="InfoWeb" xml:space="preserve"><value>웹</value></data>
+<data name="InfoSample" xml:space="preserve"><value>샘플 음성</value></data>
+<data name="InfoAliasCount" xml:space="preserve"><value>에일리어스 수</value></data>
+<data name="InfoOtoCount" xml:space="preserve"><value>원음 설정 수</value></data>
+<data name="InfoSampleCount" xml:space="preserve"><value>음성 파일 수</value></data>
+<data name="InfoOtoSet" xml:space="preserve"><value>원음 설정</value></data>
+<data name="InfoPrefixMap" xml:space="preserve"><value>prefix.map 행 수</value></data>
+<data name="InfoSubBank" xml:space="preserve"><value>음색 수</value></data>
+<data name="InfoSubBankDetail" xml:space="preserve"><value>음색</value></data>
+<data name="InfoColors" xml:space="preserve"><value>선택 가능한 음색</value></data>
+<data name="InfoPath" xml:space="preserve"><value>위치</value></data>
+<data name="InfoReadme" xml:space="preserve"><value>설명서</value></data>
+<data name="LicenseAuthorFormat" xml:space="preserve"><value>제작자: {0}</value></data>
+<data name="LicenseVersionFormat" xml:space="preserve"><value>버전: {0}</value></data>
+<data name="ParameterColor" xml:space="preserve"><value>음색</value></data>
+<data name="ParameterColorDescription" xml:space="preserve"><value>character.yaml의 subbanks에 정의된 음색을 선택합니다.</value></data>
+<data name="ParameterBaseTone" xml:space="preserve"><value>기준 음정</value></data>
+<data name="ParameterBaseToneDescription" xml:space="preserve"><value>음정 기법을 쓰지 않은 곳에서 사용하는 음정입니다.</value></data>
+<data name="ParameterSpeed" xml:space="preserve"><value>말하기 속도</value></data>
+<data name="ParameterSpeedDescription" xml:space="preserve"><value>값이 클수록 각 모라가 짧아집니다.</value></data>
+<data name="ParameterTempo" xml:space="preserve"><value>템포</value></data>
+<data name="ParameterTempoDescription" xml:space="preserve"><value>음정 기법에서 1/4처럼 음표 길이를 분수로 쓸 때 사용합니다.</value></data>
+<data name="ParameterVolume" xml:space="preserve"><value>음량</value></data>
+<data name="ParameterVolumeDescription" xml:space="preserve"><value>출력 전체의 음량입니다. 100이 원음 그대로입니다.</value></data>
+<data name="ParameterModulation" xml:space="preserve"><value>모듈레이션</value></data>
+<data name="ParameterModulationDescription" xml:space="preserve"><value>원음의 음정 흔들림을 얼마나 남길지입니다. 0이면 지정한 음정이 그대로 됩니다.</value></data>
+<data name="ParameterFormant" xml:space="preserve"><value>포먼트</value></data>
+<data name="ParameterFormantDescription" xml:space="preserve"><value>스펙트럼 포락선을 반음 단위로 주파수 방향으로 옮깁니다. 양수면 목소리가 가늘어집니다.</value></data>
+<data name="ParameterBreathiness" xml:space="preserve"><value>숨소리</value></data>
+<data name="ParameterBreathinessDescription" xml:space="preserve"><value>비주기성 지표를 높여 숨 성분을 늘립니다.</value></data>
+<data name="ParameterBrightness" xml:space="preserve"><value>고역 강조</value></data>
+<data name="ParameterBrightnessDescription" xml:space="preserve"><value>나이퀴스트 주파수에서의 이득을 지정해 주파수 특성을 기울입니다.</value></data>
+<data name="PronounceNotes" xml:space="preserve"><value>노트</value></data>
+<data name="PronounceNotesDescription" xml:space="preserve"><value>발음에서 만든 노트 열을 편집합니다.</value></data>
+<data name="EditNotes" xml:space="preserve"><value>노트 편집</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>노트를 위아래로 옮기면 음정이, 오른쪽 끝을 옮기면 길이가 바뀝니다.</value></data>
+<data name="ZoomIn" xml:space="preserve"><value>확대</value></data>
+<data name="ZoomOut" xml:space="preserve"><value>축소</value></data>
+<data name="InsertRest" xml:space="preserve"><value>쉼표 삽입</value></data>
+<data name="RemoveNote" xml:space="preserve"><value>노트 삭제</value></data>
+<data name="RestLabel" xml:space="preserve"><value>쉼표</value></data>
+<data name="NoteGroupBasic" xml:space="preserve"><value>기본</value></data>
+<data name="NoteGroupExpression" xml:space="preserve"><value>표현</value></data>
+<data name="NoteGroupTiming" xml:space="preserve"><value>시간</value></data>
+<data name="NoteGroupPortamento" xml:space="preserve"><value>포르타멘토</value></data>
+<data name="NoteGroupVibrato" xml:space="preserve"><value>비브라토</value></data>
+<data name="NoteLyric" xml:space="preserve"><value>가사</value></data>
+<data name="NoteTone" xml:space="preserve"><value>음정</value></data>
+<data name="NoteLength" xml:space="preserve"><value>길이</value></data>
+<data name="NoteVelocity" xml:space="preserve"><value>자음 속도</value></data>
+<data name="NoteIntensity" xml:space="preserve"><value>음량</value></data>
+<data name="NoteModulation" xml:space="preserve"><value>모듈레이션</value></data>
+<data name="NotePreutterance" xml:space="preserve"><value>선행 발성</value></data>
+<data name="NoteOverlap" xml:space="preserve"><value>오버랩</value></data>
+<data name="NoteStartPoint" xml:space="preserve"><value>시작 위치</value></data>
+<data name="NoteFadeIn" xml:space="preserve"><value>페이드 인</value></data>
+<data name="NoteFadeOut" xml:space="preserve"><value>페이드 아웃</value></data>
+<data name="PitchPointTime" xml:space="preserve"><value>시간</value></data>
+<data name="PitchPointCents" xml:space="preserve"><value>센트</value></data>
+<data name="PitchPointShape" xml:space="preserve"><value>곡선</value></data>
+<data name="PitchShapeSCurve" xml:space="preserve"><value>S자</value></data>
+<data name="PitchShapeLinear" xml:space="preserve"><value>직선</value></data>
+<data name="PitchShapeRCurve" xml:space="preserve"><value>R자</value></data>
+<data name="PitchShapeJCurve" xml:space="preserve"><value>J자</value></data>
+<data name="AddPitchPoint" xml:space="preserve"><value>제어점 추가</value></data>
+<data name="RemovePitchPoint" xml:space="preserve"><value>제어점 삭제</value></data>
+<data name="ResetPitch" xml:space="preserve"><value>음정 곡선 되돌리기</value></data>
+<data name="VibratoLength" xml:space="preserve"><value>길이</value></data>
+<data name="VibratoPeriod" xml:space="preserve"><value>주기</value></data>
+<data name="VibratoDepth" xml:space="preserve"><value>깊이</value></data>
+<data name="VibratoFadeIn" xml:space="preserve"><value>시작</value></data>
+<data name="VibratoFadeOut" xml:space="preserve"><value>끝</value></data>
+<data name="VibratoPhase" xml:space="preserve"><value>위상</value></data>
+<data name="VibratoOffset" xml:space="preserve"><value>중심 이동</value></data>
+<data name="EmptyTextMessage" xml:space="preserve"><value>발음이 비어 있습니다.</value></data>
+<data name="AliasNotFoundMessage" xml:space="preserve"><value>이 음원의 원음 설정에서 {0}을(를) 찾을 수 없습니다.</value></data>
+<data name="NoRenderableNoteMessage" xml:space="preserve"><value>합성할 수 있는 노트가 없습니다.</value></data>
+<data name="TextTooLongMessage" xml:space="preserve"><value>발음이 너무 깁니다. 나누어 주세요.</value></data>
+<data name="AboutUTAU" xml:space="preserve"><value>UTAU 정보</value></data>
+<data name="AboutUTAUDescription" xml:space="preserve"><value>UTAU 음원의 원음 설정을 그대로 읽어 WORLD로 재합성합니다. 단독음, 연속음, CVVC를 모두 지원합니다.</value></data>
+<data name="AboutUTAUHowTo" xml:space="preserve"><value>음원 폴더는 user/resources/utau에 두거나 탐색 폴더에 추가하세요. 발음은 가나로 씁니다.</value></data>
+<data name="AboutUTAUNotation" xml:space="preserve"><value>발음 안에 &lt;!음이름:길이&gt; 라고 쓰면 그 뒤 가나의 음정과 길이가 정해집니다. 길이는 밀리초나 1/4 같은 음표로 쓸 수 있습니다.</value></data>
+<data name="AboutUTAUNotationExample" xml:space="preserve"><value>예: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  쉼표는 &lt;!R:200&gt; 이라고 씁니다.</value></data>
+<data name="AboutUTAUCredit" xml:space="preserve"><value>음성 분석과 합성에는 M. Morise의 WORLD를 이식한 WorldNet을 사용합니다.</value></data>
+</root>

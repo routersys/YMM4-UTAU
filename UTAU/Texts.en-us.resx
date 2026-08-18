@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+<data name="CurrentCulture" xml:space="preserve"><value>en-us</value></data>
+<data name="UTAU" xml:space="preserve"><value>UTAU</value></data>
+<data name="UpdateAvailableMessage" xml:space="preserve"><value>A new version {0} is available.</value></data>
+<data name="F0EstimatorLabel" xml:space="preserve"><value>Fundamental frequency estimation</value></data>
+<data name="F0EstimatorHarvest" xml:space="preserve"><value>Harvest</value></data>
+<data name="F0EstimatorHarvestDescription" xml:space="preserve"><value>More accurate but slower to analyse.</value></data>
+<data name="F0EstimatorDio" xml:space="preserve"><value>Dio</value></data>
+<data name="F0EstimatorDioDescription" xml:space="preserve"><value>Faster to analyse but less accurate.</value></data>
+<data name="StretchModeLabel" xml:space="preserve"><value>Stretching method</value></data>
+<data name="StretchModeLoop" xml:space="preserve"><value>Loop</value></data>
+<data name="StretchModeLoopDescription" xml:space="preserve"><value>Repeats the sustained region back and forth.</value></data>
+<data name="StretchModeStretch" xml:space="preserve"><value>Stretch</value></data>
+<data name="StretchModeStretchDescription" xml:space="preserve"><value>Scales the sustained region uniformly in time.</value></data>
+<data name="EngineSettings" xml:space="preserve"><value>Engine settings</value></data>
+<data name="AnalysisCacheLabel" xml:space="preserve"><value>Analysis cache</value></data>
+<data name="ClearCache" xml:space="preserve"><value>Clear the cache</value></data>
+<data name="SearchDirectories" xml:space="preserve"><value>Search folders</value></data>
+<data name="AddDirectory" xml:space="preserve"><value>Add a folder</value></data>
+<data name="RemoveDirectory" xml:space="preserve"><value>Remove the folder</value></data>
+<data name="OpenDefaultDirectory" xml:space="preserve"><value>Open the default folder</value></data>
+<data name="Refresh" xml:space="preserve"><value>Reload</value></data>
+<data name="VoiceBankList" xml:space="preserve"><value>Voicebanks</value></data>
+<data name="VoiceBankCount" xml:space="preserve"><value>{0} voicebank(s)</value></data>
+<data name="DefaultColor" xml:space="preserve"><value>Default</value></data>
+<data name="InfoKey" xml:space="preserve"><value>Item</value></data>
+<data name="InfoValue" xml:space="preserve"><value>Value</value></data>
+<data name="InfoName" xml:space="preserve"><value>Name</value></data>
+<data name="InfoAuthor" xml:space="preserve"><value>Author</value></data>
+<data name="InfoVersion" xml:space="preserve"><value>Version</value></data>
+<data name="InfoWeb" xml:space="preserve"><value>Web</value></data>
+<data name="InfoSample" xml:space="preserve"><value>Sample audio</value></data>
+<data name="InfoAliasCount" xml:space="preserve"><value>Aliases</value></data>
+<data name="InfoOtoCount" xml:space="preserve"><value>oto.ini files</value></data>
+<data name="InfoSampleCount" xml:space="preserve"><value>Audio files</value></data>
+<data name="InfoOtoSet" xml:space="preserve"><value>oto.ini</value></data>
+<data name="InfoPrefixMap" xml:space="preserve"><value>prefix.map entries</value></data>
+<data name="InfoSubBank" xml:space="preserve"><value>Voice colours</value></data>
+<data name="InfoSubBankDetail" xml:space="preserve"><value>Voice colour</value></data>
+<data name="InfoColors" xml:space="preserve"><value>Selectable voice colours</value></data>
+<data name="InfoPath" xml:space="preserve"><value>Location</value></data>
+<data name="InfoReadme" xml:space="preserve"><value>Readme</value></data>
+<data name="LicenseAuthorFormat" xml:space="preserve"><value>Author: {0}</value></data>
+<data name="LicenseVersionFormat" xml:space="preserve"><value>Version: {0}</value></data>
+<data name="ParameterColor" xml:space="preserve"><value>Voice colour</value></data>
+<data name="ParameterColorDescription" xml:space="preserve"><value>Selects a voice colour declared in the subbanks of character.yaml.</value></data>
+<data name="ParameterBaseTone" xml:space="preserve"><value>Base pitch</value></data>
+<data name="ParameterBaseToneDescription" xml:space="preserve"><value>The pitch used wherever no pitch notation is written.</value></data>
+<data name="ParameterSpeed" xml:space="preserve"><value>Speaking rate</value></data>
+<data name="ParameterSpeedDescription" xml:space="preserve"><value>Larger values shorten each mora.</value></data>
+<data name="ParameterTempo" xml:space="preserve"><value>Tempo</value></data>
+<data name="ParameterTempoDescription" xml:space="preserve"><value>Used when a note length is written as a fraction such as 1/4 in the pitch notation.</value></data>
+<data name="ParameterVolume" xml:space="preserve"><value>Volume</value></data>
+<data name="ParameterVolumeDescription" xml:space="preserve"><value>The volume of the whole output. 100 keeps the original level.</value></data>
+<data name="ParameterModulation" xml:space="preserve"><value>Modulation</value></data>
+<data name="ParameterModulationDescription" xml:space="preserve"><value>How much of the original pitch movement is kept. 0 follows the specified pitch exactly.</value></data>
+<data name="ParameterFormant" xml:space="preserve"><value>Formant</value></data>
+<data name="ParameterFormantDescription" xml:space="preserve"><value>Shifts the spectral envelope along frequency in semitones. Positive values make the voice thinner.</value></data>
+<data name="ParameterBreathiness" xml:space="preserve"><value>Breathiness</value></data>
+<data name="ParameterBreathinessDescription" xml:space="preserve"><value>Raises the aperiodicity so that the breath component increases.</value></data>
+<data name="ParameterBrightness" xml:space="preserve"><value>High frequency emphasis</value></data>
+<data name="ParameterBrightnessDescription" xml:space="preserve"><value>Tilts the spectrum by the gain given at the Nyquist frequency.</value></data>
+<data name="PronounceNotes" xml:space="preserve"><value>Notes</value></data>
+<data name="PronounceNotesDescription" xml:space="preserve"><value>Edits the note sequence built from the pronunciation.</value></data>
+<data name="EditNotes" xml:space="preserve"><value>Edit the notes</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>Drag a note vertically to change its pitch and drag its right edge to change its length.</value></data>
+<data name="ZoomIn" xml:space="preserve"><value>Zoom in</value></data>
+<data name="ZoomOut" xml:space="preserve"><value>Zoom out</value></data>
+<data name="InsertRest" xml:space="preserve"><value>Insert a rest</value></data>
+<data name="RemoveNote" xml:space="preserve"><value>Remove the note</value></data>
+<data name="RestLabel" xml:space="preserve"><value>Rest</value></data>
+<data name="NoteGroupBasic" xml:space="preserve"><value>Basic</value></data>
+<data name="NoteGroupExpression" xml:space="preserve"><value>Expression</value></data>
+<data name="NoteGroupTiming" xml:space="preserve"><value>Timing</value></data>
+<data name="NoteGroupPortamento" xml:space="preserve"><value>Portamento</value></data>
+<data name="NoteGroupVibrato" xml:space="preserve"><value>Vibrato</value></data>
+<data name="NoteLyric" xml:space="preserve"><value>Lyric</value></data>
+<data name="NoteTone" xml:space="preserve"><value>Pitch</value></data>
+<data name="NoteLength" xml:space="preserve"><value>Length</value></data>
+<data name="NoteVelocity" xml:space="preserve"><value>Consonant velocity</value></data>
+<data name="NoteIntensity" xml:space="preserve"><value>Intensity</value></data>
+<data name="NoteModulation" xml:space="preserve"><value>Modulation</value></data>
+<data name="NotePreutterance" xml:space="preserve"><value>Preutterance</value></data>
+<data name="NoteOverlap" xml:space="preserve"><value>Overlap</value></data>
+<data name="NoteStartPoint" xml:space="preserve"><value>Start point</value></data>
+<data name="NoteFadeIn" xml:space="preserve"><value>Fade in</value></data>
+<data name="NoteFadeOut" xml:space="preserve"><value>Fade out</value></data>
+<data name="PitchPointTime" xml:space="preserve"><value>Time</value></data>
+<data name="PitchPointCents" xml:space="preserve"><value>Cents</value></data>
+<data name="PitchPointShape" xml:space="preserve"><value>Curve</value></data>
+<data name="PitchShapeSCurve" xml:space="preserve"><value>S curve</value></data>
+<data name="PitchShapeLinear" xml:space="preserve"><value>Linear</value></data>
+<data name="PitchShapeRCurve" xml:space="preserve"><value>R curve</value></data>
+<data name="PitchShapeJCurve" xml:space="preserve"><value>J curve</value></data>
+<data name="AddPitchPoint" xml:space="preserve"><value>Add a control point</value></data>
+<data name="RemovePitchPoint" xml:space="preserve"><value>Remove the control point</value></data>
+<data name="ResetPitch" xml:space="preserve"><value>Reset the pitch curve</value></data>
+<data name="VibratoLength" xml:space="preserve"><value>Length</value></data>
+<data name="VibratoPeriod" xml:space="preserve"><value>Period</value></data>
+<data name="VibratoDepth" xml:space="preserve"><value>Depth</value></data>
+<data name="VibratoFadeIn" xml:space="preserve"><value>Fade in</value></data>
+<data name="VibratoFadeOut" xml:space="preserve"><value>Fade out</value></data>
+<data name="VibratoPhase" xml:space="preserve"><value>Phase</value></data>
+<data name="VibratoOffset" xml:space="preserve"><value>Centre offset</value></data>
+<data name="EmptyTextMessage" xml:space="preserve"><value>The pronunciation is empty.</value></data>
+<data name="AliasNotFoundMessage" xml:space="preserve"><value>{0} was not found in the oto.ini of this voicebank.</value></data>
+<data name="NoRenderableNoteMessage" xml:space="preserve"><value>There is no note that can be synthesised.</value></data>
+<data name="TextTooLongMessage" xml:space="preserve"><value>The pronunciation is too long. Please split it.</value></data>
+<data name="AboutUTAU" xml:space="preserve"><value>About UTAU</value></data>
+<data name="AboutUTAUDescription" xml:space="preserve"><value>This plugin reads the oto.ini of a UTAU voicebank as it is and resynthesises it with WORLD. Single kana, VCV and CVVC voicebanks are all supported.</value></data>
+<data name="AboutUTAUHowTo" xml:space="preserve"><value>Put the voicebank folders under user/resources/utau or add them to the search folders. The pronunciation is written in kana.</value></data>
+<data name="AboutUTAUNotation" xml:space="preserve"><value>Writing &lt;!note:length&gt; in the pronunciation sets the pitch and the length of the kana that follows it. The length is written in milliseconds or as a note such as 1/4.</value></data>
+<data name="AboutUTAUNotationExample" xml:space="preserve"><value>Example: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  A rest is written as &lt;!R:200&gt;.</value></data>
+<data name="AboutUTAUCredit" xml:space="preserve"><value>WorldNet, a port of WORLD by M. Morise, is used for the analysis and the synthesis.</value></data>
+</root>

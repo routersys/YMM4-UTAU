@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+<data name="CurrentCulture" xml:space="preserve"><value>ja-jp</value></data>
+<data name="UTAU" xml:space="preserve"><value>UTAU</value></data>
+<data name="UpdateAvailableMessage" xml:space="preserve"><value>新しいバージョン {0} が公開されています。</value></data>
+<data name="F0EstimatorLabel" xml:space="preserve"><value>基本周波数の推定</value></data>
+<data name="F0EstimatorHarvest" xml:space="preserve"><value>Harvest</value></data>
+<data name="F0EstimatorHarvestDescription" xml:space="preserve"><value>精度が高い代わりに解析が重くなります。</value></data>
+<data name="F0EstimatorDio" xml:space="preserve"><value>Dio</value></data>
+<data name="F0EstimatorDioDescription" xml:space="preserve"><value>解析が軽い代わりに精度が下がります。</value></data>
+<data name="StretchModeLabel" xml:space="preserve"><value>伸縮方式</value></data>
+<data name="StretchModeLoop" xml:space="preserve"><value>ループ</value></data>
+<data name="StretchModeLoopDescription" xml:space="preserve"><value>伸ばす区間を折り返して繰り返します。</value></data>
+<data name="StretchModeStretch" xml:space="preserve"><value>ストレッチ</value></data>
+<data name="StretchModeStretchDescription" xml:space="preserve"><value>伸ばす区間の時間を一様に引き伸ばします。</value></data>
+<data name="EngineSettings" xml:space="preserve"><value>エンジン設定</value></data>
+<data name="AnalysisCacheLabel" xml:space="preserve"><value>解析キャッシュ</value></data>
+<data name="ClearCache" xml:space="preserve"><value>キャッシュを破棄</value></data>
+<data name="SearchDirectories" xml:space="preserve"><value>探索フォルダ</value></data>
+<data name="AddDirectory" xml:space="preserve"><value>フォルダを追加</value></data>
+<data name="RemoveDirectory" xml:space="preserve"><value>フォルダを削除</value></data>
+<data name="OpenDefaultDirectory" xml:space="preserve"><value>既定のフォルダを開く</value></data>
+<data name="Refresh" xml:space="preserve"><value>再読み込み</value></data>
+<data name="VoiceBankList" xml:space="preserve"><value>音源一覧</value></data>
+<data name="VoiceBankCount" xml:space="preserve"><value>{0} 音源</value></data>
+<data name="DefaultColor" xml:space="preserve"><value>既定</value></data>
+<data name="InfoKey" xml:space="preserve"><value>項目</value></data>
+<data name="InfoValue" xml:space="preserve"><value>内容</value></data>
+<data name="InfoName" xml:space="preserve"><value>名前</value></data>
+<data name="InfoAuthor" xml:space="preserve"><value>作者</value></data>
+<data name="InfoVersion" xml:space="preserve"><value>バージョン</value></data>
+<data name="InfoWeb" xml:space="preserve"><value>ウェブ</value></data>
+<data name="InfoSample" xml:space="preserve"><value>サンプル音声</value></data>
+<data name="InfoAliasCount" xml:space="preserve"><value>エイリアス数</value></data>
+<data name="InfoOtoCount" xml:space="preserve"><value>原音設定の数</value></data>
+<data name="InfoSampleCount" xml:space="preserve"><value>音声ファイル数</value></data>
+<data name="InfoOtoSet" xml:space="preserve"><value>原音設定</value></data>
+<data name="InfoPrefixMap" xml:space="preserve"><value>prefix.map の行数</value></data>
+<data name="InfoSubBank" xml:space="preserve"><value>声色の数</value></data>
+<data name="InfoSubBankDetail" xml:space="preserve"><value>声色</value></data>
+<data name="InfoColors" xml:space="preserve"><value>選択できる声色</value></data>
+<data name="InfoPath" xml:space="preserve"><value>場所</value></data>
+<data name="InfoReadme" xml:space="preserve"><value>説明書</value></data>
+<data name="LicenseAuthorFormat" xml:space="preserve"><value>作者: {0}</value></data>
+<data name="LicenseVersionFormat" xml:space="preserve"><value>バージョン: {0}</value></data>
+<data name="ParameterColor" xml:space="preserve"><value>声色</value></data>
+<data name="ParameterColorDescription" xml:space="preserve"><value>character.yaml の subbanks で定義された声色を選びます。</value></data>
+<data name="ParameterBaseTone" xml:space="preserve"><value>基準の音程</value></data>
+<data name="ParameterBaseToneDescription" xml:space="preserve"><value>音程記法を書かなかった箇所で使う音程です。</value></data>
+<data name="ParameterSpeed" xml:space="preserve"><value>話速</value></data>
+<data name="ParameterSpeedDescription" xml:space="preserve"><value>値を大きくすると各モーラが短くなります。</value></data>
+<data name="ParameterTempo" xml:space="preserve"><value>テンポ</value></data>
+<data name="ParameterTempoDescription" xml:space="preserve"><value>音程記法で 1/4 のように音符の長さを書いたときに使います。</value></data>
+<data name="ParameterVolume" xml:space="preserve"><value>音量</value></data>
+<data name="ParameterVolumeDescription" xml:space="preserve"><value>出力全体の音量です。100 が原音のままです。</value></data>
+<data name="ParameterModulation" xml:space="preserve"><value>モジュレーション</value></data>
+<data name="ParameterModulationDescription" xml:space="preserve"><value>原音の音程の揺れをどれだけ残すかです。0 で完全に指定した音程になります。</value></data>
+<data name="ParameterFormant" xml:space="preserve"><value>フォルマント</value></data>
+<data name="ParameterFormantDescription" xml:space="preserve"><value>スペクトル包絡を半音単位で周波数方向へ移します。正の値で声が細くなります。</value></data>
+<data name="ParameterBreathiness" xml:space="preserve"><value>息の量</value></data>
+<data name="ParameterBreathinessDescription" xml:space="preserve"><value>非周期性指標を強めて息の成分を増やします。</value></data>
+<data name="ParameterBrightness" xml:space="preserve"><value>高域の強調</value></data>
+<data name="ParameterBrightnessDescription" xml:space="preserve"><value>ナイキスト周波数における利得を指定して周波数特性を傾けます。</value></data>
+<data name="PronounceNotes" xml:space="preserve"><value>ノート</value></data>
+<data name="PronounceNotesDescription" xml:space="preserve"><value>発音から組み立てたノート列を編集します。</value></data>
+<data name="EditNotes" xml:space="preserve"><value>ノートを編集</value></data>
+<data name="NoteEditorHint" xml:space="preserve"><value>ノートを上下に動かすと音程が、右端を動かすと長さが変わります。</value></data>
+<data name="ZoomIn" xml:space="preserve"><value>拡大</value></data>
+<data name="ZoomOut" xml:space="preserve"><value>縮小</value></data>
+<data name="InsertRest" xml:space="preserve"><value>休符を挿入</value></data>
+<data name="RemoveNote" xml:space="preserve"><value>ノートを削除</value></data>
+<data name="RestLabel" xml:space="preserve"><value>休符</value></data>
+<data name="NoteGroupBasic" xml:space="preserve"><value>基本</value></data>
+<data name="NoteGroupExpression" xml:space="preserve"><value>表現</value></data>
+<data name="NoteGroupTiming" xml:space="preserve"><value>時間</value></data>
+<data name="NoteGroupPortamento" xml:space="preserve"><value>ポルタメント</value></data>
+<data name="NoteGroupVibrato" xml:space="preserve"><value>ビブラート</value></data>
+<data name="NoteLyric" xml:space="preserve"><value>歌詞</value></data>
+<data name="NoteTone" xml:space="preserve"><value>音程</value></data>
+<data name="NoteLength" xml:space="preserve"><value>長さ</value></data>
+<data name="NoteVelocity" xml:space="preserve"><value>子音速度</value></data>
+<data name="NoteIntensity" xml:space="preserve"><value>音量</value></data>
+<data name="NoteModulation" xml:space="preserve"><value>モジュレーション</value></data>
+<data name="NotePreutterance" xml:space="preserve"><value>先行発声</value></data>
+<data name="NoteOverlap" xml:space="preserve"><value>オーバーラップ</value></data>
+<data name="NoteStartPoint" xml:space="preserve"><value>開始位置</value></data>
+<data name="NoteFadeIn" xml:space="preserve"><value>フェードイン</value></data>
+<data name="NoteFadeOut" xml:space="preserve"><value>フェードアウト</value></data>
+<data name="PitchPointTime" xml:space="preserve"><value>時間</value></data>
+<data name="PitchPointCents" xml:space="preserve"><value>セント</value></data>
+<data name="PitchPointShape" xml:space="preserve"><value>曲線</value></data>
+<data name="PitchShapeSCurve" xml:space="preserve"><value>S字</value></data>
+<data name="PitchShapeLinear" xml:space="preserve"><value>直線</value></data>
+<data name="PitchShapeRCurve" xml:space="preserve"><value>R字</value></data>
+<data name="PitchShapeJCurve" xml:space="preserve"><value>J字</value></data>
+<data name="AddPitchPoint" xml:space="preserve"><value>制御点を追加</value></data>
+<data name="RemovePitchPoint" xml:space="preserve"><value>制御点を削除</value></data>
+<data name="ResetPitch" xml:space="preserve"><value>音程曲線を戻す</value></data>
+<data name="VibratoLength" xml:space="preserve"><value>長さ</value></data>
+<data name="VibratoPeriod" xml:space="preserve"><value>周期</value></data>
+<data name="VibratoDepth" xml:space="preserve"><value>深さ</value></data>
+<data name="VibratoFadeIn" xml:space="preserve"><value>立ち上がり</value></data>
+<data name="VibratoFadeOut" xml:space="preserve"><value>終わり</value></data>
+<data name="VibratoPhase" xml:space="preserve"><value>位相</value></data>
+<data name="VibratoOffset" xml:space="preserve"><value>中心のずれ</value></data>
+<data name="EmptyTextMessage" xml:space="preserve"><value>発音が空です。</value></data>
+<data name="AliasNotFoundMessage" xml:space="preserve"><value>原音設定に {0} が見つかりません。</value></data>
+<data name="NoRenderableNoteMessage" xml:space="preserve"><value>合成できるノートがありません。</value></data>
+<data name="TextTooLongMessage" xml:space="preserve"><value>発音が長すぎます。分割してください。</value></data>
+<data name="AboutUTAU" xml:space="preserve"><value>UTAUについて</value></data>
+<data name="AboutUTAUDescription" xml:space="preserve"><value>UTAU音源の原音設定をそのまま読み込み、WORLDで再合成します。単独音・連続音・CVVCのいずれにも対応します。</value></data>
+<data name="AboutUTAUHowTo" xml:space="preserve"><value>音源フォルダは user/resources/utau に置くか、探索フォルダに追加してください。発音はかなで書きます。</value></data>
+<data name="AboutUTAUNotation" xml:space="preserve"><value>発音の中に &lt;!音名:長さ&gt; と書くと、その直後のかなの音程と長さが決まります。長さはミリ秒か 1/4 のような音符で書けます。</value></data>
+<data name="AboutUTAUNotationExample" xml:space="preserve"><value>例: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  休符は &lt;!R:200&gt; と書きます。</value></data>
+<data name="AboutUTAUCredit" xml:space="preserve"><value>音声の分析と合成には M. Morise 氏の WORLD を移植した WorldNet を使用しています。</value></data>
+</root>
