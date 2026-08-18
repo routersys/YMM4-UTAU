@@ -227,53 +227,58 @@
                 <Grid Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" IsEnabled="{Binding HasSelection}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
-                        <RowDefinition Height="26"/>
-                        <RowDefinition Height="26"/>
-                        <RowDefinition Height="108"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <c:PropertiesEditor Grid.Row="0" Target="{Binding SelectedNote.Note}" IsScrollViewerEnabled="True"/>
-                    <Grid Grid.Row="1">
-                        <TextBlock Text="{x:Static root:Texts.NoteGroupPortamento}" VerticalAlignment="Center" Margin="6,0,0,0"/>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Button Width="26" Height="26" Command="{Binding AddPitchPointCommand}" ToolTip="{x:Static root:Texts.AddPitchPoint}"
-                                    Content="{DynamicResource {x:Static icons:IconKeys.Plus}}"/>
-                            <Button Width="26" Height="26" Command="{Binding RemovePitchPointCommand}" ToolTip="{x:Static root:Texts.RemovePitchPoint}"
-                                    Content="{DynamicResource {x:Static icons:IconKeys.Minus}}"/>
-                            <Button Width="26" Height="26" Command="{Binding ResetPitchCommand}" ToolTip="{x:Static root:Texts.ResetPitch}"
-                                    Content="{DynamicResource {x:Static icons:IconKeys.Restore}}"/>
-                        </StackPanel>
-                    </Grid>
-                    <Grid Grid.Row="2" IsEnabled="{Binding HasPitchPoint}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="92"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{x:Static root:Texts.PitchPointShape}" VerticalAlignment="Center" Margin="6,0,0,0"/>
-                        <c:CommonComboBox Grid.Column="1" Margin="0"
-                                          ItemsSource="{Binding Source={x:Static vm:NoteEditorViewModel.PitchShapes}}"
-                                          DisplayMemberPath="Name"
-                                          SelectedValuePath="Value"
-                                          Value="{Binding SelectedPitchPoint.Shape}"/>
-                    </Grid>
-                    <DataGrid Grid.Row="3" ItemsSource="{Binding PitchPoints}"
-                              SelectedItem="{Binding SelectedPitchPoint}"
-                              Margin="0"
-                              AutoGenerateColumns="False"
-                              CanUserAddRows="False"
-                              CanUserDeleteRows="False"
-                              CanUserReorderColumns="False"
-                              CanUserResizeRows="False"
-                              RowHeight="24"
-                              SelectionMode="Single"
-                              SelectionUnit="FullRow"
-                              HeadersVisibility="Column">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="{x:Static root:Texts.PitchPointTime}" Width="*"
-                                                Binding="{Binding Milliseconds, StringFormat=F0}"/>
-                            <DataGridTextColumn Header="{x:Static root:Texts.PitchPointCents}" Width="*"
-                                                Binding="{Binding Cents, StringFormat=F0}"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                    <Expander Grid.Row="1" Header="{x:Static root:Texts.NoteGroupPortamento}" IsExpanded="False">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="26"/>
+                                <RowDefinition Height="108"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="48"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{x:Static root:Texts.PitchPointShape}" VerticalAlignment="Center"/>
+                                <c:CommonComboBox Grid.Column="1" Margin="0"
+                                                  IsEnabled="{Binding HasPitchPoint}"
+                                                  ItemsSource="{Binding Source={x:Static vm:NoteEditorViewModel.PitchShapes}}"
+                                                  DisplayMemberPath="Name"
+                                                  SelectedValuePath="Value"
+                                                  Value="{Binding SelectedPitchPoint.Shape}"/>
+                                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                    <Button Width="26" Height="26" Command="{Binding AddPitchPointCommand}" ToolTip="{x:Static root:Texts.AddPitchPoint}"
+                                            Content="{DynamicResource {x:Static icons:IconKeys.Plus}}"/>
+                                    <Button Width="26" Height="26" Command="{Binding RemovePitchPointCommand}" ToolTip="{x:Static root:Texts.RemovePitchPoint}"
+                                            Content="{DynamicResource {x:Static icons:IconKeys.Minus}}"/>
+                                    <Button Width="26" Height="26" Command="{Binding ResetPitchCommand}" ToolTip="{x:Static root:Texts.ResetPitch}"
+                                            Content="{DynamicResource {x:Static icons:IconKeys.Restore}}"/>
+                                </StackPanel>
+                            </Grid>
+                            <DataGrid Grid.Row="1" ItemsSource="{Binding PitchPoints}"
+                                      SelectedItem="{Binding SelectedPitchPoint}"
+                                      Margin="0"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False"
+                                      CanUserDeleteRows="False"
+                                      CanUserReorderColumns="False"
+                                      CanUserResizeRows="False"
+                                      RowHeight="24"
+                                      SelectionMode="Single"
+                                      SelectionUnit="FullRow"
+                                      HeadersVisibility="Column">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="{x:Static root:Texts.PitchPointTime}" Width="*"
+                                                        Binding="{Binding Milliseconds, StringFormat=F0}"/>
+                                    <DataGridTextColumn Header="{x:Static root:Texts.PitchPointCents}" Width="*"
+                                                        Binding="{Binding Cents, StringFormat=F0}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Expander>
                 </Grid>
             </Grid>
         </c:PopupButton.PopupContent>
