@@ -18,6 +18,7 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         Length,
         PitchHandle,
         Expression,
+        Select,
     }
 
     const double WheelScrollStep = 64.0;
@@ -26,8 +27,7 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
     NoteViewModel? dragTarget;
     PitchPoint? dragPoint;
     Point dragOrigin;
-    int dragOriginLengthTicks;
-    int dragOriginTone;
+    bool dragMoved;
     bool isPanning;
     Point panOrigin;
     double panHorizontalOffset;
@@ -141,16 +141,27 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
 
     void RollCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (ViewModel is not { } viewModel || e.ClickCount < 2)
-            return;
-        if (viewModel.SelectedNote is not { } selected || selected.IsRest)
+        if (ViewModel is not { } viewModel)
             return;
 
-        var position = e.GetPosition(RollCanvas);
-        var ticks = viewModel.TicksFromCanvasX(position.X) - selected.StartTicks;
-        viewModel.AddPitchPointAt(
-            Math.Clamp(ticks, 0, selected.Note.LengthTicks),
-            viewModel.CentsFromCanvasY(position.Y, selected.Note.Tone));
+        if (e.ClickCount >= 2)
+        {
+            if (viewModel.SelectedNote is not { } selected || selected.IsRest)
+                return;
+
+            var position = e.GetPosition(RollCanvas);
+            var ticks = viewModel.TicksFromCanvasX(position.X) - selected.StartTicks;
+            viewModel.AddPitchPointAt(
+                Math.Clamp(ticks, 0, selected.Note.LengthTicks),
+                viewModel.CentsFromCanvasY(position.Y, selected.Note.Tone));
+            e.Handled = true;
+            return;
+        }
+
+        dragMode = DragMode.Select;
+        dragOrigin = e.GetPosition(RollCanvas);
+        viewModel.UpdateSelectionBox(dragOrigin, dragOrigin);
+        RollCanvas.CaptureMouse();
         e.Handled = true;
     }
 
@@ -177,9 +188,21 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         if (sender is not FrameworkElement { DataContext: NoteViewModel note } || ViewModel is not { } viewModel)
             return;
 
-        viewModel.SelectedNote = note;
-        BeginDrag(note, DragMode.Tone, e);
         e.Handled = true;
+        if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+        {
+            viewModel.ToggleSelection(note);
+            return;
+        }
+
+        if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+        {
+            viewModel.SelectRange(note);
+            return;
+        }
+
+        viewModel.MakePrimary(note);
+        BeginDrag(note, DragMode.Tone, e);
     }
 
     void NoteResize_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -187,7 +210,7 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         if (sender is not FrameworkElement { DataContext: NoteViewModel note } || ViewModel is not { } viewModel)
             return;
 
-        viewModel.SelectedNote = note;
+        viewModel.MakePrimary(note);
         BeginDrag(note, DragMode.Length, e);
         e.Handled = true;
     }
@@ -218,8 +241,8 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         dragMode = mode;
         dragTarget = note;
         dragOrigin = e.GetPosition(RollCanvas);
-        dragOriginLengthTicks = note.LengthTicks;
-        dragOriginTone = note.Tone;
+        dragMoved = false;
+        ViewModel?.BeginTransform();
         RollCanvas.CaptureMouse();
     }
 
@@ -235,6 +258,12 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         {
             HorizontalScroller.ScrollToHorizontalOffset(panHorizontalOffset - (position.X - panOrigin.X));
             VerticalScroller.ScrollToVerticalOffset(panVerticalOffset - (position.Y - panOrigin.Y));
+            return;
+        }
+
+        if (dragMode == DragMode.Select)
+        {
+            viewModel.UpdateSelectionBox(dragOrigin, position);
             return;
         }
 
@@ -255,12 +284,14 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         if (dragMode == DragMode.Tone)
         {
             var delta = (int)Math.Round((dragOrigin.Y - position.Y) / viewModel.SemitoneHeight);
-            dragTarget.Tone = Math.Clamp(dragOriginTone + delta, 0, 127);
+            dragMoved |= delta != 0;
+            viewModel.TransformTones(delta);
             return;
         }
 
         var deltaTicks = viewModel.TicksFromCanvasX(position.X - dragOrigin.X);
-        dragTarget.LengthTicks = viewModel.SnapLength(dragOriginLengthTicks + deltaTicks);
+        dragMoved |= deltaTicks != 0;
+        viewModel.TransformLengths(deltaTicks);
     }
 
     void RollCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) => EndDrag();
@@ -279,11 +310,26 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         if (dragMode is DragMode.None or DragMode.Expression)
             return;
 
+        if (dragMode == DragMode.Select)
+        {
+            dragMode = DragMode.None;
+            RollCanvas.ReleaseMouseCapture();
+            ViewModel?.CommitSelectionBox(Keyboard.Modifiers.HasFlag(ModifierKeys.Control));
+            return;
+        }
+
         var shouldRelayout = dragMode is DragMode.Tone or DragMode.Length;
+        var collapseTarget = dragMode == DragMode.Tone && !dragMoved && ViewModel is { SelectedCount: > 1 }
+            ? dragTarget
+            : null;
         dragMode = DragMode.None;
         dragTarget = null;
         dragPoint = null;
+        dragMoved = false;
         RollCanvas.ReleaseMouseCapture();
+        ViewModel?.EndTransform();
+        if (collapseTarget is not null)
+            ViewModel?.Select(collapseTarget);
         if (shouldRelayout)
             ViewModel?.InvalidateLayout();
     }
