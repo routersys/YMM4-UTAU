@@ -47,7 +47,7 @@ internal static class UstImporter
             var sectionTempo = ParseNumber(section.Find(UstKeys.Tempo));
             var isTempoChange = IsUsableTempo(sectionTempo) && Math.Abs(sectionTempo!.Value - currentTempo) > TempoEpsilon;
             if (isTempoChange)
-                currentTempo = sectionTempo!.Value;
+                currentTempo = Math.Clamp(sectionTempo!.Value, TimeBase.MinimumTempo, TimeBase.MaximumTempo);
 
             var note = CreateNote(section, noteLength, new TimeBase(currentTempo, 1.0));
             if (isTempoChange)
