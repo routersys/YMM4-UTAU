@@ -134,7 +134,7 @@ public sealed class PhonemizerTests : IDisposable
     static readonly TimeBase Base = TimeBase.Default;
 
     static IReadOnlyList<PhonemeUnit> Phonemize(VoiceBank bank, IReadOnlyList<UTAUNote> notes)
-        => Phonemizer.Phonemize(bank, notes, null, PhonemizeOptions.Default, TempoMap.Create(notes, Base));
+        => Phonemizer.Phonemize(bank, TempoMap.Create(notes, Base), null, PhonemizeOptions.Default);
 
     static IReadOnlyList<UTAUNote> Notes(string text)
         => NoteSequenceBuilder.Build(text, NoteBuildOptions.Create(60));

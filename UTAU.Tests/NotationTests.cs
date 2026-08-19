@@ -297,3 +297,87 @@ public sealed class KanaRomanizationTests
         Assert.Equal("ー", KanaRomanization.ToHiragana("ー"));
     }
 }
+
+public sealed class TempoNotationTests
+{
+    static IReadOnlyList<UTAUNote> Build(string text)
+        => NoteSequenceBuilder.Build(text, NoteBuildOptions.Create(60));
+
+    [Fact]
+    public void TheTempoDirectiveAppliesToTheNextNote()
+    {
+        var notes = Build("あ<!T=140>い う");
+
+        Assert.Equal(UTAUNote.FollowScoreValue, notes[0].TempoOverride, 9);
+        Assert.Equal(140.0, notes[1].TempoOverride, 9);
+        Assert.Equal(UTAUNote.FollowScoreValue, notes[2].TempoOverride, 9);
+    }
+
+    [Fact]
+    public void TheDirectiveCombinesWithAToneAndALength()
+    {
+        var notes = Build("<!T=90:1/4><!E4>あ");
+
+        var note = Assert.Single(notes);
+        Assert.Equal(90.0, note.TempoOverride, 9);
+        Assert.Equal(TimeBase.TicksPerQuarterNote, note.LengthTicks);
+        Assert.True(MusicalTone.TryParse("E4", out var expected));
+        Assert.Equal(expected.NoteNumber, note.Tone);
+    }
+
+    [Fact]
+    public void TheDirectiveIsCaseInsensitive()
+    {
+        Assert.Equal(140.0, Assert.Single(Build("<!t=140>あ")).TempoOverride, 9);
+    }
+
+    [Fact]
+    public void ARestCarriesTheTempoWithoutMergingIntoThePreviousRest()
+    {
+        var notes = Build("、<!T=200>、あ");
+
+        Assert.Equal(3, notes.Count);
+        Assert.True(notes[0].IsRest);
+        Assert.True(notes[1].IsRest);
+        Assert.Equal(UTAUNote.FollowScoreValue, notes[0].TempoOverride, 9);
+        Assert.Equal(200.0, notes[1].TempoOverride, 9);
+    }
+
+    [Fact]
+    public void RestsStillMergeWithoutATempo()
+    {
+        var notes = Build("、、あ");
+
+        Assert.Equal(2, notes.Count);
+        Assert.True(notes[0].IsRest);
+    }
+
+    [Theory]
+    [InlineData("<!T=10>あ")]
+    [InlineData("<!T=500>あ")]
+    [InlineData("<!T=abc>あ")]
+    [InlineData("<!T=>あ")]
+    public void OutOfRangeOrMalformedDirectivesAreNotDirectives(string text)
+    {
+        Assert.All(Build(text), x => Assert.Equal(UTAUNote.FollowScoreValue, x.TempoOverride, 9));
+    }
+
+    [Fact]
+    public void TheDirectiveChangesTheRenderedTiming()
+    {
+        var steady = TempoMap.Create([.. Build("あいうえ")], new TimeBase(120.0, 1.0));
+        var faster = TempoMap.Create([.. Build("あい<!T=240>うえ")], new TimeBase(120.0, 1.0));
+
+        Assert.Equal(steady.TotalTicks, faster.TotalTicks);
+        Assert.True(faster.TotalMilliseconds < steady.TotalMilliseconds);
+        Assert.Equal(steady.TotalMilliseconds * 0.75, faster.TotalMilliseconds, 6);
+    }
+
+    [Fact]
+    public void TheDirectiveSurvivesNormalization()
+    {
+        var normalized = LyricNormalizer.Normalize(" ア <!T=140> イ ");
+
+        Assert.Contains("<!T=140>", normalized, StringComparison.Ordinal);
+    }
+}

@@ -37,6 +37,7 @@ public sealed class PronounceChangeNotificationTests
     [Theory]
     [InlineData(nameof(UTAUNote.Tone))]
     [InlineData(nameof(UTAUNote.LengthTicks))]
+    [InlineData(nameof(UTAUNote.TempoOverride))]
     [InlineData(nameof(UTAUNote.Lyric))]
     [InlineData(nameof(UTAUNote.Velocity))]
     [InlineData(nameof(UTAUNote.Intensity))]
@@ -57,6 +58,7 @@ public sealed class PronounceChangeNotificationTests
         {
             case nameof(UTAUNote.Tone): note.Tone = 64; break;
             case nameof(UTAUNote.LengthTicks): note.LengthTicks = 960; break;
+            case nameof(UTAUNote.TempoOverride): note.TempoOverride = 150.0; break;
             case nameof(UTAUNote.Lyric): note.Lyric = "か"; break;
             case nameof(UTAUNote.Velocity): note.Velocity = 50.0; break;
             case nameof(UTAUNote.Intensity): note.Intensity = 50.0; break;
