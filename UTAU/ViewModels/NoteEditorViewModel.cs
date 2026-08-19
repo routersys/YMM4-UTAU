@@ -27,6 +27,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public const double PitchHandleSize = 8.0;
     public const double SelectionBoxThreshold = 3.0;
     public const double MinimumPitchCurveSpacing = 1.0;
+    public const double WindowMarginRatio = 0.5;
 
     readonly UTAUVoicePronounce pronounce;
     readonly ObservableCollection<UTAUNote> source;
@@ -59,12 +60,19 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     double[] pitchSampleTones = [];
     UTAUNote[] noteBuffer = [];
     int pitchSampleCount;
+    double viewportLeft;
+    double viewportWidth;
+    int windowStartTicks;
+    int windowEndTicks = int.MaxValue;
+    int visibleFirst;
+    int visibleLast = -1;
 
     public NoteEditorViewModel(UTAUVoicePronounce pronounce)
     {
         this.pronounce = pronounce;
         source = pronounce.Notes;
         Notes = [.. source.Select(x => new NoteViewModel(x, this))];
+        Notes.CollectionChanged += OnNotesChanged;
         ZoomInCommand = new ActionCommand(_ => pixelsPerTick < MaximumPixelsPerTick, _ => ZoomHorizontally(ZoomStep));
         ZoomOutCommand = new ActionCommand(_ => pixelsPerTick > MinimumPixelsPerTick, _ => ZoomHorizontally(1.0 / ZoomStep));
         ZoomVerticalInCommand = new ActionCommand(_ => semitoneHeight < MaximumSemitoneHeight, _ => ZoomVertically(ZoomStep));
@@ -83,6 +91,8 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     }
 
     public ObservableCollection<NoteViewModel> Notes { get; }
+
+    public ObservableCollection<NoteViewModel> VisibleNotes { get; } = [];
 
     public ICommand ZoomInCommand { get; }
 
@@ -268,6 +278,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
         TotalTicks = position;
         OnPropertyChanged(nameof(TotalTicks));
+        ResetWindow();
         UpdateKeyboard();
         UpdateTimeGridLines();
         OnPropertyChanged(nameof(CanvasWidth));
@@ -275,6 +286,116 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         UpdatePitchCurve();
         UpdatePitchHandles();
         UpdateExpression();
+    }
+
+    public void SetViewport(double left, double width)
+    {
+        viewportLeft = left;
+        viewportWidth = width;
+        if (!MoveWindow())
+            return;
+
+        SyncVisibleNotes();
+        UpdateTimeGridLines();
+        ProjectPitchCurve();
+        UpdateExpression();
+    }
+
+    void OnNotesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        visibleFirst = 0;
+        visibleLast = -1;
+    }
+
+    void ResetWindow()
+    {
+        windowStartTicks = int.MaxValue;
+        windowEndTicks = int.MinValue;
+        MoveWindow();
+        SyncVisibleNotes();
+    }
+
+    bool MoveWindow()
+    {
+        int start;
+        int end;
+        if (viewportWidth <= 0.0 || PixelsPerTick <= 0.0)
+        {
+            start = 0;
+            end = int.MaxValue;
+        }
+        else
+        {
+            var margin = viewportWidth * WindowMarginRatio;
+            start = (int)Math.Max((viewportLeft - margin) / PixelsPerTick, 0.0);
+            end = (int)Math.Min((viewportLeft + viewportWidth + margin) / PixelsPerTick, int.MaxValue);
+        }
+
+        if (start == windowStartTicks && end == windowEndTicks)
+            return false;
+
+        windowStartTicks = start;
+        windowEndTicks = end;
+        return true;
+    }
+
+    void SyncVisibleNotes()
+    {
+        var first = 0;
+        var last = -1;
+        for (var index = 0; index < Notes.Count; index++)
+        {
+            var note = Notes[index];
+            if (note.EndTicks < windowStartTicks)
+                continue;
+            if (note.StartTicks > windowEndTicks)
+                break;
+            if (last < 0)
+                first = index;
+            last = index;
+        }
+
+        if (last < first)
+        {
+            VisibleNotes.Clear();
+            visibleFirst = 0;
+            visibleLast = -1;
+            return;
+        }
+
+        if (!CanSlideTo(first, last))
+        {
+            VisibleNotes.Clear();
+            for (var index = first; index <= last; index++)
+                VisibleNotes.Add(Notes[index]);
+            visibleFirst = first;
+            visibleLast = last;
+            return;
+        }
+
+        while (visibleFirst < first)
+        {
+            VisibleNotes.RemoveAt(0);
+            visibleFirst++;
+        }
+
+        while (visibleLast > last)
+        {
+            VisibleNotes.RemoveAt(VisibleNotes.Count - 1);
+            visibleLast--;
+        }
+
+        while (visibleFirst > first)
+        {
+            visibleFirst--;
+            VisibleNotes.Insert(0, Notes[visibleFirst]);
+        }
+
+        while (visibleLast < last)
+        {
+            visibleLast++;
+            VisibleNotes.Add(Notes[visibleLast]);
+        }
     }
 
     public void InvalidateTones()
@@ -294,6 +415,8 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         foreach (var note in Notes)
             note.RaiseLayoutChanged();
 
+        if (MoveWindow())
+            SyncVisibleNotes();
         UpdateKeyboard();
         UpdateTimeGridLines();
         OnPropertyChanged(nameof(CanvasWidth));
@@ -392,22 +515,55 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         ProjectPitchCurve();
     }
 
+    int LowerBound(int ticks)
+    {
+        var low = 0;
+        var high = pitchSampleCount;
+        while (low < high)
+        {
+            var middle = (low + high) / 2;
+            if (pitchSampleTicks[middle] < ticks)
+                low = middle + 1;
+            else
+                high = middle;
+        }
+        return Math.Max(low - 1, 0);
+    }
+
+    int UpperBound(int ticks)
+    {
+        var low = 0;
+        var high = pitchSampleCount;
+        while (low < high)
+        {
+            var middle = (low + high) / 2;
+            if (pitchSampleTicks[middle] <= ticks)
+                low = middle + 1;
+            else
+                high = middle;
+        }
+        return Math.Min(low + 1, pitchSampleCount);
+    }
+
     void ProjectPitchCurve()
     {
         var spacing = PitchCurveIntervalTicks * PixelsPerTick;
         var step = spacing <= 0.0 ? 1 : Math.Max((int)(MinimumPitchCurveSpacing / spacing), 1);
-        var points = new PointCollection(step == 1 ? pitchSampleCount : pitchSampleCount / step * 2 + 2);
+        var from = LowerBound(windowStartTicks);
+        var to = UpperBound(windowEndTicks);
+        var span = Math.Max(to - from, 0);
+        var points = new PointCollection(step == 1 ? span : span / step * 2 + 2);
 
         if (step == 1)
         {
-            for (var index = 0; index < pitchSampleCount; index++)
+            for (var index = from; index < to; index++)
                 points.Add(ToCanvasPoint(pitchSampleTicks[index], pitchSampleTones[index]));
         }
         else
         {
-            for (var start = 0; start < pitchSampleCount; start += step)
+            for (var start = from; start < to; start += step)
             {
-                var end = Math.Min(start + step, pitchSampleCount);
+                var end = Math.Min(start + step, to);
                 var lowest = start;
                 var highest = start;
                 for (var index = start + 1; index < end; index++)
@@ -767,6 +923,8 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public void Dispose()
     {
         ObservePitchPoints(null);
+        Notes.CollectionChanged -= OnNotesChanged;
+        VisibleNotes.Clear();
         selectedNotes.Clear();
         transformTargets.Clear();
         foreach (var note in Notes)
@@ -860,12 +1018,14 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     {
         var values = samples ?? CurrentCurve.Values;
         var expression = SelectedExpression;
-        var points = new PointCollection();
         var total = Math.Max(TotalTicks, ExpressionCurve.IntervalTicks);
+        var first = Math.Max(windowStartTicks / ExpressionCurve.IntervalTicks - 1, 0);
+        var last = Math.Min(windowEndTicks / ExpressionCurve.IntervalTicks + 1, total / ExpressionCurve.IntervalTicks);
+        var points = new PointCollection(Math.Max(last - first + 1, 1));
 
-        for (var ticks = 0; ticks <= total; ticks += ExpressionCurve.IntervalTicks)
+        for (var index = first; index <= last; index++)
         {
-            var index = ticks / ExpressionCurve.IntervalTicks;
+            var ticks = index * ExpressionCurve.IntervalTicks;
             var value = values.Length == 0 ? 0.0 : values[Math.Clamp(index, 0, values.Length - 1)];
             points.Add(new Point(ticks * PixelsPerTick, (1.0 - expression.ToRatio(value)) * StripHeight));
         }
@@ -881,7 +1041,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         var sung = 0;
         foreach (var note in Notes)
         {
-            if (!note.IsRest)
+            if (!note.IsRest && IsInsideWindow(note))
                 sung++;
         }
 
@@ -890,7 +1050,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         var index = 0;
         foreach (var note in Notes)
         {
-            if (note.IsRest)
+            if (note.IsRest || !IsInsideWindow(note))
                 continue;
 
             var value = expression.NoteExpression switch
@@ -908,6 +1068,18 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
             bar.Height = Math.Max(Math.Abs(baseline - y), 1.0);
         }
     }
+
+    bool CanSlideTo(int first, int last)
+        => visibleLast >= visibleFirst
+            && last >= visibleFirst
+            && first <= visibleLast
+            && VisibleNotes.Count == visibleLast - visibleFirst + 1
+            && visibleLast < Notes.Count
+            && ReferenceEquals(VisibleNotes[0], Notes[visibleFirst])
+            && ReferenceEquals(VisibleNotes[^1], Notes[visibleLast]);
+
+    bool IsInsideWindow(NoteViewModel note)
+        => note.EndTicks >= windowStartTicks && note.StartTicks <= windowEndTicks;
 
     void UpdateKeyboard()
     {
@@ -932,13 +1104,16 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     void UpdateTimeGridLines()
     {
         var total = TotalTicks;
-        var count = total <= 1 ? 0 : (total - 1) / TimeBase.TicksPerQuarterNote;
+        var last = total <= 1 ? 0 : (total - 1) / TimeBase.TicksPerQuarterNote;
+        var first = Math.Max(windowStartTicks / TimeBase.TicksPerQuarterNote, 1);
+        last = Math.Min(last, windowEndTicks / TimeBase.TicksPerQuarterNote);
+        var count = Math.Max(last - first + 1, 0);
         Resize(TimeGridLines, count, () => new GridLineViewModel());
 
         var height = CanvasHeight;
         for (var index = 0; index < count; index++)
         {
-            var ticks = (index + 1) * TimeBase.TicksPerQuarterNote;
+            var ticks = (first + index) * TimeBase.TicksPerQuarterNote;
             var line = TimeGridLines[index];
             line.Left = ticks * PixelsPerTick;
             line.Height = height;
