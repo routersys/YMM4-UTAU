@@ -159,3 +159,135 @@ public sealed class NoteEditorLayoutTests
         Assert.Equal(expected, viewModel.TotalTicks);
     }
 }
+
+public sealed class ScaleUpdateTests
+{
+    static NoteEditorViewModel CreateViewModel(int noteCount, bool withVibrato)
+    {
+        var pronounce = new UTAUVoicePronounce();
+        for (var index = 0; index < noteCount; index++)
+        {
+            var note = new UTAUNote { Lyric = "あ", Tone = 60 + index % 7, LengthTicks = 480 };
+            if (withVibrato)
+            {
+                note.Vibrato.LengthPercent = 80.0;
+                note.Vibrato.DepthCents = 200.0;
+                note.Vibrato.FadeInPercent = 0.0;
+                note.Vibrato.FadeOutPercent = 0.0;
+            }
+            pronounce.Notes.Add(note);
+        }
+        return new NoteEditorViewModel(pronounce);
+    }
+
+    static (double Lowest, double Highest) ToneRange(NoteEditorViewModel viewModel)
+    {
+        var lowest = double.MaxValue;
+        var highest = double.MinValue;
+        foreach (var point in viewModel.PitchCurve)
+        {
+            var tone = viewModel.MaximumTone + 0.5 - point.Y / viewModel.SemitoneHeight;
+            lowest = Math.Min(lowest, tone);
+            highest = Math.Max(highest, tone);
+        }
+        return (lowest, highest);
+    }
+
+    [Fact]
+    public void ScalingReusesTheKeyboardAndGridObjects()
+    {
+        var viewModel = CreateViewModel(60, false);
+        var key = viewModel.Keyboard[0];
+        var line = viewModel.TimeGridLines[0];
+        var bar = viewModel.ExpressionBars[0];
+        var keyCount = viewModel.Keyboard.Count;
+        var lineCount = viewModel.TimeGridLines.Count;
+
+        viewModel.ZoomHorizontally(NoteEditorViewModel.ZoomStep);
+        viewModel.ZoomVertically(NoteEditorViewModel.ZoomStep);
+
+        Assert.Same(key, viewModel.Keyboard[0]);
+        Assert.Same(line, viewModel.TimeGridLines[0]);
+        Assert.Same(bar, viewModel.ExpressionBars[0]);
+        Assert.Equal(keyCount, viewModel.Keyboard.Count);
+        Assert.Equal(lineCount, viewModel.TimeGridLines.Count);
+    }
+
+    [Fact]
+    public void ScalingUpdatesTheGeometryOfTheReusedObjects()
+    {
+        var viewModel = CreateViewModel(60, false);
+        var line = viewModel.TimeGridLines[0];
+        var left = line.Left;
+        var height = viewModel.Keyboard[0].Height;
+
+        viewModel.ZoomHorizontally(NoteEditorViewModel.ZoomStep);
+        Assert.Equal(left * NoteEditorViewModel.ZoomStep, line.Left, 6);
+
+        viewModel.ZoomVertically(NoteEditorViewModel.ZoomStep);
+        Assert.Equal(height * NoteEditorViewModel.ZoomStep, viewModel.Keyboard[0].Height, 6);
+    }
+
+    [Fact]
+    public void ScalingDoesNotMoveNotesInTicks()
+    {
+        var viewModel = CreateViewModel(40, false);
+        var before = viewModel.Notes.Select(x => x.StartTicks).ToArray();
+
+        viewModel.ZoomHorizontally(1.0 / NoteEditorViewModel.ZoomStep);
+        viewModel.ZoomVertically(NoteEditorViewModel.ZoomStep);
+
+        Assert.Equal(before, viewModel.Notes.Select(x => x.StartTicks).ToArray());
+    }
+
+    [Fact]
+    public void TheCurveKeepsEverySampleWhileTheyAreAtLeastAPixelApart()
+    {
+        var viewModel = CreateViewModel(40, true);
+        while (viewModel.PixelsPerTick < NoteEditorViewModel.MaximumPixelsPerTick)
+            viewModel.ZoomHorizontally(NoteEditorViewModel.ZoomStep);
+
+        var expected = viewModel.Notes.Sum(x => x.LengthTicks / NoteEditorViewModel.PitchCurveIntervalTicks + 1);
+
+        Assert.Equal(expected, viewModel.PitchCurve.Count);
+    }
+
+    [Fact]
+    public void TheCurveIsThinnedOnceSamplesFallBelowAPixel()
+    {
+        var viewModel = CreateViewModel(40, true);
+        var dense = viewModel.PitchCurve.Count;
+
+        while (viewModel.PixelsPerTick > NoteEditorViewModel.MinimumPixelsPerTick)
+            viewModel.ZoomHorizontally(1.0 / NoteEditorViewModel.ZoomStep);
+
+        Assert.True(viewModel.PitchCurve.Count * 3 < dense, $"dense={dense} thinned={viewModel.PitchCurve.Count}");
+    }
+
+    [Fact]
+    public void TheThinnedCurveKeepsTheVibratoEnvelope()
+    {
+        var viewModel = CreateViewModel(40, true);
+        var dense = ToneRange(viewModel);
+
+        while (viewModel.PixelsPerTick > NoteEditorViewModel.MinimumPixelsPerTick)
+            viewModel.ZoomHorizontally(1.0 / NoteEditorViewModel.ZoomStep);
+        var thinned = ToneRange(viewModel);
+
+        Assert.Equal(dense.Lowest, thinned.Lowest, 9);
+        Assert.Equal(dense.Highest, thinned.Highest, 9);
+    }
+
+    [Fact]
+    public void EditingTheScoreStillRebuildsTheRows()
+    {
+        var viewModel = CreateViewModel(10, false);
+        var lineCount = viewModel.TimeGridLines.Count;
+        var barCount = viewModel.ExpressionBars.Count;
+
+        viewModel.Notes[0].LengthTicks = 1920;
+
+        Assert.True(viewModel.TimeGridLines.Count > lineCount);
+        Assert.Equal(barCount, viewModel.ExpressionBars.Count);
+    }
+}
