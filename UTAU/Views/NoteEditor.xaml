@@ -30,6 +30,7 @@
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="26"/>
+                    <RowDefinition Height="26"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="72"/>
                     <RowDefinition Height="14"/>
@@ -68,7 +69,26 @@
                     <TextBlock Text="{Binding GuideText}" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.75"/>
                 </StackPanel>
 
-                <ScrollViewer x:Name="VerticalScroller" Grid.Row="1" Grid.Column="0"
+                <Grid Grid.Row="1" Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" MinWidth="180"/>
+                        <ColumnDefinition Width="26"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <c:FileSelector Grid.Column="0"
+                                    FileType="None"
+                                    ShowThumbnail="False"
+                                    Filter="*.ust"
+                                    FilterName="{x:Static root:Texts.UstFilterName}"
+                                    Value="{Binding UstPath}"/>
+                    <Button Grid.Column="1" Width="26" Height="26" Command="{Binding ImportUstCommand}"
+                            ToolTip="{x:Static root:Texts.ImportUst}"
+                            Content="{DynamicResource {x:Static icons:IconKeys.FileImportOutline}}"/>
+                    <TextBlock Grid.Column="2" Text="{Binding ImportMessage}" VerticalAlignment="Center"
+                               Margin="6,0,0,0" Opacity="0.75" TextTrimming="CharacterEllipsis"/>
+                </Grid>
+
+                <ScrollViewer x:Name="VerticalScroller" Grid.Row="2" Grid.Column="0"
                               VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                               SizeChanged="Scroller_SizeChanged">
                     <Grid>
@@ -281,7 +301,7 @@
                 </ScrollViewer>
 
 
-                <Grid Grid.Row="2" Grid.Column="0">
+                <Grid Grid.Row="3" Grid.Column="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="42"/>
                         <ColumnDefinition Width="*"/>
@@ -358,10 +378,10 @@
                     </ScrollViewer>
                 </Grid>
 
-                <ScrollBar x:Name="HorizontalBar" Grid.Row="3" Grid.Column="0" Orientation="Horizontal"
+                <ScrollBar x:Name="HorizontalBar" Grid.Row="4" Grid.Column="0" Orientation="Horizontal"
                            Margin="42,0,0,0" Scroll="HorizontalBar_Scroll"/>
 
-                <Grid Grid.Row="1" Grid.RowSpan="3" Grid.Column="1" IsEnabled="{Binding HasSelection}">
+                <Grid Grid.Row="1" Grid.RowSpan="4" Grid.Column="1" IsEnabled="{Binding HasSelection}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="26"/>
