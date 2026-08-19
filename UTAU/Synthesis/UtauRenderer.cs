@@ -19,6 +19,15 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
 
     sealed record Segment(int StartFrame, int FrameCount, IReadOnlyList<int> TimingIndices);
 
+    sealed record SegmentBuffers(
+        double[] F0,
+        double[] Spectrogram,
+        double[] Aperiodicity,
+        double[] WeightSum,
+        double[] VoicedWeight,
+        double[] LogF0Sum,
+        double[] Output);
+
     readonly record struct AnalysisRequest(
         AudioSample Sample,
         string Path,
@@ -71,6 +80,16 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
         var warpedSpectrum = new double[spectrumSize];
         var frameAperiodicity = new double[spectrumSize];
 
+        var widest = segments.Max(x => x.FrameCount);
+        var buffers = new SegmentBuffers(
+            new double[widest],
+            new double[widest * spectrumSize],
+            new double[widest * spectrumSize],
+            new double[widest],
+            new double[widest],
+            new double[widest],
+            new double[ToSampleIndex(widest - 1, framePeriod, sampleRate) + 1]);
+
         foreach (var segment in segments)
         {
             RenderSegment(
@@ -86,6 +105,7 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
                 frameSpectrum,
                 warpedSpectrum,
                 frameAperiodicity,
+                buffers,
                 samples);
         }
 
@@ -142,15 +162,24 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
         double[] frameSpectrum,
         double[] warpedSpectrum,
         double[] frameAperiodicity,
+        SegmentBuffers buffers,
         double[] samples)
     {
         var frameCount = segment.FrameCount;
-        var f0 = new double[frameCount];
-        var spectrogram = new double[(long)frameCount * spectrumSize];
-        var aperiodicity = new double[(long)frameCount * spectrumSize];
-        var weightSum = new double[frameCount];
-        var voicedWeight = new double[frameCount];
-        var logF0Sum = new double[frameCount];
+        var elements = frameCount * spectrumSize;
+        var f0 = buffers.F0;
+        var spectrogram = buffers.Spectrogram;
+        var aperiodicity = buffers.Aperiodicity;
+        var weightSum = buffers.WeightSum;
+        var voicedWeight = buffers.VoicedWeight;
+        var logF0Sum = buffers.LogF0Sum;
+
+        Array.Clear(f0, 0, frameCount);
+        Array.Clear(spectrogram, 0, elements);
+        Array.Clear(aperiodicity, 0, elements);
+        Array.Clear(weightSum, 0, frameCount);
+        Array.Clear(voicedWeight, 0, frameCount);
+        Array.Clear(logF0Sum, 0, frameCount);
 
         foreach (var index in segment.TimingIndices)
         {
@@ -178,13 +207,23 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
 
         Finalize(frameCount, spectrumSize, spectrogram, aperiodicity, weightSum, voicedWeight, logF0Sum, f0);
 
-        var buffer = new double[ToSampleIndex(frameCount - 1, framePeriod, sampleRate) + 1];
-        WorldSynthesis.Synthesize(f0, spectrogram, aperiodicity, fftSize, framePeriod, sampleRate, buffer, arena);
+        var produced = ToSampleIndex(frameCount - 1, framePeriod, sampleRate) + 1;
+        var output = buffers.Output.AsSpan(0, produced);
+        output.Clear();
+        WorldSynthesis.Synthesize(
+            f0.AsSpan(0, frameCount),
+            spectrogram.AsSpan(0, elements),
+            aperiodicity.AsSpan(0, elements),
+            fftSize,
+            framePeriod,
+            sampleRate,
+            output,
+            arena);
 
         var start = ToSampleIndex(segment.StartFrame, framePeriod, sampleRate);
-        var length = Math.Min(buffer.Length, samples.Length - start);
+        var length = Math.Min(produced, samples.Length - start);
         if (length > 0)
-            Array.Copy(buffer, 0, samples, start, length);
+            Array.Copy(buffers.Output, 0, samples, start, length);
     }
 
     void AccumulateUnit(
