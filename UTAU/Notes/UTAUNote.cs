@@ -16,6 +16,7 @@ internal sealed class UTAUNote : UndoRedoable
     public const double DefaultFadeInMilliseconds = 5.0;
     public const double DefaultFadeOutMilliseconds = 35.0;
     public const double FollowOtoValue = 0.0;
+    public const double FollowScoreValue = 0.0;
     public const string RestLyric = "R";
 
     string lyric = string.Empty;
@@ -25,6 +26,7 @@ internal sealed class UTAUNote : UndoRedoable
     double intensity = 100.0;
     double modulation;
     double startPointMilliseconds;
+    double tempoOverride;
     double preutteranceOverride;
     double overlapOverride;
     double fadeInMilliseconds = DefaultFadeInMilliseconds;
@@ -60,6 +62,18 @@ internal sealed class UTAUNote : UndoRedoable
     {
         get => lengthTicks;
         set => Set(ref lengthTicks, Math.Clamp(value, MinimumLengthTicks, MaximumLengthTicks));
+    }
+
+    [Display(GroupName = nameof(Texts.NoteGroupBasic), Name = nameof(Texts.NoteTempo), Description = nameof(Texts.NoteTempoDescription), ResourceType = typeof(Texts))]
+    [TextBoxSlider("F0", "BPM", 0.0, TimeBase.MaximumTempo, Delay = -1)]
+    [Range(0.0, TimeBase.MaximumTempo)]
+    [DefaultValue(FollowScoreValue)]
+    public double TempoOverride
+    {
+        get => tempoOverride;
+        set => Set(ref tempoOverride, value <= FollowScoreValue
+            ? FollowScoreValue
+            : Math.Clamp(value, TimeBase.MinimumTempo, TimeBase.MaximumTempo));
     }
 
     [Display(GroupName = nameof(Texts.NoteGroupExpression), Name = nameof(Texts.NoteVelocity), Description = nameof(Texts.NoteVelocityDescription), ResourceType = typeof(Texts))]
@@ -161,6 +175,7 @@ internal sealed class UTAUNote : UndoRedoable
             Lyric = Lyric,
             Tone = Tone,
             LengthTicks = LengthTicks,
+            TempoOverride = TempoOverride,
             Velocity = Velocity,
             Intensity = Intensity,
             Modulation = Modulation,
