@@ -16,13 +16,15 @@ internal sealed record NotationToken(
     NotationTokenKind Kind,
     string Text,
     int? Tone = null,
-    int? LengthTicks = null);
+    int? LengthTicks = null,
+    double? Tempo = null);
 
 internal static class NotationScanner
 {
     public const char DirectiveOpen = '<';
     public const char DirectiveClose = '>';
     public const char DirectiveMarker = '!';
+    public const string TempoPrefix = "T=";
     public const char LongVowelMark = 'ー';
 
     static readonly char[] CombiningKana =
@@ -116,6 +118,12 @@ internal static class NotationScanner
             return true;
         }
 
+        if (TryParseTempo(tonePart, out var tempo))
+        {
+            token = new NotationToken(NotationTokenKind.Directive, content, null, lengthTicks, tempo);
+            return true;
+        }
+
         if (string.Equals(tonePart, "R", StringComparison.OrdinalIgnoreCase) || tonePart == "-")
         {
             token = new NotationToken(NotationTokenKind.Rest, tonePart, null, lengthTicks);
@@ -126,6 +134,22 @@ internal static class NotationScanner
             return false;
 
         token = new NotationToken(NotationTokenKind.Directive, content, tone.NoteNumber, lengthTicks);
+        return true;
+    }
+
+    static bool TryParseTempo(string text, out double? tempo)
+    {
+        tempo = null;
+        if (text.Length <= TempoPrefix.Length || !text.StartsWith(TempoPrefix, StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        if (!double.TryParse(text[TempoPrefix.Length..], NumberStyles.Float, CultureInfo.InvariantCulture, out var value)
+            || !double.IsFinite(value)
+            || value < TimeBase.MinimumTempo
+            || value > TimeBase.MaximumTempo)
+            return false;
+
+        tempo = value;
         return true;
     }
 
