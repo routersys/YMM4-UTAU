@@ -12,6 +12,7 @@ namespace UTAU;
 internal sealed class UTAUVoicePronounce : UndoRedoable, IVoicePronounce
 {
     string sourceText = string.Empty;
+    string importMessage = string.Empty;
     double tempo = TimeBase.DefaultTempo;
     double speed = 1.0;
     LipSyncFrame[]? lipSyncFrames;
@@ -58,6 +59,13 @@ internal sealed class UTAUVoicePronounce : UndoRedoable, IVoicePronounce
     }
 
     [Browsable(false)]
+    public string ImportMessage
+    {
+        get => importMessage;
+        set => Set(ref importMessage, value ?? string.Empty);
+    }
+
+    [Browsable(false)]
     public LipSyncFrame[]? LipSyncFrames
     {
         get => lipSyncFrames;
@@ -85,5 +93,38 @@ internal sealed class UTAUVoicePronounce : UndoRedoable, IVoicePronounce
             pronounce.Notes.Add(note);
         }
         return pronounce;
+    }
+
+    public static UTAUVoicePronounce FromUst(string path, UTAUVoiceParameter parameter)
+    {
+        if (UstParser.ParseFile(path) is not { } document)
+            throw new InvalidOperationException(Texts.UstImportFailed);
+
+        var imported = UstImporter.Import(document);
+        if (imported.Notes.Count == 0)
+            throw new InvalidOperationException(Texts.UstImportEmpty);
+
+        var pronounce = new UTAUVoicePronounce
+        {
+            SourceText = path,
+            Tempo = imported.Tempo,
+            Speed = parameter.Speed,
+            ImportMessage = BuildImportMessage(imported),
+        };
+        foreach (var note in imported.Notes)
+            pronounce.Notes.Add(note);
+        return pronounce;
+    }
+
+    static string BuildImportMessage(UstImportResult imported)
+    {
+        var parts = new List<string> { string.Format(Texts.UstImportedFormat, imported.Notes.Count) };
+        if (imported.TrimmedRestTicks > 0)
+            parts.Add(string.Format(Texts.UstRestTrimmedFormat, imported.TrimmedRestTicks));
+        if (imported.TempoChangeCount > 0)
+            parts.Add(Texts.UstTempoChangeIgnored);
+        if (imported.LegacyPitchNoteCount > 0)
+            parts.Add(Texts.UstLegacyPitchIgnored);
+        return string.Join("  ", parts);
     }
 }
