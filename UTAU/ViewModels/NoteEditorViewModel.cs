@@ -26,7 +26,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public const double StripHeight = 72.0;
     public const double PitchHandleSize = 8.0;
     public const double SelectionBoxThreshold = 3.0;
-    public const double MinimumPitchCurveSpacing = 1.0;
+    public const double MinimumCurveSpacing = 1.0;
     public const double WindowMarginRatio = 0.5;
 
     readonly UTAUVoicePronounce pronounce;
@@ -548,7 +548,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     void ProjectPitchCurve()
     {
         var spacing = PitchCurveIntervalTicks * PixelsPerTick;
-        var step = spacing <= 0.0 ? 1 : Math.Max((int)(MinimumPitchCurveSpacing / spacing), 1);
+        var step = spacing <= 0.0 ? 1 : Math.Max((int)(MinimumCurveSpacing / spacing), 1);
         var from = LowerBound(windowStartTicks);
         var to = UpperBound(windowEndTicks);
         var span = Math.Max(to - from, 0);
@@ -1021,18 +1021,50 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         var total = Math.Max(TotalTicks, ExpressionCurve.IntervalTicks);
         var first = Math.Max(windowStartTicks / ExpressionCurve.IntervalTicks - 1, 0);
         var last = Math.Min(windowEndTicks / ExpressionCurve.IntervalTicks + 1, total / ExpressionCurve.IntervalTicks);
-        var points = new PointCollection(Math.Max(last - first + 1, 1));
+        var spacing = ExpressionCurve.IntervalTicks * PixelsPerTick;
+        var step = spacing <= 0.0 ? 1 : Math.Max((int)(MinimumCurveSpacing / spacing), 1);
+        var span = Math.Max(last - first + 1, 0);
+        var points = new PointCollection(step == 1 ? Math.Max(span, 1) : span / step * 2 + 2);
 
-        for (var index = first; index <= last; index++)
+        if (step == 1)
         {
-            var ticks = index * ExpressionCurve.IntervalTicks;
-            var value = values.Length == 0 ? 0.0 : values[Math.Clamp(index, 0, values.Length - 1)];
-            points.Add(new Point(ticks * PixelsPerTick, (1.0 - expression.ToRatio(value)) * StripHeight));
+            for (var index = first; index <= last; index++)
+                points.Add(ToStripPoint(values, expression, index));
+        }
+        else
+        {
+            for (var start = first; start <= last; start += step)
+            {
+                var end = Math.Min(start + step - 1, last);
+                var lowest = start;
+                var highest = start;
+                for (var index = start + 1; index <= end; index++)
+                {
+                    if (SampleAt(values, index) < SampleAt(values, lowest))
+                        lowest = index;
+                    if (SampleAt(values, index) > SampleAt(values, highest))
+                        highest = index;
+                }
+
+                var near = Math.Min(lowest, highest);
+                var far = Math.Max(lowest, highest);
+                points.Add(ToStripPoint(values, expression, near));
+                if (far != near)
+                    points.Add(ToStripPoint(values, expression, far));
+            }
         }
 
         points.Freeze();
         return points;
     }
+
+    static double SampleAt(double[] values, int index)
+        => values.Length == 0 ? 0.0 : values[Math.Clamp(index, 0, values.Length - 1)];
+
+    Point ToStripPoint(double[] values, ExpressionItem expression, int index)
+        => new(
+            index * ExpressionCurve.IntervalTicks * PixelsPerTick,
+            (1.0 - expression.ToRatio(SampleAt(values, index))) * StripHeight);
 
     void UpdateExpressionBars()
     {
