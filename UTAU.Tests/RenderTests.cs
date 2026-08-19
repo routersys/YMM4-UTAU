@@ -1,4 +1,6 @@
 using System.IO;
+using System.Text;
+using UTAU;
 using UTAU.Models;
 using UTAU.Notes;
 using UTAU.Phonemes;
@@ -309,5 +311,79 @@ public sealed class UtauRendererTests : IDisposable
         var result = Render(bank, "あか");
         Assert.Equal(TestVoiceBank.SampleRate, result.SampleRate);
         Assert.True(Peak(result.Samples) > 0.01);
+    }
+}
+
+public sealed class SegmentedRenderTests : IDisposable
+{
+    const int TailSamples = 2205;
+
+    readonly string directory = TestVoiceBank.CreateTemporaryDirectory();
+    readonly AnalysisCache cache = new(64L * 1024 * 1024);
+
+    public void Dispose() => TestVoiceBank.DeleteDirectory(directory);
+
+    double[] Render(VoiceBank bank, string text)
+    {
+        var notes = NoteSequenceBuilder.Build(text, NoteBuildOptions.Create(60));
+        var units = Phonemizer.Phonemize(bank, TempoMap.Create(notes, TimeBase.Default), null, PhonemizeOptions.Default);
+        using var arena = new WorldArena();
+        var settings = RenderSettings.Default with { Estimator = F0Estimator.Dio };
+        return new UtauRenderer(settings, RenderCurves.Empty, cache).Render(units, arena).Samples;
+    }
+
+    [Fact]
+    public void APhraseIsUnchangedByWhatFollowsAfterALongRest()
+    {
+        var bank = TestVoiceBank.CreateSingleKanaBank(directory);
+
+        var alone = Render(bank, "<!C4:1/4>あ");
+        var followed = Render(bank, "<!C4:1/4>あ<!R:1920><!C4:1/4>か");
+
+        Assert.True(followed.Length > alone.Length * 2);
+        for (var index = 0; index < alone.Length - TailSamples; index++)
+            Assert.Equal(alone[index], followed[index], 1e-12);
+    }
+
+    [Fact]
+    public void TheGapBetweenPhrasesIsSilent()
+    {
+        var bank = TestVoiceBank.CreateSingleKanaBank(directory);
+        var samples = Render(bank, "<!C4:1/4>あ<!R:1920><!C4:1/4>か");
+
+        var middle = samples.Length / 2;
+        var window = samples.Length / 20;
+        for (var index = middle - window; index < middle + window; index++)
+            Assert.Equal(0.0, samples[index], 1e-6);
+
+        Assert.Contains(samples.Take(samples.Length / 4), x => Math.Abs(x) > 1e-3);
+        Assert.Contains(samples.Skip(samples.Length * 3 / 4), x => Math.Abs(x) > 1e-3);
+    }
+
+    [Fact]
+    public void ManyPhrasesSeparatedByRestsStillRender()
+    {
+        var bank = TestVoiceBank.CreateSingleKanaBank(directory);
+        var builder = new StringBuilder();
+        for (var index = 0; index < 24; index++)
+            builder.Append("<!C4:1/4>あ<!R:960>");
+
+        var samples = Render(bank, builder.ToString());
+
+        Assert.True(samples.Length > 0);
+        Assert.Contains(samples, x => Math.Abs(x) > 1e-3);
+    }
+
+    [Fact]
+    public void OnePhraseWithoutAnyRestIsRefusedInsteadOfExhaustingMemory()
+    {
+        var bank = TestVoiceBank.CreateSingleKanaBank(directory);
+        var builder = new StringBuilder();
+        for (var index = 0; index < 400; index++)
+            builder.Append("<!C4:1/1>あ");
+
+        var error = Assert.Throws<InvalidOperationException>(() => Render(bank, builder.ToString()));
+
+        Assert.Equal(Texts.TextTooLongMessage, error.Message);
     }
 }
