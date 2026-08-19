@@ -61,7 +61,7 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
             result = isUst ? UTAUVoicePronounce.FromUst(ustPath, param) : UTAUVoicePronounce.FromText(source, param);
 
         var timeBase = isUst ? new TimeBase(result.Tempo, param.Speed) : new TimeBase(param.Tempo, param.Speed);
-        var tempoMap = TempoMap.Create(result.Notes, timeBase);
+        var tempoMap = TempoMap.Create([.. result.Notes], timeBase);
 
         await Semaphore.WaitAsync().ConfigureAwait(false);
         try
@@ -78,8 +78,7 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
 
     void Render(string source, UTAUVoicePronounce pronounce, UTAUVoiceParameter parameter, TempoMap tempoMap, string filePath)
     {
-        var notes = pronounce.Notes.ToArray();
-        var units = Phonemizer.Phonemize(bank, notes, parameter.Color, PhonemizeOptions.Default, tempoMap);
+        var units = Phonemizer.Phonemize(bank, tempoMap, parameter.Color, PhonemizeOptions.Default);
         ThrowIfUnresolved(units);
 
         var settings = new RenderSettings(
@@ -98,7 +97,7 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
 
         WaveIo.Write(filePath, result.Samples, result.SampleRate);
         pronounce.SourceText = source;
-        pronounce.LipSyncFrames = BuildLipSyncFrames(notes, tempoMap, result.OffsetMilliseconds);
+        pronounce.LipSyncFrames = BuildLipSyncFrames(tempoMap, result.OffsetMilliseconds);
     }
 
     static RenderCurves BuildCurves(UTAUVoicePronounce pronounce, TempoMap tempoMap)
@@ -126,11 +125,11 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
         throw new InvalidOperationException(string.Format(Texts.AliasNotFoundMessage, listed));
     }
 
-    static LipSyncFrame[] BuildLipSyncFrames(IReadOnlyList<UTAUNote> notes, TempoMap tempoMap, double offsetMilliseconds)
+    static LipSyncFrame[] BuildLipSyncFrames(TempoMap tempoMap, double offsetMilliseconds)
     {
-        var frames = new List<LabFrame>(notes.Count);
+        var frames = new List<LabFrame>(tempoMap.Count);
 
-        for (var index = 0; index < notes.Count; index++)
+        for (var index = 0; index < tempoMap.Count; index++)
         {
             var start = tempoMap.StartMilliseconds(index) - offsetMilliseconds;
             var end = start + tempoMap.LengthMilliseconds(index);
@@ -140,7 +139,7 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
             frames.Add(new LabFrame(
                 TimeSpan.FromMilliseconds(Math.Max(start, 0.0)),
                 TimeSpan.FromMilliseconds(end),
-                GetLabel(notes[index])));
+                GetLabel(tempoMap.Notes[index])));
         }
 
         return LipSyncFrame.FromLabFrames(frames);
