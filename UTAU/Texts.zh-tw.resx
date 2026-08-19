@@ -196,7 +196,8 @@
 <data name="UstImportedFormat" xml:space="preserve"><value>已載入 {0} 個音符</value></data>
 <data name="UstImportFailed" xml:space="preserve"><value>無法讀取 UST 檔案</value></data>
 <data name="UstImportEmpty" xml:space="preserve"><value>檔案中沒有可載入的音符</value></data>
-<data name="UstTempoChangeIgnored" xml:space="preserve"><value>未匯入速度變化</value></data>
 <data name="UstLegacyPitchIgnored" xml:space="preserve"><value>未匯入舊式音高資料</value></data>
 <data name="UstRestTrimmedFormat" xml:space="preserve"><value>已去除首尾休止符 {0} 刻</value></data>
+<data name="NoteTempo" xml:space="preserve"><value>速度</value></data>
+<data name="NoteTempoDescription" xml:space="preserve"><value>0 表示沿用樂譜的速度。填入數值則從該音符起改變速度。</value></data>
 </root>

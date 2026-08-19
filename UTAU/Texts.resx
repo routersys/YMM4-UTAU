@@ -196,7 +196,8 @@
 <data name="UstImportedFormat" xml:space="preserve"><value>{0} 個のノートを読み込みました</value></data>
 <data name="UstImportFailed" xml:space="preserve"><value>USTを読み込めませんでした</value></data>
 <data name="UstImportEmpty" xml:space="preserve"><value>読み込めるノートがありません</value></data>
-<data name="UstTempoChangeIgnored" xml:space="preserve"><value>テンポの変化は取り込めません</value></data>
 <data name="UstLegacyPitchIgnored" xml:space="preserve"><value>旧式の音程は取り込めません</value></data>
 <data name="UstRestTrimmedFormat" xml:space="preserve"><value>前後の休符 {0} ティックを除きました</value></data>
+<data name="NoteTempo" xml:space="preserve"><value>テンポ</value></data>
+<data name="NoteTempoDescription" xml:space="preserve"><value>0でこの譜面のテンポに従います。値を入れるとこのノートから先のテンポが変わります。</value></data>
 </root>

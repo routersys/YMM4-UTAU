@@ -196,7 +196,8 @@
 <data name="UstImportedFormat" xml:space="preserve"><value>Memuat {0} not</value></data>
 <data name="UstImportFailed" xml:space="preserve"><value>Berkas UST tidak dapat dibaca</value></data>
 <data name="UstImportEmpty" xml:space="preserve"><value>Berkas tidak memiliki not untuk dimuat</value></data>
-<data name="UstTempoChangeIgnored" xml:space="preserve"><value>Perubahan tempo tidak diimpor</value></data>
 <data name="UstLegacyPitchIgnored" xml:space="preserve"><value>Data nada lawas tidak diimpor</value></data>
 <data name="UstRestTrimmedFormat" xml:space="preserve"><value>Memangkas {0} tik istirahat di awal dan akhir</value></data>
+<data name="NoteTempo" xml:space="preserve"><value>Tempo</value></data>
+<data name="NoteTempoDescription" xml:space="preserve"><value>0 mengikuti tempo partitur. Sebuah nilai mengubah tempo mulai dari not ini.</value></data>
 </root>

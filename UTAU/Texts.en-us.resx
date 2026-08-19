@@ -196,7 +196,8 @@
 <data name="UstImportedFormat" xml:space="preserve"><value>Loaded {0} notes</value></data>
 <data name="UstImportFailed" xml:space="preserve"><value>The UST file could not be read</value></data>
 <data name="UstImportEmpty" xml:space="preserve"><value>The file has no notes to load</value></data>
-<data name="UstTempoChangeIgnored" xml:space="preserve"><value>Tempo changes were not imported</value></data>
 <data name="UstLegacyPitchIgnored" xml:space="preserve"><value>The legacy pitch data was not imported</value></data>
 <data name="UstRestTrimmedFormat" xml:space="preserve"><value>Trimmed {0} ticks of leading and trailing rests</value></data>
+<data name="NoteTempo" xml:space="preserve"><value>Tempo</value></data>
+<data name="NoteTempoDescription" xml:space="preserve"><value>0 follows the tempo of the score. A value changes the tempo from this note onward.</value></data>
 </root>
