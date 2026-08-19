@@ -19,21 +19,20 @@ internal static class Phonemizer
         IReadOnlyList<UTAUNote> notes,
         string? color,
         PhonemizeOptions options,
-        TimeBase timeBase)
+        TempoMap tempoMap)
     {
         ArgumentNullException.ThrowIfNull(bank);
         ArgumentNullException.ThrowIfNull(notes);
+        ArgumentNullException.ThrowIfNull(tempoMap);
 
         var units = new List<PhonemeUnit>();
-        var position = 0.0;
         var previousVowel = KanaRomanization.StartVowel;
 
         for (var i = 0; i < notes.Count; i++)
         {
             var note = notes[i];
-            var start = position;
-            var length = timeBase.ToMilliseconds(note.LengthTicks);
-            position += length;
+            var start = tempoMap.StartMilliseconds(i);
+            var length = tempoMap.LengthMilliseconds(i);
 
             if (note.IsRest)
             {
