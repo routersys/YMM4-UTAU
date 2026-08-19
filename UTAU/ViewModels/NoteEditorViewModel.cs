@@ -54,8 +54,6 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     bool isAutoFitEnabled = true;
     double lastFitWidth;
     double lastFitHeight;
-    string ustPath = string.Empty;
-    string importMessage = string.Empty;
 
     public NoteEditorViewModel(UTAUVoicePronounce pronounce)
     {
@@ -69,7 +67,6 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         InsertRestCommand = new ActionCommand(_ => selectedNotes.Count > 0, _ => InsertRest());
         RemoveNoteCommand = new ActionCommand(_ => selectedNotes.Count > 0 && Notes.Count > selectedNotes.Count, _ => RemoveSelected());
         SelectAllCommand = new ActionCommand(_ => Notes.Count > 0, _ => SelectAll());
-        ImportUstCommand = new ActionCommand(_ => ustPath.Length > 0, _ => ImportUst());
         AddPitchPointCommand = new ActionCommand(_ => SelectedNote is not null, _ => AddPitchPoint());
         RemovePitchPointCommand = new ActionCommand(_ => SelectedPitchPoint is not null, _ => RemoveSelectedPitchPoint());
         ResetPitchCommand = new ActionCommand(_ => SelectedNote is not null, _ => ResetPitch());
@@ -96,19 +93,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     public ICommand SelectAllCommand { get; }
 
-    public ICommand ImportUstCommand { get; }
-
-    public string UstPath
-    {
-        get => ustPath;
-        set => Set(ref ustPath, value ?? string.Empty);
-    }
-
-    public string ImportMessage
-    {
-        get => importMessage;
-        private set => Set(ref importMessage, value);
-    }
+    public string ImportMessage => pronounce.ImportMessage;
 
     public ICommand AddPitchPointCommand { get; }
 
@@ -877,60 +862,6 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
         Select(Notes[Math.Min(index, Notes.Count - 1)]);
         InvalidateLayout();
-    }
-
-    void ImportUst()
-    {
-        if (UstParser.ParseFile(UstPath) is not { } document)
-        {
-            ImportMessage = Texts.UstImportFailed;
-            return;
-        }
-
-        var result = UstImporter.Import(document);
-        if (result.Notes.Count == 0)
-        {
-            ImportMessage = Texts.UstImportEmpty;
-            return;
-        }
-
-        ReplaceNotes(result);
-        ImportMessage = BuildImportMessage(result);
-    }
-
-    void ReplaceNotes(UstImportResult result)
-    {
-        Select(null);
-        for (var index = Notes.Count - 1; index >= 0; index--)
-        {
-            var note = Notes[index];
-            source.RemoveAt(index);
-            Notes.RemoveAt(index);
-            note.Dispose();
-        }
-
-        foreach (var note in result.Notes)
-        {
-            source.Add(note);
-            Notes.Add(new NoteViewModel(note, this));
-        }
-
-        pronounce.Tempo = result.Tempo;
-        EnableAutoFit();
-        InvalidateLayout();
-        Select(Notes.FirstOrDefault());
-    }
-
-    static string BuildImportMessage(UstImportResult result)
-    {
-        var parts = new List<string> { string.Format(Texts.UstImportedFormat, result.Notes.Count) };
-        if (result.TrimmedRestTicks > 0)
-            parts.Add(string.Format(Texts.UstRestTrimmedFormat, result.TrimmedRestTicks));
-        if (result.TempoChangeCount > 0)
-            parts.Add(Texts.UstTempoChangeIgnored);
-        if (result.LegacyPitchNoteCount > 0)
-            parts.Add(Texts.UstLegacyPitchIgnored);
-        return string.Join("  ", parts);
     }
 
     void AddPitchPoint()
