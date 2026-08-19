@@ -61,11 +61,12 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
             result = isUst ? UTAUVoicePronounce.FromUst(ustPath, param) : UTAUVoicePronounce.FromText(source, param);
 
         var timeBase = isUst ? new TimeBase(result.Tempo, param.Speed) : new TimeBase(param.Tempo, param.Speed);
+        var tempoMap = TempoMap.Create(result.Notes, timeBase);
 
         await Semaphore.WaitAsync().ConfigureAwait(false);
         try
         {
-            await Task.Run(() => Render(source, result, param, timeBase, filePath)).ConfigureAwait(false);
+            await Task.Run(() => Render(source, result, param, tempoMap, filePath)).ConfigureAwait(false);
         }
         finally
         {
@@ -75,10 +76,10 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
         return result;
     }
 
-    void Render(string source, UTAUVoicePronounce pronounce, UTAUVoiceParameter parameter, TimeBase timeBase, string filePath)
+    void Render(string source, UTAUVoicePronounce pronounce, UTAUVoiceParameter parameter, TempoMap tempoMap, string filePath)
     {
         var notes = pronounce.Notes.ToArray();
-        var units = Phonemizer.Phonemize(bank, notes, parameter.Color, PhonemizeOptions.Default, timeBase);
+        var units = Phonemizer.Phonemize(bank, notes, parameter.Color, PhonemizeOptions.Default, tempoMap);
         ThrowIfUnresolved(units);
 
         var settings = new RenderSettings(
@@ -90,25 +91,23 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
             parameter.Brightness);
 
         using var arena = new WorldArena();
-        var renderer = new UtauRenderer(settings, BuildCurves(pronounce, timeBase), AnalysisCache.Shared);
+        var renderer = new UtauRenderer(settings, BuildCurves(pronounce, tempoMap), AnalysisCache.Shared);
         var result = renderer.Render(units, arena);
         if (result.Samples.Length == 0)
             throw new InvalidOperationException(Texts.NoRenderableNoteMessage);
 
         WaveIo.Write(filePath, result.Samples, result.SampleRate);
         pronounce.SourceText = source;
-        pronounce.LipSyncFrames = BuildLipSyncFrames(notes, timeBase, result.OffsetMilliseconds);
+        pronounce.LipSyncFrames = BuildLipSyncFrames(notes, tempoMap, result.OffsetMilliseconds);
     }
 
-    static RenderCurves BuildCurves(UTAUVoicePronounce pronounce, TimeBase timeBase)
+    static RenderCurves BuildCurves(UTAUVoicePronounce pronounce, TempoMap tempoMap)
     {
         if (pronounce.FormantCurve.IsEmpty && pronounce.BreathinessCurve.IsEmpty)
             return RenderCurves.Empty;
 
-        return new RenderCurves(
-            pronounce.FormantCurve.Values,
-            pronounce.BreathinessCurve.Values,
-            timeBase.ToMilliseconds(ExpressionCurve.IntervalTicks));
+        var resampled = ExpressionCurveResampler.Resample(pronounce.FormantCurve, pronounce.BreathinessCurve, tempoMap);
+        return new RenderCurves(resampled.Formant, resampled.Breathiness, resampled.IntervalMilliseconds);
     }
 
     static void ThrowIfUnresolved(IReadOnlyList<PhonemeUnit> units)
@@ -127,23 +126,21 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
         throw new InvalidOperationException(string.Format(Texts.AliasNotFoundMessage, listed));
     }
 
-    static LipSyncFrame[] BuildLipSyncFrames(IReadOnlyList<UTAUNote> notes, TimeBase timeBase, double offsetMilliseconds)
+    static LipSyncFrame[] BuildLipSyncFrames(IReadOnlyList<UTAUNote> notes, TempoMap tempoMap, double offsetMilliseconds)
     {
         var frames = new List<LabFrame>(notes.Count);
-        var position = 0.0;
 
-        foreach (var note in notes)
+        for (var index = 0; index < notes.Count; index++)
         {
-            var start = position - offsetMilliseconds;
-            position += timeBase.ToMilliseconds(note.LengthTicks);
-            var end = position - offsetMilliseconds;
+            var start = tempoMap.StartMilliseconds(index) - offsetMilliseconds;
+            var end = start + tempoMap.LengthMilliseconds(index);
             if (end <= 0.0)
                 continue;
 
             frames.Add(new LabFrame(
                 TimeSpan.FromMilliseconds(Math.Max(start, 0.0)),
                 TimeSpan.FromMilliseconds(end),
-                GetLabel(note)));
+                GetLabel(notes[index])));
         }
 
         return LipSyncFrame.FromLabFrames(frames);
