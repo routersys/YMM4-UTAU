@@ -169,7 +169,7 @@
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
 
-                                <ItemsControl ItemsSource="{Binding Notes}">
+                                <ItemsControl ItemsSource="{Binding VisibleNotes}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <Canvas/>

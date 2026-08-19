@@ -69,7 +69,14 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
 
     void RequestFit() => Dispatcher.BeginInvoke(UpdateFit, DispatcherPriority.Loaded);
 
-    void UpdateFit() => ViewModel?.FitToViewport(HorizontalScroller.ActualWidth, VerticalScroller.ActualHeight);
+    void UpdateFit()
+    {
+        if (ViewModel is not { } viewModel)
+            return;
+
+        viewModel.FitToViewport(HorizontalScroller.ActualWidth, VerticalScroller.ActualHeight);
+        viewModel.SetViewport(HorizontalScroller.HorizontalOffset, HorizontalScroller.ViewportWidth);
+    }
 
     void Scroller_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateFit();
 
@@ -85,6 +92,7 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         HorizontalBar.SmallChange = WheelScrollStep;
         HorizontalBar.Value = e.HorizontalOffset;
         StripScroller.ScrollToHorizontalOffset(e.HorizontalOffset);
+        ViewModel?.SetViewport(e.HorizontalOffset, e.ViewportWidth);
     }
 
     void HorizontalBar_Scroll(object sender, ScrollEventArgs e)
