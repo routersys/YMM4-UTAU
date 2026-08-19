@@ -2,26 +2,29 @@ namespace UTAU.Notes;
 
 internal sealed class TempoMap
 {
+    readonly IReadOnlyList<UTAUNote> notes;
     readonly TimeBase baseTimeBase;
     readonly int[] startTicks;
     readonly double[] startMilliseconds;
+    readonly double[] lengthMilliseconds;
     readonly double[] millisecondsPerTick;
-    readonly double[] tempos;
 
     TempoMap(
+        IReadOnlyList<UTAUNote> notes,
         TimeBase baseTimeBase,
         int[] startTicks,
         double[] startMilliseconds,
+        double[] lengthMilliseconds,
         double[] millisecondsPerTick,
-        double[] tempos,
         int totalTicks,
         double totalMilliseconds)
     {
+        this.notes = notes;
         this.baseTimeBase = baseTimeBase;
         this.startTicks = startTicks;
         this.startMilliseconds = startMilliseconds;
+        this.lengthMilliseconds = lengthMilliseconds;
         this.millisecondsPerTick = millisecondsPerTick;
-        this.tempos = tempos;
         TotalTicks = totalTicks;
         TotalMilliseconds = totalMilliseconds;
     }
@@ -33,8 +36,8 @@ internal sealed class TempoMap
         var count = notes.Count;
         var startTicks = new int[count];
         var startMilliseconds = new double[count];
+        var lengthMilliseconds = new double[count];
         var millisecondsPerTick = new double[count];
-        var tempos = new double[count];
 
         var ticks = 0;
         var milliseconds = 0.0;
@@ -49,17 +52,27 @@ internal sealed class TempoMap
             var timeBase = new TimeBase(tempo, baseTimeBase.Speed);
             startTicks[index] = ticks;
             startMilliseconds[index] = milliseconds;
+            lengthMilliseconds[index] = timeBase.ToMilliseconds(note.LengthTicks);
             millisecondsPerTick[index] = timeBase.MillisecondsPerTick;
-            tempos[index] = tempo;
 
-            milliseconds += timeBase.ToMilliseconds(note.LengthTicks);
+            milliseconds += lengthMilliseconds[index];
             ticks += note.LengthTicks;
         }
 
-        return new TempoMap(baseTimeBase, startTicks, startMilliseconds, millisecondsPerTick, tempos, ticks, milliseconds);
+        return new TempoMap(
+            notes,
+            baseTimeBase,
+            startTicks,
+            startMilliseconds,
+            lengthMilliseconds,
+            millisecondsPerTick,
+            ticks,
+            milliseconds);
     }
 
-    public int Count => startTicks.Length;
+    public IReadOnlyList<UTAUNote> Notes => notes;
+
+    public int Count => notes.Count;
 
     public int TotalTicks { get; }
 
@@ -68,21 +81,11 @@ internal sealed class TempoMap
     public double MinimumMillisecondsPerTick
         => millisecondsPerTick.Length == 0 ? baseTimeBase.MillisecondsPerTick : millisecondsPerTick.Min();
 
-    public TimeBase TimeBaseAt(int noteIndex)
-        => Count == 0 ? baseTimeBase : new TimeBase(tempos[Math.Clamp(noteIndex, 0, Count - 1)], baseTimeBase.Speed);
-
     public double StartMilliseconds(int noteIndex)
         => Count == 0 ? 0.0 : startMilliseconds[Math.Clamp(noteIndex, 0, Count - 1)];
 
     public double LengthMilliseconds(int noteIndex)
-    {
-        if (Count == 0)
-            return 0.0;
-
-        var index = Math.Clamp(noteIndex, 0, Count - 1);
-        var end = index + 1 < Count ? startMilliseconds[index + 1] : TotalMilliseconds;
-        return end - startMilliseconds[index];
-    }
+        => Count == 0 ? 0.0 : lengthMilliseconds[Math.Clamp(noteIndex, 0, Count - 1)];
 
     public double ToMilliseconds(double ticks)
     {
