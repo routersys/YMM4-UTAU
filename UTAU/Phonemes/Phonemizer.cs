@@ -16,15 +16,14 @@ internal static class Phonemizer
 {
     public static IReadOnlyList<PhonemeUnit> Phonemize(
         VoiceBank bank,
-        IReadOnlyList<UTAUNote> notes,
+        TempoMap tempoMap,
         string? color,
-        PhonemizeOptions options,
-        TempoMap tempoMap)
+        PhonemizeOptions options)
     {
         ArgumentNullException.ThrowIfNull(bank);
-        ArgumentNullException.ThrowIfNull(notes);
         ArgumentNullException.ThrowIfNull(tempoMap);
 
+        var notes = tempoMap.Notes;
         var units = new List<PhonemeUnit>();
         var previousVowel = KanaRomanization.StartVowel;
 
