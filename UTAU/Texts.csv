@@ -133,3 +133,11 @@ PitchPointTimeDescription,,ノートの先頭からの位置です。480ティ�
 PitchPointCentsDescription,,ノートの音程からのずれです。100セントが半音です。,The offset from the pitch of the note. 100 cents is a semitone.,相对音符音高的偏移。100 音分为半音。,相對音符音高的偏移。100 音分為半音。,노트 음정으로부터의 차이입니다. 100센트가 반음입니다.,El desvío respecto al tono de la nota. 100 centésimas equivalen a un semitono.,الانحراف عن درجة النوتة. 100 سنت تساوي نصف نغمة.,Selisih dari nada not. 100 sen sama dengan satu seminada.
 SelectAllNotes,,すべてのノートを選択,Select all the notes,选择所有音符,選擇所有音符,모든 노트 선택,Seleccionar todas las notas,تحديد كل النوتات,Pilih semua not
 SelectionCountFormat,,{0} 個を選択中,{0} notes selected,已选择 {0} 个音符,已選擇 {0} 個音符,{0}개 선택 중,{0} notas seleccionadas,تم تحديد {0} نوتة,{0} not terpilih
+ImportUst,,USTを読み込む,Load a UST file,载入 UST 文件,載入 UST 檔案,UST 불러오기,Cargar un archivo UST,تحميل ملف UST,Muat berkas UST
+UstFilterName,,UTAUの譜面,UTAU sequence,UTAU 乐谱,UTAU 樂譜,UTAU 악보,Partitura de UTAU,نوتة UTAU,Partitur UTAU
+UstImportedFormat,,{0} 個のノートを読み込みました,Loaded {0} notes,已载入 {0} 个音符,已載入 {0} 個音符,노트 {0}개를 불러왔습니다,Se cargaron {0} notas,تم تحميل {0} نوتة,Memuat {0} not
+UstImportFailed,,USTを読み込めませんでした,The UST file could not be read,无法读取 UST 文件,無法讀取 UST 檔案,UST를 읽지 못했습니다,No se pudo leer el archivo UST,تعذّر قراءة ملف UST,Berkas UST tidak dapat dibaca
+UstImportEmpty,,読み込めるノートがありません,The file has no notes to load,文件中没有可载入的音符,檔案中沒有可載入的音符,불러올 노트가 없습니다,El archivo no tiene notas que cargar,لا توجد نوتات لتحميلها في الملف,Berkas tidak memiliki not untuk dimuat
+UstTempoChangeIgnored,,テンポの変化は取り込めません,Tempo changes were not imported,未导入速度变化,未匯入速度變化,템포 변화는 가져오지 않았습니다,Los cambios de tempo no se importaron,لم يتم استيراد تغييرات الإيقاع,Perubahan tempo tidak diimpor
+UstLegacyPitchIgnored,,旧式の音程は取り込めません,The legacy pitch data was not imported,未导入旧式音高数据,未匯入舊式音高資料,구형 음정 자료는 가져오지 않았습니다,Los datos de tono heredados no se importaron,لم يتم استيراد بيانات الدرجة القديمة,Data nada lawas tidak diimpor
+UstRestTrimmedFormat,,前後の休符 {0} ティックを除きました,Trimmed {0} ticks of leading and trailing rests,已去除首尾休止符 {0} 刻,已去除首尾休止符 {0} 刻,앞뒤 쉼표 {0}틱을 제거했습니다,Se recortaron {0} tics de silencios inicial y final,تمت إزالة {0} تِك من السكتات في البداية والنهاية,Memangkas {0} tik istirahat di awal dan akhir

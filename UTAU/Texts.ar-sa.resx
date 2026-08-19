@@ -193,4 +193,12 @@
 <data name="PitchPointCentsDescription" xml:space="preserve"><value>الانحراف عن درجة النوتة. 100 سنت تساوي نصف نغمة.</value></data>
 <data name="SelectAllNotes" xml:space="preserve"><value>تحديد كل النوتات</value></data>
 <data name="SelectionCountFormat" xml:space="preserve"><value>تم تحديد {0} نوتة</value></data>
+<data name="ImportUst" xml:space="preserve"><value>تحميل ملف UST</value></data>
+<data name="UstFilterName" xml:space="preserve"><value>نوتة UTAU</value></data>
+<data name="UstImportedFormat" xml:space="preserve"><value>تم تحميل {0} نوتة</value></data>
+<data name="UstImportFailed" xml:space="preserve"><value>تعذّر قراءة ملف UST</value></data>
+<data name="UstImportEmpty" xml:space="preserve"><value>لا توجد نوتات لتحميلها في الملف</value></data>
+<data name="UstTempoChangeIgnored" xml:space="preserve"><value>لم يتم استيراد تغييرات الإيقاع</value></data>
+<data name="UstLegacyPitchIgnored" xml:space="preserve"><value>لم يتم استيراد بيانات الدرجة القديمة</value></data>
+<data name="UstRestTrimmedFormat" xml:space="preserve"><value>تمت إزالة {0} تِك من السكتات في البداية والنهاية</value></data>
 </root>
