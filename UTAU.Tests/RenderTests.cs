@@ -375,6 +375,38 @@ public sealed class SegmentedRenderTests : IDisposable
     }
 
     [Fact]
+    public void ARestOpensAGapWideEnoughToSplitOn()
+    {
+        var bank = TestVoiceBank.CreateSingleKanaBank(directory);
+
+        Assert.True(GapFrames(bank, "<!C4:1/4>あ<!R:1920><!C4:1/4>か") > 10.0);
+        Assert.True(GapFrames(bank, "<!C4:1/4>あ<!R:240><!C4:1/4>か") > 10.0);
+        Assert.True(GapFrames(bank, "<!C4:1/4>あ<!C4:1/4>か") < 0.0);
+    }
+
+    static double GapFrames(VoiceBank bank, string text)
+    {
+        var notes = NoteSequenceBuilder.Build(text, NoteBuildOptions.Create(60));
+        var units = Phonemizer.Phonemize(bank, TempoMap.Create(notes, TimeBase.Default), null, PhonemizeOptions.Default);
+        var timings = UnitTimingBuilder.Build(units).OrderBy(x => x.AudioStartMilliseconds).ToArray();
+        return (timings[1].AudioStartMilliseconds - timings[0].AudioEndMilliseconds) / WorldAnalyzer.FramePeriod;
+    }
+
+    [Fact]
+    public void AScoreTooLongForOneBufferStillRendersWhenItHasRests()
+    {
+        var bank = TestVoiceBank.CreateSingleKanaBank(directory);
+        var builder = new StringBuilder();
+        for (var index = 0; index < 40; index++)
+            builder.Append("<!C4:1/4>あ<!R:1920>");
+
+        var samples = Render(bank, builder.ToString());
+
+        Assert.True(samples.Length > 44100 * 90, $"length={samples.Length}");
+        Assert.Contains(samples, x => Math.Abs(x) > 1e-3);
+    }
+
+    [Fact]
     public void OnePhraseWithoutAnyRestIsRefusedInsteadOfExhaustingMemory()
     {
         var bank = TestVoiceBank.CreateSingleKanaBank(directory);
