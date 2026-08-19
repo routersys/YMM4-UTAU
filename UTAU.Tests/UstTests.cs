@@ -987,6 +987,58 @@ public sealed class UstTempoRangeTests
     }
 
     [Fact]
+    public void RepeatingAnOutOfRangeTempoIsNotTreatedAsAChange()
+    {
+        var content = "[#SETTING]\r\nTempo=520.00\r\n"
+            + "[#0000]\r\nLength=480\r\nLyric=a\r\nNoteNum=60\r\nTempo=520.00\r\n"
+            + "[#0001]\r\nLength=480\r\nLyric=a\r\nNoteNum=60\r\nTempo=520.00\r\n"
+            + "[#0002]\r\nLength=480\r\nLyric=a\r\nNoteNum=60\r\nTempo=520.00\r\n";
+        var result = Import(content);
+
+        Assert.Equal(TimeBase.MaximumTempo, result.Tempo, 9);
+        Assert.All(result.Notes, x => Assert.Equal(UTAUNote.FollowScoreValue, x.TempoOverride, 9));
+    }
+
+    [Fact]
+    public void TwoDifferentOutOfRangeTemposCollapseToOneClampedValue()
+    {
+        var content = "[#SETTING]\r\nTempo=520.00\r\n"
+            + "[#0000]\r\nLength=480\r\nLyric=a\r\nNoteNum=60\r\n"
+            + "[#0001]\r\nLength=480\r\nLyric=a\r\nNoteNum=60\r\nTempo=640.00\r\n";
+        var result = Import(content);
+
+        Assert.All(result.Notes, x => Assert.Equal(UTAUNote.FollowScoreValue, x.TempoOverride, 9));
+    }
+
+    [Fact]
+    public void ATempoBelowTheModelRangeStillOverridesOnlyOnce()
+    {
+        var content = "[#SETTING]\r\nTempo=120.00\r\n"
+            + "[#0000]\r\nLength=480\r\nLyric=a\r\nNoteNum=60\r\n"
+            + "[#0001]\r\nLength=480\r\nLyric=a\r\nNoteNum=60\r\nTempo=5.00\r\n"
+            + "[#0002]\r\nLength=480\r\nLyric=a\r\nNoteNum=60\r\nTempo=8.00\r\n";
+        var result = Import(content);
+
+        Assert.Equal(
+            [UTAUNote.FollowScoreValue, TimeBase.MinimumTempo, UTAUNote.FollowScoreValue],
+            result.Notes.Select(x => x.TempoOverride));
+    }
+
+    [Fact]
+    public void AGenuineTempoChangeIsStillRecorded()
+    {
+        var content = "[#SETTING]\r\nTempo=120.00\r\n"
+            + "[#0000]\r\nLength=480\r\nLyric=a\r\nNoteNum=60\r\n"
+            + "[#0001]\r\nLength=480\r\nLyric=a\r\nNoteNum=60\r\nTempo=180.00\r\n"
+            + "[#0002]\r\nLength=480\r\nLyric=a\r\nNoteNum=60\r\nTempo=180.00\r\n";
+        var result = Import(content);
+
+        Assert.Equal(
+            [UTAUNote.FollowScoreValue, 180.0, UTAUNote.FollowScoreValue],
+            result.Notes.Select(x => x.TempoOverride));
+    }
+
+    [Fact]
     public void TheImportedPitchUsesTheTempoOfItsOwnNote()
     {
         var content = "[#SETTING]\r\nTempo=125.00\r\n"

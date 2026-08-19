@@ -45,7 +45,8 @@ internal static class UstImporter
             AddRest(notes, start - end, previousTone);
 
             var sectionTempo = ParseNumber(section.Find(UstKeys.Tempo));
-            var isTempoChange = IsUsableTempo(sectionTempo) && Math.Abs(sectionTempo!.Value - currentTempo) > TempoEpsilon;
+            var isTempoChange = IsUsableTempo(sectionTempo)
+                && Math.Abs(ClampTempo(sectionTempo!.Value) - currentTempo) > TempoEpsilon;
             if (isTempoChange)
                 currentTempo = ClampTempo(sectionTempo!.Value);
 
