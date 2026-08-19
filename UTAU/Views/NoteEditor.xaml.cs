@@ -91,6 +91,7 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
         HorizontalBar.LargeChange = e.ViewportWidth;
         HorizontalBar.SmallChange = WheelScrollStep;
         HorizontalBar.Value = e.HorizontalOffset;
+        StripScroller.Width = e.ViewportWidth;
         StripScroller.ScrollToHorizontalOffset(e.HorizontalOffset);
         ViewModel?.SetViewport(e.HorizontalOffset, e.ViewportWidth);
     }
