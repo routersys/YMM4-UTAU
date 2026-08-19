@@ -1213,7 +1213,12 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
             return;
 
         foreach (var note in selectedNotes)
-            note.Note.PitchPoints.Clear();
+        {
+            var points = note.Note.PitchPoints;
+            for (var index = points.Count - 1; index >= 0; index--)
+                points.RemoveAt(index);
+        }
+
         SelectedPitchPoint = null;
         UpdatePitchCurve();
         UpdatePitchHandles();
