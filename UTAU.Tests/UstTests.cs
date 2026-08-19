@@ -4,6 +4,7 @@ using System.Text;
 using UTAU;
 using UTAU.Models;
 using UTAU.Notes;
+using UTAU.Synthesis;
 using UTAU.ViewModels;
 using YukkuriMovieMaker.UndoRedo;
 
@@ -644,43 +645,69 @@ public sealed class UstTests
     }
 }
 
-public sealed class UstEditorImportTests
+
+public sealed class UstSourceTests
+{
+    [Theory]
+    [InlineData(@"C:\songs\a.ust")]
+    [InlineData(@"C:\ボイス\歌.ust")]
+    [InlineData(@"C:\songs\a.UST")]
+    [InlineData(@"  C:\songs\a.ust  ")]
+    [InlineData(@"""C:\songs\a.ust""")]
+    [InlineData(@"relative\a.ust")]
+    public void UstPathsAreRecognised(string text)
+    {
+        Assert.True(UstSource.TryGetPath(text, out var path));
+        Assert.EndsWith(".ust", path, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(path, path.Trim());
+        Assert.DoesNotContain('"', path);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData("あいうえお")]
+    [InlineData("a.ustx")]
+    [InlineData("song.wav")]
+    [InlineData(".ust")]
+    [InlineData("<!C4:480>あ")]
+    [InlineData("C:\\songs\\a.ust\r\nあ")]
+    [InlineData("あ\nC:\\songs\\a.ust")]
+    public void OtherTextIsNotAPath(string text)
+    {
+        Assert.False(UstSource.TryGetPath(text, out var path));
+        Assert.Equal(string.Empty, path);
+    }
+}
+
+public sealed class UstPronounceTests
 {
     const string Sample = "[#VERSION]\r\nUST Version1.2\r\n[#SETTING]\r\nTempo=144.00\r\n"
         + "[#0000]\r\nLength=480\r\nLyric=か\r\nNoteNum=62\r\n"
         + "[#0001]\r\nLength=240\r\nLyric=き\r\nNoteNum=64\r\n"
         + "[#TRACKEND]\r\n";
 
-    static string WriteSample(string directory, string content)
+    static string Write(string directory, string content)
     {
         var path = Path.Combine(directory, "sample.ust");
         File.WriteAllBytes(path, VoiceBankTextReader.ShiftJis.GetBytes(content));
         return path;
     }
 
-    static NoteEditorViewModel CreateEditor(UTAUVoicePronounce pronounce, string path)
-    {
-        var viewModel = new NoteEditorViewModel(pronounce) { UstPath = path };
-        viewModel.ImportUstCommand.Execute(null);
-        return viewModel;
-    }
-
     [Fact]
-    public void ImportingReplacesTheNotesAndTempo()
+    public void TheNotesAndTempoComeFromTheFile()
     {
         var directory = TestVoiceBank.CreateTemporaryDirectory();
         try
         {
-            var pronounce = new UTAUVoicePronounce();
-            pronounce.Notes.Add(new UTAUNote { Lyric = "あ" });
-            pronounce.Notes.Add(new UTAUNote { Lyric = "い" });
-
-            var viewModel = CreateEditor(pronounce, WriteSample(directory, Sample));
+            var path = Write(directory, Sample);
+            var pronounce = UTAUVoicePronounce.FromUst(path, new UTAUVoiceParameter { Speed = 1.5 });
 
             Assert.Equal(["か", "き"], pronounce.Notes.Select(x => x.Lyric).ToArray());
-            Assert.Equal(pronounce.Notes.Count, viewModel.Notes.Count);
+            Assert.Equal([480, 240], pronounce.Notes.Select(x => x.LengthTicks).ToArray());
             Assert.Equal(144.0, pronounce.Tempo, 9);
-            Assert.Same(viewModel.Notes[0], viewModel.SelectedNote);
+            Assert.Equal(1.5, pronounce.Speed, 9);
+            Assert.Equal(path, pronounce.SourceText);
         }
         finally
         {
@@ -689,25 +716,26 @@ public sealed class UstEditorImportTests
     }
 
     [Fact]
-    public void TheReplacedNotesStopNotifyingTheHost()
+    public void AnUnreadableFileIsReported()
+    {
+        var missing = Path.Combine(Path.GetTempPath(), "no-such-file.ust");
+        var error = Assert.Throws<InvalidOperationException>(
+            () => UTAUVoicePronounce.FromUst(missing, new UTAUVoiceParameter()));
+
+        Assert.Equal(Texts.UstImportFailed, error.Message);
+    }
+
+    [Fact]
+    public void AFileWithoutNotesIsReported()
     {
         var directory = TestVoiceBank.CreateTemporaryDirectory();
         try
         {
-            var pronounce = new UTAUVoicePronounce();
-            var discarded = new UTAUNote { Lyric = "あ" };
-            pronounce.Notes.Add(discarded);
+            var path = Write(directory, "[#SETTING]\r\nTempo=120.00\r\n[#TRACKEND]\r\n");
+            var error = Assert.Throws<InvalidOperationException>(
+                () => UTAUVoicePronounce.FromUst(path, new UTAUVoiceParameter()));
 
-            CreateEditor(pronounce, WriteSample(directory, Sample));
-
-            var raised = 0;
-            pronounce.UndoRedoCommandCreated += (_, _) => raised++;
-
-            discarded.Tone = 70;
-            Assert.Equal(0, raised);
-
-            pronounce.Notes[0].Tone = 70;
-            Assert.True(raised > 0);
+            Assert.Equal(Texts.UstImportEmpty, error.Message);
         }
         finally
         {
@@ -716,29 +744,14 @@ public sealed class UstEditorImportTests
     }
 
     [Fact]
-    public void ImportingIsUndoable()
+    public void TheNoticeCountsTheNotes()
     {
         var directory = TestVoiceBank.CreateTemporaryDirectory();
         try
         {
-            var pronounce = new UTAUVoicePronounce();
-            pronounce.Notes.Add(new UTAUNote { Lyric = "あ" });
+            var pronounce = UTAUVoicePronounce.FromUst(Write(directory, Sample), new UTAUVoiceParameter());
 
-            var commands = new List<IUndoRedoCommandBase>();
-            pronounce.UndoRedoCommandCreated += (_, e) => commands.Add(e.Command);
-
-            CreateEditor(pronounce, WriteSample(directory, Sample));
-
-            Assert.NotEmpty(commands);
-            Assert.DoesNotContain(commands, x => x is IUndoRedoCommand { IsEmpty: true });
-
-            for (var index = commands.Count - 1; index >= 0; index--)
-            {
-                if (commands[index] is IUndoRedoCommand command)
-                    command.Undo();
-            }
-
-            Assert.Equal(["あ"], pronounce.Notes.Select(x => x.Lyric).ToArray());
+            Assert.Equal(string.Format(Texts.UstImportedFormat, 2), pronounce.ImportMessage);
         }
         finally
         {
@@ -747,30 +760,21 @@ public sealed class UstEditorImportTests
     }
 
     [Fact]
-    public void AMissingFileReportsAFailureAndKeepsTheNotes()
-    {
-        var pronounce = new UTAUVoicePronounce();
-        pronounce.Notes.Add(new UTAUNote { Lyric = "あ" });
-
-        var viewModel = CreateEditor(pronounce, Path.Combine(Path.GetTempPath(), "no-such-file.ust"));
-
-        Assert.Equal(Texts.UstImportFailed, viewModel.ImportMessage);
-        Assert.Equal(["あ"], pronounce.Notes.Select(x => x.Lyric).ToArray());
-    }
-
-    [Fact]
-    public void AFileWithoutNotesReportsAndKeepsTheNotes()
+    public void TheNoticeListsWhatCouldNotBeImported()
     {
         var directory = TestVoiceBank.CreateTemporaryDirectory();
         try
         {
-            var pronounce = new UTAUVoicePronounce();
-            pronounce.Notes.Add(new UTAUNote { Lyric = "あ" });
+            var content = "[#SETTING]\r\nTempo=120.00\r\n"
+                + "[#0000]\r\nLength=480\r\nLyric=R\r\nNoteNum=60\r\n"
+                + "[#0001]\r\nLength=480\r\nLyric=か\r\nNoteNum=62\r\nPBType=5\r\nPitchBend=0,1,2\r\n"
+                + "[#0002]\r\nLength=480\r\nLyric=き\r\nNoteNum=64\r\nTempo=150.00\r\n"
+                + "[#TRACKEND]\r\n";
+            var pronounce = UTAUVoicePronounce.FromUst(Write(directory, content), new UTAUVoiceParameter());
 
-            var viewModel = CreateEditor(pronounce, WriteSample(directory, "[#SETTING]\r\nTempo=120.00\r\n[#TRACKEND]\r\n"));
-
-            Assert.Equal(Texts.UstImportEmpty, viewModel.ImportMessage);
-            Assert.Equal(["あ"], pronounce.Notes.Select(x => x.Lyric).ToArray());
+            Assert.Contains(Texts.UstTempoChangeIgnored, pronounce.ImportMessage);
+            Assert.Contains(Texts.UstLegacyPitchIgnored, pronounce.ImportMessage);
+            Assert.Contains(string.Format(Texts.UstRestTrimmedFormat, 480), pronounce.ImportMessage);
         }
         finally
         {
@@ -779,12 +783,115 @@ public sealed class UstEditorImportTests
     }
 
     [Fact]
-    public void TheImportCommandNeedsAPath()
+    public async Task ThePronunciationKeepsTheUstPathVerbatim()
     {
-        var viewModel = new NoteEditorViewModel(new UTAUVoicePronounce());
+        var directory = TestVoiceBank.CreateTemporaryDirectory();
+        try
+        {
+            var speaker = new UTAUVoiceSpeaker(TestVoiceBank.CreateSingleKanaBank(directory));
+            var path = @"C:\ボイス\歌.ust";
 
-        Assert.False(viewModel.ImportUstCommand.CanExecute(null));
-        viewModel.UstPath = "x.ust";
-        Assert.True(viewModel.ImportUstCommand.CanExecute(null));
+            Assert.Equal(path, await speaker.ConvertKanjiToYomiAsync(path, new UTAUVoiceParameter()));
+            Assert.Equal(path, await speaker.ConvertKanjiToYomiAsync($"  \"{path}\"  ", new UTAUVoiceParameter()));
+        }
+        finally
+        {
+            TestVoiceBank.DeleteDirectory(directory);
+        }
+    }
+
+    [Fact]
+    public async Task PlainTextIsStillNormalised()
+    {
+        var directory = TestVoiceBank.CreateTemporaryDirectory();
+        try
+        {
+            var speaker = new UTAUVoiceSpeaker(TestVoiceBank.CreateSingleKanaBank(directory));
+
+            Assert.Equal("あいうえお", await speaker.ConvertKanjiToYomiAsync("アイウエオ", new UTAUVoiceParameter()));
+        }
+        finally
+        {
+            TestVoiceBank.DeleteDirectory(directory);
+        }
+    }
+}
+
+public sealed class UstRenderSourceTests
+{
+    static string WriteUst(string directory, double tempo)
+    {
+        var content = "[#SETTING]\r\n"
+            + string.Format(CultureInfo.InvariantCulture, "Tempo={0:F2}\r\n", tempo)
+            + "[#0000]\r\nLength=480\r\nLyric=あ\r\nNoteNum=60\r\n[#TRACKEND]\r\n";
+        var path = Path.Combine(directory, string.Format(CultureInfo.InvariantCulture, "song{0:F0}.ust", tempo));
+        File.WriteAllBytes(path, VoiceBankTextReader.ShiftJis.GetBytes(content));
+        return path;
+    }
+
+    static async Task<double> RenderAsync(UTAUVoiceSpeaker speaker, string directory, string text, double parameterTempo)
+    {
+        var output = Path.Combine(directory, Guid.NewGuid().ToString("N") + ".wav");
+        var parameter = new UTAUVoiceParameter { Tempo = parameterTempo };
+        await speaker.CreateVoiceAsync(text, null, parameter, output);
+        return WaveIo.Read(output).DurationMilliseconds;
+    }
+
+    [Fact]
+    public async Task TheFileTempoDrivesTheRenderOfAUstSource()
+    {
+        var directory = TestVoiceBank.CreateTemporaryDirectory();
+        try
+        {
+            var speaker = new UTAUVoiceSpeaker(TestVoiceBank.CreateSingleKanaBank(directory));
+            var path = WriteUst(directory, 240.0);
+
+            var slow = await RenderAsync(speaker, directory, path, 60.0);
+            var fast = await RenderAsync(speaker, directory, path, 400.0);
+
+            Assert.Equal(slow, fast, 3);
+        }
+        finally
+        {
+            TestVoiceBank.DeleteDirectory(directory);
+        }
+    }
+
+    [Fact]
+    public async Task TheParameterTempoStillDrivesTheRenderOfPlainText()
+    {
+        var directory = TestVoiceBank.CreateTemporaryDirectory();
+        try
+        {
+            var speaker = new UTAUVoiceSpeaker(TestVoiceBank.CreateSingleKanaBank(directory));
+
+            var slow = await RenderAsync(speaker, directory, "あ", 60.0);
+            var fast = await RenderAsync(speaker, directory, "あ", 240.0);
+
+            Assert.True(slow > fast * 1.5, $"slow={slow} fast={fast}");
+        }
+        finally
+        {
+            TestVoiceBank.DeleteDirectory(directory);
+        }
+    }
+
+    [Fact]
+    public async Task TwoTemposInTheFileGiveDifferentLengths()
+    {
+        var directory = TestVoiceBank.CreateTemporaryDirectory();
+        try
+        {
+            var speaker = new UTAUVoiceSpeaker(TestVoiceBank.CreateSingleKanaBank(directory));
+
+            var slow = await RenderAsync(speaker, directory, WriteUst(directory, 60.0), 120.0);
+            var fast = await RenderAsync(speaker, directory, WriteUst(directory, 240.0), 120.0);
+
+            Assert.True(slow > fast * 1.5, $"slow={slow} fast={fast}");
+        }
+        finally
+        {
+            TestVoiceBank.DeleteDirectory(directory);
+        }
     }
 }
