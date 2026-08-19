@@ -29,6 +29,7 @@ internal sealed class UTAUVoiceParameter : VoiceParameterBase
     [Display(Name = nameof(Texts.ParameterBaseTone), Description = nameof(Texts.ParameterBaseToneDescription), ResourceType = typeof(Texts))]
     [ToneComboBox]
     [DefaultValue(60)]
+    [HideForUstSource]
     public int BaseTone
     {
         get => baseTone;
@@ -49,6 +50,7 @@ internal sealed class UTAUVoiceParameter : VoiceParameterBase
     [TextBoxSlider("F0", "BPM", 20.0, 400.0, Delay = -1)]
     [Range(20.0, 400.0)]
     [DefaultValue(120.0)]
+    [HideForUstSource]
     public double Tempo
     {
         get => tempo;
@@ -69,6 +71,7 @@ internal sealed class UTAUVoiceParameter : VoiceParameterBase
     [TextBoxSlider("F0", "%", -200.0, 200.0, Delay = -1)]
     [Range(-200.0, 200.0)]
     [DefaultValue(0.0)]
+    [HideForUstSource]
     public double Modulation
     {
         get => modulation;
