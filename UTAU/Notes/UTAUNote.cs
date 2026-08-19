@@ -51,7 +51,7 @@ internal sealed class UTAUNote : UndoRedoable
     public int Tone
     {
         get => tone;
-        set => Set(ref tone, Math.Clamp(value, 0, 127));
+        set => Set(ref tone, ClampTone(value));
     }
 
     [Display(GroupName = nameof(Texts.NoteGroupBasic), Name = nameof(Texts.NoteLength), Description = nameof(Texts.NoteLengthDescription), ResourceType = typeof(Texts))]
@@ -61,8 +61,16 @@ internal sealed class UTAUNote : UndoRedoable
     public int LengthTicks
     {
         get => lengthTicks;
-        set => Set(ref lengthTicks, Math.Clamp(value, MinimumLengthTicks, MaximumLengthTicks));
+        set => Set(ref lengthTicks, ClampLength(value));
     }
+
+    public static int ClampTone(int value) => Math.Clamp(value, 0, 127);
+
+    public static int ClampLength(int value) => Math.Clamp(value, MinimumLengthTicks, MaximumLengthTicks);
+
+    public void PreviewTone(int value) => SetWithoutUndoRedo(ref tone, ClampTone(value), nameof(Tone));
+
+    public void PreviewLength(int value) => SetWithoutUndoRedo(ref lengthTicks, ClampLength(value), nameof(LengthTicks));
 
     [Display(GroupName = nameof(Texts.NoteGroupBasic), Name = nameof(Texts.NoteTempo), Description = nameof(Texts.NoteTempoDescription), ResourceType = typeof(Texts))]
     [TextBoxSlider("F0", "BPM", 0.0, TimeBase.MaximumTempo, Delay = -1)]
