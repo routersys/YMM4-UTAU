@@ -17,6 +17,8 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
         double ConsonantEnd,
         double MeanF0);
 
+    sealed record Segment(int StartFrame, int FrameCount, IReadOnlyList<int> TimingIndices);
+
     readonly record struct AnalysisRequest(
         AudioSample Sample,
         string Path,
@@ -27,8 +29,9 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
         double RegionEnd,
         double ConsonantEnd);
 
-    const long MaximumFrameElements = 1L << 27;
+    const long MaximumFrameElements = 1L << 24;
     const double FrameCountEpsilon = 1e-9;
+    const int SegmentGapFrames = 10;
 
     readonly Dictionary<string, AudioSample> loadedSamples = new(StringComparer.OrdinalIgnoreCase);
 
@@ -49,9 +52,99 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
         var offset = timings.Min(x => x.AudioStartMilliseconds);
         var totalMilliseconds = timings.Max(x => x.AudioEndMilliseconds) - offset;
         var frameCount = Math.Max((int)Math.Ceiling(totalMilliseconds / framePeriod - FrameCountEpsilon) + 1, 2);
-        if ((long)frameCount * spectrumSize > MaximumFrameElements)
-            throw new InvalidOperationException(Texts.TextTooLongMessage);
 
+        var segments = BuildSegments(timings, offset, framePeriod, frameCount);
+        foreach (var segment in segments)
+        {
+            if ((long)segment.FrameCount * spectrumSize > MaximumFrameElements)
+                throw new InvalidOperationException(Texts.TextTooLongMessage);
+        }
+
+        var requests = timings
+            .Select(x => ResolveRequest(x.Unit, sampleRate))
+            .ToArray();
+        AnalyzeInParallel(requests);
+
+        var outputLength = ToSampleIndex(frameCount - 1, framePeriod, sampleRate) + 1;
+        var samples = new double[outputLength];
+        var frameSpectrum = new double[spectrumSize];
+        var warpedSpectrum = new double[spectrumSize];
+        var frameAperiodicity = new double[spectrumSize];
+
+        foreach (var segment in segments)
+        {
+            RenderSegment(
+                segment,
+                timings,
+                requests,
+                arena,
+                offset,
+                framePeriod,
+                sampleRate,
+                fftSize,
+                spectrumSize,
+                frameSpectrum,
+                warpedSpectrum,
+                frameAperiodicity,
+                samples);
+        }
+
+        return new RenderResult(samples, sampleRate, timings, offset);
+    }
+
+    static int ToSampleIndex(int frame, double framePeriod, int sampleRate)
+        => (int)(frame * framePeriod / 1000.0 * sampleRate);
+
+    static IReadOnlyList<Segment> BuildSegments(
+        IReadOnlyList<UnitTiming> timings,
+        double offset,
+        double framePeriod,
+        int frameCount)
+    {
+        var groups = new List<(int Start, int End, List<int> Indices)>();
+
+        foreach (var index in Enumerable.Range(0, timings.Count).OrderBy(x => timings[x].AudioStartMilliseconds))
+        {
+            var start = Math.Clamp((int)Math.Floor((timings[index].AudioStartMilliseconds - offset) / framePeriod), 0, frameCount - 1);
+            var end = Math.Clamp((int)Math.Ceiling((timings[index].AudioEndMilliseconds - offset) / framePeriod), start, frameCount - 1);
+
+            if (groups.Count > 0 && start <= groups[^1].End + SegmentGapFrames)
+            {
+                var last = groups[^1];
+                last.Indices.Add(index);
+                groups[^1] = (last.Start, Math.Max(last.End, end), last.Indices);
+                continue;
+            }
+
+            groups.Add((start, end, [index]));
+        }
+
+        var segments = new List<Segment>(groups.Count);
+        for (var index = 0; index < groups.Count; index++)
+        {
+            var start = index == 0 ? 0 : groups[index].Start;
+            var end = index + 1 < groups.Count ? groups[index + 1].Start : frameCount - 1;
+            segments.Add(new Segment(start, end - start + 1, groups[index].Indices));
+        }
+        return segments;
+    }
+
+    void RenderSegment(
+        Segment segment,
+        IReadOnlyList<UnitTiming> timings,
+        IReadOnlyList<AnalysisRequest?> requests,
+        WorldArena arena,
+        double offset,
+        double framePeriod,
+        int sampleRate,
+        int fftSize,
+        int spectrumSize,
+        double[] frameSpectrum,
+        double[] warpedSpectrum,
+        double[] frameAperiodicity,
+        double[] samples)
+    {
+        var frameCount = segment.FrameCount;
         var f0 = new double[frameCount];
         var spectrogram = new double[(long)frameCount * spectrumSize];
         var aperiodicity = new double[(long)frameCount * spectrumSize];
@@ -59,27 +152,18 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
         var voicedWeight = new double[frameCount];
         var logF0Sum = new double[frameCount];
 
-        var frameSpectrum = new double[spectrumSize];
-        var warpedSpectrum = new double[spectrumSize];
-        var frameAperiodicity = new double[spectrumSize];
-
-        var requests = timings
-            .Select(x => ResolveRequest(x.Unit, sampleRate))
-            .ToArray();
-        AnalyzeInParallel(requests);
-
-        for (var index = 0; index < timings.Count; index++)
+        foreach (var index in segment.TimingIndices)
         {
-            var timing = timings[index];
             var source = BuildSource(requests[index], arena);
             if (source is null)
                 continue;
 
             AccumulateUnit(
-                timing,
+                timings[index],
                 source,
                 offset,
                 framePeriod,
+                segment.StartFrame,
                 frameCount,
                 spectrumSize,
                 frameSpectrum,
@@ -94,11 +178,13 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
 
         Finalize(frameCount, spectrumSize, spectrogram, aperiodicity, weightSum, voicedWeight, logF0Sum, f0);
 
-        var outputLength = (int)((frameCount - 1) * framePeriod / 1000.0 * sampleRate) + 1;
-        var samples = new double[outputLength];
-        WorldSynthesis.Synthesize(f0, spectrogram, aperiodicity, fftSize, framePeriod, sampleRate, samples, arena);
+        var buffer = new double[ToSampleIndex(frameCount - 1, framePeriod, sampleRate) + 1];
+        WorldSynthesis.Synthesize(f0, spectrogram, aperiodicity, fftSize, framePeriod, sampleRate, buffer, arena);
 
-        return new RenderResult(samples, sampleRate, timings, offset);
+        var start = ToSampleIndex(segment.StartFrame, framePeriod, sampleRate);
+        var length = Math.Min(buffer.Length, samples.Length - start);
+        if (length > 0)
+            Array.Copy(buffer, 0, samples, start, length);
     }
 
     void AccumulateUnit(
@@ -106,6 +192,7 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
         UnitSource source,
         double offset,
         double framePeriod,
+        int segmentStartFrame,
         int frameCount,
         int spectrumSize,
         double[] frameSpectrum,
@@ -119,8 +206,8 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
     {
         var unit = timing.Unit;
         var note = unit.Note;
-        var startFrame = Math.Max((int)Math.Floor((timing.AudioStartMilliseconds - offset) / framePeriod), 0);
-        var endFrame = Math.Min((int)Math.Ceiling((timing.AudioEndMilliseconds - offset) / framePeriod), frameCount - 1);
+        var startFrame = Math.Max((int)Math.Floor((timing.AudioStartMilliseconds - offset) / framePeriod) - segmentStartFrame, 0);
+        var endFrame = Math.Min((int)Math.Ceiling((timing.AudioEndMilliseconds - offset) / framePeriod) - segmentStartFrame, frameCount - 1);
         var gain = settings.Gain * Math.Clamp(note.Intensity, 0.0, 200.0) / 100.0;
         var baseFormantRatio = settings.FormantRatio;
         var hasFormantCurve = curves.HasFormant;
@@ -130,7 +217,7 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
 
         for (var frame = startFrame; frame <= endFrame; frame++)
         {
-            var absolute = offset + frame * framePeriod;
+            var absolute = offset + (segmentStartFrame + frame) * framePeriod;
             var elapsed = absolute - timing.AudioStartMilliseconds;
             var weight = timing.GetWeight(elapsed);
             if (weight <= 0.0)
