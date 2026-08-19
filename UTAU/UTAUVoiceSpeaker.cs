@@ -39,7 +39,7 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
     public IReadOnlyList<string> Colors => bank.Colors;
 
     public Task<string> ConvertKanjiToYomiAsync(string text, IVoiceParameter voiceParameter)
-        => Task.FromResult(LyricNormalizer.Normalize(text));
+        => Task.FromResult(UstSource.TryGetPath(text, out var path) ? path : LyricNormalizer.Normalize(text));
 
     public IVoiceParameter CreateVoiceParameter() => new UTAUVoiceParameter();
 
@@ -50,19 +50,22 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
 
     public async Task<IVoicePronounce?> CreateVoiceAsync(string text, IVoicePronounce? pronounce, IVoiceParameter? parameter, string filePath)
     {
-        var normalized = LyricNormalizer.Normalize(text);
-        if (normalized.Length == 0)
+        var param = parameter as UTAUVoiceParameter ?? new UTAUVoiceParameter();
+        var isUst = UstSource.TryGetPath(text, out var ustPath);
+        var source = isUst ? ustPath : LyricNormalizer.Normalize(text);
+        if (source.Length == 0)
             throw new InvalidOperationException(Texts.EmptyTextMessage);
 
-        var param = parameter as UTAUVoiceParameter ?? new UTAUVoiceParameter();
         var result = pronounce as UTAUVoicePronounce;
-        if (result is null || result.SourceText != normalized || result.Notes.Count == 0)
-            result = UTAUVoicePronounce.FromText(normalized, param);
+        if (result is null || result.SourceText != source || result.Notes.Count == 0)
+            result = isUst ? UTAUVoicePronounce.FromUst(ustPath, param) : UTAUVoicePronounce.FromText(source, param);
+
+        var timeBase = isUst ? new TimeBase(result.Tempo, param.Speed) : new TimeBase(param.Tempo, param.Speed);
 
         await Semaphore.WaitAsync().ConfigureAwait(false);
         try
         {
-            await Task.Run(() => Render(normalized, result, param, filePath)).ConfigureAwait(false);
+            await Task.Run(() => Render(source, result, param, timeBase, filePath)).ConfigureAwait(false);
         }
         finally
         {
@@ -72,10 +75,9 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
         return result;
     }
 
-    void Render(string normalized, UTAUVoicePronounce pronounce, UTAUVoiceParameter parameter, string filePath)
+    void Render(string source, UTAUVoicePronounce pronounce, UTAUVoiceParameter parameter, TimeBase timeBase, string filePath)
     {
         var notes = pronounce.Notes.ToArray();
-        var timeBase = new TimeBase(parameter.Tempo, parameter.Speed);
         var units = Phonemizer.Phonemize(bank, notes, parameter.Color, PhonemizeOptions.Default, timeBase);
         ThrowIfUnresolved(units);
 
@@ -94,7 +96,7 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
             throw new InvalidOperationException(Texts.NoRenderableNoteMessage);
 
         WaveIo.Write(filePath, result.Samples, result.SampleRate);
-        pronounce.SourceText = normalized;
+        pronounce.SourceText = source;
         pronounce.LipSyncFrames = BuildLipSyncFrames(notes, timeBase, result.OffsetMilliseconds);
     }
 
