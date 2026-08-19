@@ -1,9 +1,12 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Windows;
 using UTAU;
 using UTAU.Notes;
+using UTAU.Views;
 using YukkuriMovieMaker.Controls;
 
 namespace UTAU.Tests;
@@ -137,5 +140,80 @@ public sealed class EditorMetadataTests
             var actual = Convert.ToDouble(property.GetValue(parameter));
             Assert.Equal(Convert.ToDouble(declared.Value), actual, 9);
         }
+    }
+}
+
+public sealed class ParameterVisibilityTests
+{
+    sealed class VoiceItemStub
+    {
+        public string Hatsuon { get; set; } = string.Empty;
+    }
+
+    sealed class CharacterStub
+    {
+        public string Name { get; set; } = string.Empty;
+    }
+
+    static readonly string[] HiddenForUst =
+    [
+        nameof(UTAUVoiceParameter.BaseTone),
+        nameof(UTAUVoiceParameter.Tempo),
+        nameof(UTAUVoiceParameter.Modulation),
+    ];
+
+    static object Convert(object? value)
+        => new HideForUstSourceAttribute.VisibilityConverter()
+            .Convert(value, typeof(Visibility), null, CultureInfo.InvariantCulture);
+
+    [Theory]
+    [InlineData(@"C:\songs\a.ust")]
+    [InlineData(@"  ""C:\songs\a.ust""  ")]
+    public void AUstPronunciationHidesTheParameter(string pronunciation)
+    {
+        Assert.Equal(Visibility.Collapsed, Convert(pronunciation));
+    }
+
+    [Theory]
+    [InlineData("あいうえお")]
+    [InlineData("")]
+    [InlineData("a.wav")]
+    public void PlainTextKeepsTheParameterVisible(string pronunciation)
+    {
+        Assert.Equal(Visibility.Visible, Convert(pronunciation));
+    }
+
+    [Fact]
+    public void AnItemWithoutAPronunciationKeepsTheParameterVisible()
+    {
+        Assert.Equal(Visibility.Visible, Convert(null));
+        Assert.Equal(Visibility.Visible, Convert(new CharacterStub()));
+    }
+
+    [Fact]
+    public void TheBindingFollowsThePronunciationOfTheItem()
+    {
+        var attribute = new HideForUstSourceAttribute();
+        var parameter = new UTAUVoiceParameter();
+
+        var forItem = attribute.GetBinding(new VoiceItemStub(), parameter);
+        Assert.Equal(HideForUstSourceAttribute.PronunciationPropertyName, forItem.Path.Path);
+        Assert.IsType<HideForUstSourceAttribute.VisibilityConverter>(forItem.Converter);
+
+        var forCharacter = attribute.GetBinding(new CharacterStub(), parameter);
+        Assert.Equal(string.Empty, forCharacter.Path.Path);
+    }
+
+    [Fact]
+    public void OnlyTheParametersThatTheScoreSuppliesAreHidden()
+    {
+        var hidden = typeof(UTAUVoiceParameter)
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(x => x.GetCustomAttribute<HideForUstSourceAttribute>() is not null)
+            .Select(x => x.Name)
+            .OrderBy(x => x, StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Equal(HiddenForUst.OrderBy(x => x, StringComparer.Ordinal).ToArray(), hidden);
     }
 }
