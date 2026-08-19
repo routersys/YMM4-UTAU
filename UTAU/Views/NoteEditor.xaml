@@ -23,7 +23,7 @@
                    BeginEdit="PopupButton_BeginEdit"
                    EndEdit="PopupButton_EndEdit">
         <c:PopupButton.PopupContent>
-            <Grid>
+            <Grid UseLayoutRounding="False">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="280"/>
