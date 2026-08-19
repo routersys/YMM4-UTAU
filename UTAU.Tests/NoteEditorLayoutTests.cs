@@ -291,3 +291,119 @@ public sealed class ScaleUpdateTests
         Assert.Equal(barCount, viewModel.ExpressionBars.Count);
     }
 }
+
+public sealed class EditorCostTests
+{
+    static UTAUVoicePronounce CreateScore(int noteCount)
+    {
+        var pronounce = new UTAUVoicePronounce();
+        for (var index = 0; index < noteCount; index++)
+        {
+            var note = new UTAUNote { Lyric = "あ", Tone = 60 + index % 13, LengthTicks = 480 };
+            note.PitchPoints.Add(new PitchPoint(-40, -200.0));
+            note.PitchPoints.Add(new PitchPoint(40, 0.0));
+            pronounce.Notes.Add(note);
+        }
+        return pronounce;
+    }
+
+    static long Allocated(Action action, int iterations)
+    {
+        action();
+        var before = GC.GetAllocatedBytesForCurrentThread();
+        for (var index = 0; index < iterations; index++)
+            action();
+        return (GC.GetAllocatedBytesForCurrentThread() - before) / iterations;
+    }
+
+    [Fact]
+    public void RepeatingAnUnchangedExpressionUpdateAllocatesAlmostNothing()
+    {
+        var viewModel = new NoteEditorViewModel(CreateScore(400));
+
+        Assert.True(Allocated(viewModel.UpdateExpression, 50) < 4096);
+    }
+
+    [Fact]
+    public void ReadingTheCanvasWidthAllocatesNothing()
+    {
+        var viewModel = new NoteEditorViewModel(CreateScore(400));
+
+        Assert.Equal(0, Allocated(() => { var _ = viewModel.CanvasWidth; }, 200));
+    }
+
+    [Fact]
+    public void TheTotalLengthMatchesTheNotes()
+    {
+        var viewModel = new NoteEditorViewModel(CreateScore(40));
+        Assert.Equal(viewModel.Notes.Sum(x => x.LengthTicks), viewModel.TotalTicks);
+
+        viewModel.Notes[0].LengthTicks = 1920;
+        Assert.Equal(viewModel.Notes.Sum(x => x.LengthTicks), viewModel.TotalTicks);
+    }
+
+    [Fact]
+    public void DraggingDoesNotFillTheUndoHistory()
+    {
+        var pronounce = CreateScore(50);
+        var commands = 0;
+        pronounce.UndoRedoCommandCreated += (_, _) => commands++;
+        var viewModel = new NoteEditorViewModel(pronounce);
+        viewModel.SelectAll();
+
+        viewModel.BeginTransform();
+        commands = 0;
+        for (var move = 1; move <= 20; move++)
+            viewModel.TransformTones(move);
+
+        Assert.Equal(0, commands);
+
+        viewModel.EndTransform();
+
+        Assert.Equal(pronounce.Notes.Count, commands);
+    }
+
+    [Fact]
+    public void TheCommittedToneIsTheOneLeftByTheDrag()
+    {
+        var viewModel = new NoteEditorViewModel(CreateScore(5));
+        var before = viewModel.Notes.Select(x => x.Tone).ToArray();
+        viewModel.SelectAll();
+
+        viewModel.BeginTransform();
+        viewModel.TransformTones(7);
+        viewModel.TransformTones(3);
+        viewModel.EndTransform();
+
+        Assert.Equal(before.Select(x => x + 3).ToArray(), viewModel.Notes.Select(x => x.Tone).ToArray());
+    }
+
+    [Fact]
+    public void TheCommittedLengthIsTheOneLeftByTheDrag()
+    {
+        var viewModel = new NoteEditorViewModel(CreateScore(5));
+        viewModel.SelectAll();
+
+        viewModel.BeginTransform();
+        viewModel.TransformLengths(240);
+        viewModel.EndTransform();
+
+        Assert.All(viewModel.Notes, x => Assert.Equal(720, x.LengthTicks));
+    }
+
+    [Fact]
+    public void ADragThatChangesNothingLeavesNoUndoEntry()
+    {
+        var pronounce = CreateScore(20);
+        var viewModel = new NoteEditorViewModel(pronounce);
+        viewModel.SelectAll();
+        var commands = 0;
+        pronounce.UndoRedoCommandCreated += (_, _) => commands++;
+
+        viewModel.BeginTransform();
+        viewModel.TransformTones(0);
+        viewModel.EndTransform();
+
+        Assert.Equal(0, commands);
+    }
+}
