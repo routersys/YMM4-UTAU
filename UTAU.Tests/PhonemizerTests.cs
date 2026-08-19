@@ -133,6 +133,9 @@ public sealed class PhonemizerTests : IDisposable
 
     static readonly TimeBase Base = TimeBase.Default;
 
+    static IReadOnlyList<PhonemeUnit> Phonemize(VoiceBank bank, IReadOnlyList<UTAUNote> notes)
+        => Phonemizer.Phonemize(bank, notes, null, PhonemizeOptions.Default, TempoMap.Create(notes, Base));
+
     static IReadOnlyList<UTAUNote> Notes(string text)
         => NoteSequenceBuilder.Build(text, NoteBuildOptions.Create(60));
 
@@ -140,7 +143,7 @@ public sealed class PhonemizerTests : IDisposable
     public void SingleKanaBankResolvesEveryMora()
     {
         var bank = TestVoiceBank.CreateSingleKanaBank(directory);
-        var units = Phonemizer.Phonemize(bank, Notes("あかさ"), null, PhonemizeOptions.Default, Base);
+        var units = Phonemize(bank, Notes("あかさ"));
 
         Assert.Equal(["あ", "か", "さ"], units.Select(x => x.Alias));
         Assert.All(units, x => Assert.False(x.IsUnresolved));
@@ -150,7 +153,7 @@ public sealed class PhonemizerTests : IDisposable
     public void ContinuousBankUsesThePreviousVowel()
     {
         var bank = TestVoiceBank.CreateVcvBank(directory);
-        var units = Phonemizer.Phonemize(bank, Notes("あか"), null, PhonemizeOptions.Default, Base);
+        var units = Phonemize(bank, Notes("あか"));
 
         Assert.Equal(["- あ", "a か"], units.Select(x => x.Alias));
     }
@@ -159,7 +162,7 @@ public sealed class PhonemizerTests : IDisposable
     public void RestResetsTheContinuousContext()
     {
         var bank = TestVoiceBank.CreateVcvBank(directory);
-        var units = Phonemizer.Phonemize(bank, Notes("あ、あ"), null, PhonemizeOptions.Default, Base);
+        var units = Phonemize(bank, Notes("あ、あ"));
 
         Assert.Equal(["- あ", UTAUNote.RestLyric, "- あ"], units.Select(x => x.Alias));
     }
@@ -168,7 +171,7 @@ public sealed class PhonemizerTests : IDisposable
     public void TransitionUnitIsInsertedForCvvcBanks()
     {
         var bank = TestVoiceBank.CreateCvvcBank(directory);
-        var units = Phonemizer.Phonemize(bank, Notes("あか"), null, PhonemizeOptions.Default, Base);
+        var units = Phonemize(bank, Notes("あか"));
 
         Assert.Equal(["あ", "a k", "か", "a -"], units.Select(x => x.Alias));
     }
@@ -177,7 +180,7 @@ public sealed class PhonemizerTests : IDisposable
     public void TransitionUnitTakesTimeFromTheEndOfThePreviousNote()
     {
         var bank = TestVoiceBank.CreateCvvcBank(directory);
-        var units = Phonemizer.Phonemize(bank, Notes("あか"), null, PhonemizeOptions.Default, Base);
+        var units = Phonemize(bank, Notes("あか"));
 
         Assert.Equal(units[0].EndMilliseconds, units[1].StartMilliseconds, 9);
         Assert.Equal(units[2].StartMilliseconds, units[1].EndMilliseconds, 9);
@@ -188,7 +191,7 @@ public sealed class PhonemizerTests : IDisposable
     public void EndingUnitIsAppendedAfterTheLastNote()
     {
         var bank = TestVoiceBank.CreateCvvcBank(directory);
-        var units = Phonemizer.Phonemize(bank, Notes("あ"), null, PhonemizeOptions.Default, Base);
+        var units = Phonemize(bank, Notes("あ"));
 
         Assert.Equal(["あ", "a -"], units.Select(x => x.Alias));
         Assert.Equal(units[0].EndMilliseconds, units[1].StartMilliseconds, 9);
@@ -198,7 +201,7 @@ public sealed class PhonemizerTests : IDisposable
     public void NoEndingUnitIsAppendedWhenTheTextEndsWithARest()
     {
         var bank = TestVoiceBank.CreateCvvcBank(directory);
-        var units = Phonemizer.Phonemize(bank, Notes("あ。"), null, PhonemizeOptions.Default, Base);
+        var units = Phonemize(bank, Notes("あ。"));
 
         Assert.DoesNotContain("a -", units.Select(x => x.Alias));
     }
@@ -207,7 +210,7 @@ public sealed class PhonemizerTests : IDisposable
     public void UnresolvedLyricsAreReportedWithoutAnEntry()
     {
         var bank = TestVoiceBank.CreateSingleKanaBank(directory);
-        var units = Phonemizer.Phonemize(bank, Notes("あぱ"), null, PhonemizeOptions.Default, Base);
+        var units = Phonemize(bank, Notes("あぱ"));
 
         Assert.Contains(units, x => x.IsUnresolved && x.Alias == "ぱ");
     }
@@ -216,7 +219,7 @@ public sealed class PhonemizerTests : IDisposable
     public void RestsAreSilentButNotUnresolved()
     {
         var bank = TestVoiceBank.CreateSingleKanaBank(directory);
-        var rest = Assert.Single(Phonemizer.Phonemize(bank, Notes("、"), null, PhonemizeOptions.Default, Base));
+        var rest = Assert.Single(Phonemize(bank, Notes("、")));
 
         Assert.True(rest.IsSilent);
         Assert.False(rest.IsUnresolved);
@@ -227,7 +230,7 @@ public sealed class PhonemizerTests : IDisposable
     {
         var bank = TestVoiceBank.CreateSingleKanaBank(directory);
         var notes = Notes("あかさ");
-        var units = Phonemizer.Phonemize(bank, notes, null, PhonemizeOptions.Default, Base);
+        var units = Phonemize(bank, notes);
 
         var position = 0.0;
         for (var i = 0; i < notes.Count; i++)

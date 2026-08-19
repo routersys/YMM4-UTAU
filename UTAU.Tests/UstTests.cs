@@ -363,7 +363,7 @@ public sealed class UstTests
         var result = Import(Document("Tempo=500000.00", Sung(), Sung("Tempo=127.00"), Sung()));
 
         Assert.Equal(127.0, result.Tempo, 9);
-        Assert.Equal(0, result.TempoChangeCount);
+        Assert.All(result.Notes, x => Assert.Equal(UTAUNote.FollowScoreValue, x.TempoOverride, 9));
     }
 
     [Fact]
@@ -375,12 +375,12 @@ public sealed class UstTests
     }
 
     [Fact]
-    public void TempoChangesAreCountedAndNotApplied()
+    public void TempoChangesBecomeNoteOverrides()
     {
         var result = Import(Document("Tempo=120.00", Sung(), Sung("Tempo=150.00"), Sung("Tempo=150.00"), Sung("Tempo=90.00")));
 
         Assert.Equal(120.0, result.Tempo, 9);
-        Assert.Equal(2, result.TempoChangeCount);
+        Assert.Equal([0.0, 150.0, 0.0, 90.0], result.Notes.Select(x => x.TempoOverride).ToArray());
     }
 
     [Fact]
@@ -772,7 +772,6 @@ public sealed class UstPronounceTests
                 + "[#TRACKEND]\r\n";
             var pronounce = UTAUVoicePronounce.FromUst(Write(directory, content), new UTAUVoiceParameter());
 
-            Assert.Contains(Texts.UstTempoChangeIgnored, pronounce.ImportMessage);
             Assert.Contains(Texts.UstLegacyPitchIgnored, pronounce.ImportMessage);
             Assert.Contains(string.Format(Texts.UstRestTrimmedFormat, 480), pronounce.ImportMessage);
         }
@@ -888,6 +887,68 @@ public sealed class UstRenderSourceTests
             var fast = await RenderAsync(speaker, directory, WriteUst(directory, 240.0), 120.0);
 
             Assert.True(slow > fast * 1.5, $"slow={slow} fast={fast}");
+        }
+        finally
+        {
+            TestVoiceBank.DeleteDirectory(directory);
+        }
+    }
+}
+
+public sealed class UstTempoChangeRenderTests
+{
+    static string WriteUst(string directory, string name, string secondNoteTempo)
+    {
+        var content = "[#SETTING]\r\nTempo=120.00\r\n"
+            + "[#0000]\r\nLength=480\r\nLyric=あ\r\nNoteNum=60\r\n"
+            + "[#0001]\r\nLength=480\r\nLyric=あ\r\nNoteNum=60\r\n" + secondNoteTempo
+            + "[#TRACKEND]\r\n";
+        var path = Path.Combine(directory, name);
+        File.WriteAllBytes(path, VoiceBankTextReader.ShiftJis.GetBytes(content));
+        return path;
+    }
+
+    static async Task<double> RenderAsync(UTAUVoiceSpeaker speaker, string directory, string text)
+    {
+        var output = Path.Combine(directory, Guid.NewGuid().ToString("N") + ".wav");
+        await speaker.CreateVoiceAsync(text, null, new UTAUVoiceParameter(), output);
+        return WaveIo.Read(output).DurationMilliseconds;
+    }
+
+    [Fact]
+    public async Task ATempoChangeInsideTheFileShortensTheRender()
+    {
+        var directory = TestVoiceBank.CreateTemporaryDirectory();
+        try
+        {
+            var speaker = new UTAUVoiceSpeaker(TestVoiceBank.CreateSingleKanaBank(directory));
+
+            var steady = await RenderAsync(speaker, directory, WriteUst(directory, "steady.ust", string.Empty));
+            var faster = await RenderAsync(speaker, directory, WriteUst(directory, "faster.ust", "Tempo=240.00\r\n"));
+
+            Assert.InRange(steady - faster, 200.0, 300.0);
+        }
+        finally
+        {
+            TestVoiceBank.DeleteDirectory(directory);
+        }
+    }
+
+    [Fact]
+    public async Task TheTempoChangeSurvivesIntoTheScore()
+    {
+        var directory = TestVoiceBank.CreateTemporaryDirectory();
+        try
+        {
+            var speaker = new UTAUVoiceSpeaker(TestVoiceBank.CreateSingleKanaBank(directory));
+            var path = WriteUst(directory, "faster.ust", "Tempo=240.00\r\n");
+            var output = Path.Combine(directory, "out.wav");
+
+            var pronounce = Assert.IsType<UTAUVoicePronounce>(
+                await speaker.CreateVoiceAsync(path, null, new UTAUVoiceParameter(), output));
+
+            Assert.Equal(120.0, pronounce.Tempo, 9);
+            Assert.Equal([0.0, 240.0], pronounce.Notes.Select(x => x.TempoOverride).ToArray());
         }
         finally
         {

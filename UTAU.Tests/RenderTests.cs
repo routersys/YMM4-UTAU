@@ -115,7 +115,7 @@ public sealed class UtauRendererTests : IDisposable
     RenderResult Render(VoiceBank bank, string text, RenderSettings? settings = null, RenderCurves? curves = null, double tempo = 120.0, double speed = 1.0)
     {
         var notes = NoteSequenceBuilder.Build(text, NoteBuildOptions.Create(60));
-        var units = Phonemizer.Phonemize(bank, notes, null, PhonemizeOptions.Default, new TimeBase(tempo, speed));
+        var units = Phonemizer.Phonemize(bank, notes, null, PhonemizeOptions.Default, TempoMap.Create(notes, new TimeBase(tempo, speed)));
         using var arena = new WorldArena();
         return new UtauRenderer(settings ?? RenderSettings.Default with { Estimator = F0Estimator.Dio }, curves ?? RenderCurves.Empty, cache).Render(units, arena);
     }

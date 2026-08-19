@@ -456,7 +456,7 @@ public sealed class CurveRenderingTests : IDisposable
     double[] Render(VoiceBank bank, RenderCurves curves)
     {
         var notes = NoteSequenceBuilder.Build("<!C4:1/4>あ", NoteBuildOptions.Create(60));
-        var units = Phonemizer.Phonemize(bank, notes, null, PhonemizeOptions.Default, TimeBase.Default);
+        var units = Phonemizer.Phonemize(bank, notes, null, PhonemizeOptions.Default, TempoMap.Create(notes, TimeBase.Default));
         using var arena = new WorldArena();
         var settings = RenderSettings.Default with { Estimator = F0Estimator.Dio };
         return new UtauRenderer(settings, curves, cache).Render(units, arena).Samples;
