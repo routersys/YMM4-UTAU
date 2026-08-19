@@ -193,8 +193,6 @@
 <data name="PitchPointCentsDescription" xml:space="preserve"><value>The offset from the pitch of the note. 100 cents is a semitone.</value></data>
 <data name="SelectAllNotes" xml:space="preserve"><value>Select all the notes</value></data>
 <data name="SelectionCountFormat" xml:space="preserve"><value>{0} notes selected</value></data>
-<data name="ImportUst" xml:space="preserve"><value>Load a UST file</value></data>
-<data name="UstFilterName" xml:space="preserve"><value>UTAU sequence</value></data>
 <data name="UstImportedFormat" xml:space="preserve"><value>Loaded {0} notes</value></data>
 <data name="UstImportFailed" xml:space="preserve"><value>The UST file could not be read</value></data>
 <data name="UstImportEmpty" xml:space="preserve"><value>The file has no notes to load</value></data>

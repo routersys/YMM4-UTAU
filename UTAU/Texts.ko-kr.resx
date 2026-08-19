@@ -193,8 +193,6 @@
 <data name="PitchPointCentsDescription" xml:space="preserve"><value>노트 음정으로부터의 차이입니다. 100센트가 반음입니다.</value></data>
 <data name="SelectAllNotes" xml:space="preserve"><value>모든 노트 선택</value></data>
 <data name="SelectionCountFormat" xml:space="preserve"><value>{0}개 선택 중</value></data>
-<data name="ImportUst" xml:space="preserve"><value>UST 불러오기</value></data>
-<data name="UstFilterName" xml:space="preserve"><value>UTAU 악보</value></data>
 <data name="UstImportedFormat" xml:space="preserve"><value>노트 {0}개를 불러왔습니다</value></data>
 <data name="UstImportFailed" xml:space="preserve"><value>UST를 읽지 못했습니다</value></data>
 <data name="UstImportEmpty" xml:space="preserve"><value>불러올 노트가 없습니다</value></data>

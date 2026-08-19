@@ -193,8 +193,6 @@
 <data name="PitchPointCentsDescription" xml:space="preserve"><value>El desvío respecto al tono de la nota. 100 centésimas equivalen a un semitono.</value></data>
 <data name="SelectAllNotes" xml:space="preserve"><value>Seleccionar todas las notas</value></data>
 <data name="SelectionCountFormat" xml:space="preserve"><value>{0} notas seleccionadas</value></data>
-<data name="ImportUst" xml:space="preserve"><value>Cargar un archivo UST</value></data>
-<data name="UstFilterName" xml:space="preserve"><value>Partitura de UTAU</value></data>
 <data name="UstImportedFormat" xml:space="preserve"><value>Se cargaron {0} notas</value></data>
 <data name="UstImportFailed" xml:space="preserve"><value>No se pudo leer el archivo UST</value></data>
 <data name="UstImportEmpty" xml:space="preserve"><value>El archivo no tiene notas que cargar</value></data>

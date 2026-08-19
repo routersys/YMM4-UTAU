@@ -193,8 +193,6 @@
 <data name="PitchPointCentsDescription" xml:space="preserve"><value>ノートの音程からのずれです。100セントが半音です。</value></data>
 <data name="SelectAllNotes" xml:space="preserve"><value>すべてのノートを選択</value></data>
 <data name="SelectionCountFormat" xml:space="preserve"><value>{0} 個を選択中</value></data>
-<data name="ImportUst" xml:space="preserve"><value>USTを読み込む</value></data>
-<data name="UstFilterName" xml:space="preserve"><value>UTAUの譜面</value></data>
 <data name="UstImportedFormat" xml:space="preserve"><value>{0} 個のノートを読み込みました</value></data>
 <data name="UstImportFailed" xml:space="preserve"><value>USTを読み込めませんでした</value></data>
 <data name="UstImportEmpty" xml:space="preserve"><value>読み込めるノートがありません</value></data>

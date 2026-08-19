@@ -193,8 +193,6 @@
 <data name="PitchPointCentsDescription" xml:space="preserve"><value>相對音符音高的偏移。100 音分為半音。</value></data>
 <data name="SelectAllNotes" xml:space="preserve"><value>選擇所有音符</value></data>
 <data name="SelectionCountFormat" xml:space="preserve"><value>已選擇 {0} 個音符</value></data>
-<data name="ImportUst" xml:space="preserve"><value>載入 UST 檔案</value></data>
-<data name="UstFilterName" xml:space="preserve"><value>UTAU 樂譜</value></data>
 <data name="UstImportedFormat" xml:space="preserve"><value>已載入 {0} 個音符</value></data>
 <data name="UstImportFailed" xml:space="preserve"><value>無法讀取 UST 檔案</value></data>
 <data name="UstImportEmpty" xml:space="preserve"><value>檔案中沒有可載入的音符</value></data>

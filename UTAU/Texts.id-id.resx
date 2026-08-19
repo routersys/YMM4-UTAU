@@ -193,8 +193,6 @@
 <data name="PitchPointCentsDescription" xml:space="preserve"><value>Selisih dari nada not. 100 sen sama dengan satu seminada.</value></data>
 <data name="SelectAllNotes" xml:space="preserve"><value>Pilih semua not</value></data>
 <data name="SelectionCountFormat" xml:space="preserve"><value>{0} not terpilih</value></data>
-<data name="ImportUst" xml:space="preserve"><value>Muat berkas UST</value></data>
-<data name="UstFilterName" xml:space="preserve"><value>Partitur UTAU</value></data>
 <data name="UstImportedFormat" xml:space="preserve"><value>Memuat {0} not</value></data>
 <data name="UstImportFailed" xml:space="preserve"><value>Berkas UST tidak dapat dibaca</value></data>
 <data name="UstImportEmpty" xml:space="preserve"><value>Berkas tidak memiliki not untuk dimuat</value></data>
