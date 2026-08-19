@@ -956,3 +956,43 @@ public sealed class UstTempoChangeRenderTests
         }
     }
 }
+
+public sealed class UstTempoRangeTests
+{
+    static UstImportResult Import(string content) => UstImporter.Import(UstParser.Parse(content));
+
+    [Fact]
+    public void AnExtremeSettingTempoIsBroughtIntoTheModelRange()
+    {
+        var content = "[#SETTING]\r\nTempo=900.00\r\n"
+            + "[#0000]\r\nLength=480\r\nLyric=a\r\nNoteNum=60\r\n"
+            + "[#0001]\r\nLength=480\r\nLyric=a\r\nNoteNum=60\r\nTempo=400.00\r\n";
+        var result = Import(content);
+
+        Assert.Equal(TimeBase.MaximumTempo, result.Tempo, 9);
+        Assert.All(result.Notes, x => Assert.Equal(UTAUNote.FollowScoreValue, x.TempoOverride, 9));
+    }
+
+    [Fact]
+    public void AnExtremeNoteTempoIsBroughtIntoTheModelRange()
+    {
+        var content = "[#SETTING]\r\nTempo=120.00\r\n"
+            + "[#0000]\r\nLength=480\r\nLyric=a\r\nNoteNum=60\r\n"
+            + "[#0001]\r\nLength=480\r\nLyric=a\r\nNoteNum=60\r\nTempo=900.00\r\n";
+        var result = Import(content);
+
+        Assert.Equal(TimeBase.MaximumTempo, result.Notes[1].TempoOverride, 9);
+    }
+
+    [Fact]
+    public void TheImportedPitchUsesTheTempoOfItsOwnNote()
+    {
+        var content = "[#SETTING]\r\nTempo=125.00\r\n"
+            + "[#0000]\r\nLength=480\r\nLyric=a\r\nNoteNum=60\r\nPBS=-100;0\r\nPBW=100\r\n"
+            + "[#0001]\r\nLength=480\r\nLyric=a\r\nNoteNum=60\r\nTempo=250.00\r\nPBS=-100;0\r\nPBW=100\r\n";
+        var result = Import(content);
+
+        Assert.Equal(-100, result.Notes[0].PitchPoints[0].Ticks);
+        Assert.Equal(-200, result.Notes[1].PitchPoints[0].Ticks);
+    }
+}
