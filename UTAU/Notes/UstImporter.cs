@@ -6,7 +6,6 @@ namespace UTAU.Notes;
 internal sealed record UstImportResult(
     IReadOnlyList<UTAUNote> Notes,
     double Tempo,
-    int TempoChangeCount,
     int LegacyPitchNoteCount,
     int TrimmedRestTicks);
 
@@ -21,8 +20,8 @@ internal static class UstImporter
     {
         ArgumentNullException.ThrowIfNull(document);
 
-        var tempo = ResolveTempo(document, out var tempoChangeCount);
-        var timeBase = new TimeBase(tempo, 1.0);
+        var tempo = ResolveTempo(document);
+        var currentTempo = tempo;
         var notes = new List<UTAUNote>();
         var legacyPitchNoteCount = 0;
         var position = 0;
@@ -45,7 +44,14 @@ internal static class UstImporter
             var previousTone = notes.Count == 0 ? MusicalTone.MiddleC.NoteNumber : notes[^1].Tone;
             AddRest(notes, start - end, previousTone);
 
-            var note = CreateNote(section, noteLength, timeBase);
+            var sectionTempo = ParseNumber(section.Find(UstKeys.Tempo));
+            var isTempoChange = IsUsableTempo(sectionTempo) && Math.Abs(sectionTempo!.Value - currentTempo) > TempoEpsilon;
+            if (isTempoChange)
+                currentTempo = sectionTempo!.Value;
+
+            var note = CreateNote(section, noteLength, new TimeBase(currentTempo, 1.0));
+            if (isTempoChange)
+                note.TempoOverride = currentTempo;
             if (note.PitchPoints.Count == 0 && HasLegacyPitch(section))
                 legacyPitchNoteCount++;
             notes.Add(note);
@@ -55,7 +61,7 @@ internal static class UstImporter
         }
 
         var trimmedRestTicks = TrimSurroundingRests(notes);
-        return new UstImportResult(notes, tempo, tempoChangeCount, legacyPitchNoteCount, trimmedRestTicks);
+        return new UstImportResult(notes, tempo, legacyPitchNoteCount, trimmedRestTicks);
     }
 
     static UTAUNote CreateNote(UstSection section, int lengthTicks, TimeBase timeBase)
@@ -176,33 +182,20 @@ internal static class UstImporter
         return trimmed;
     }
 
-    static double ResolveTempo(UstDocument document, out int tempoChangeCount)
+    static double ResolveTempo(UstDocument document)
     {
-        tempoChangeCount = 0;
         var declared = ParseNumber(document.Setting?.Find(UstKeys.Tempo));
-        var resolved = IsUsableTempo(declared) ? declared!.Value : 0.0;
-        var current = resolved;
+        if (IsUsableTempo(declared))
+            return declared!.Value;
 
         foreach (var section in document.NoteSections)
         {
             var noteTempo = ParseNumber(section.Find(UstKeys.Tempo));
-            if (!IsUsableTempo(noteTempo))
-                continue;
-
-            if (resolved <= 0.0)
-            {
-                resolved = current = noteTempo!.Value;
-                continue;
-            }
-
-            if (Math.Abs(noteTempo!.Value - current) > TempoEpsilon)
-            {
-                tempoChangeCount++;
-                current = noteTempo.Value;
-            }
+            if (IsUsableTempo(noteTempo))
+                return noteTempo!.Value;
         }
 
-        return resolved > 0.0 ? resolved : TimeBase.DefaultTempo;
+        return TimeBase.DefaultTempo;
     }
 
     static bool IsUsableTempo(double? tempo) => tempo is > 0.0 and <= MaximumDeclaredTempo;
