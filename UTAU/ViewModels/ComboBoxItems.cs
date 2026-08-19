@@ -1,4 +1,5 @@
 using UTAU.Models;
+using YukkuriMovieMaker.Commons;
 
 namespace UTAU.ViewModels;
 
@@ -24,6 +25,66 @@ internal static class ComboBoxItems
     }
 }
 
-internal sealed record KeyRowViewModel(string Name, bool IsAccidental, int NoteNumber, double Height, double RollWidth);
+internal sealed class KeyRowViewModel : Bindable
+{
+    string name = string.Empty;
+    bool isAccidental;
+    int noteNumber;
+    double height;
+    double rollWidth;
 
-internal sealed record GridLineViewModel(double Left, double Height, bool IsBar);
+    public string Name
+    {
+        get => name;
+        set => Set(ref name, value);
+    }
+
+    public bool IsAccidental
+    {
+        get => isAccidental;
+        set => Set(ref isAccidental, value);
+    }
+
+    public int NoteNumber
+    {
+        get => noteNumber;
+        set => Set(ref noteNumber, value);
+    }
+
+    public double Height
+    {
+        get => height;
+        set => Set(ref height, value);
+    }
+
+    public double RollWidth
+    {
+        get => rollWidth;
+        set => Set(ref rollWidth, value);
+    }
+}
+
+internal sealed class GridLineViewModel : Bindable
+{
+    double left;
+    double height;
+    bool isBar;
+
+    public double Left
+    {
+        get => left;
+        set => Set(ref left, value);
+    }
+
+    public double Height
+    {
+        get => height;
+        set => Set(ref height, value);
+    }
+
+    public bool IsBar
+    {
+        get => isBar;
+        set => Set(ref isBar, value);
+    }
+}
