@@ -298,10 +298,12 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public void UpdatePitchCurve()
     {
         var points = new PointCollection();
+        var tempoMap = TempoMap.Create([.. Notes.Select(x => x.Note)], Time);
         var position = 0;
 
-        foreach (var note in Notes)
+        for (var index = 0; index < Notes.Count; index++)
         {
+            var note = Notes[index];
             var length = note.Note.LengthTicks;
             if (note.IsRest)
             {
@@ -309,7 +311,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
                 continue;
             }
 
-            var lengthMilliseconds = Time.ToMilliseconds(length);
+            var lengthMilliseconds = tempoMap.LengthMilliseconds(index);
             for (var elapsed = 0; elapsed <= length; elapsed += PitchCurveIntervalTicks)
             {
                 var cents = note.Note.EvaluatePitchOffsetCents(elapsed / (double)length, lengthMilliseconds);
