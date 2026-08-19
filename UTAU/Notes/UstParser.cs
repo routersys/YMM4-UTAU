@@ -25,6 +25,14 @@ internal static class UstParser
         {
             return null;
         }
+        catch (ArgumentException)
+        {
+            return null;
+        }
+        catch (NotSupportedException)
+        {
+            return null;
+        }
     }
 
     public static Encoding ResolveEncoding(ReadOnlySpan<byte> bytes)
