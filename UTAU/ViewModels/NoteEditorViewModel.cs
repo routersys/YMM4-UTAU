@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
@@ -28,6 +28,9 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public const double SelectionBoxThreshold = 3.0;
     public const double MinimumCurveSpacing = 1.0;
     public const double WindowMarginRatio = 0.5;
+    public const double MinimumFitQuarterNoteWidth = 24.0;
+    public const double MinimumFitPixelsPerTick = MinimumFitQuarterNoteWidth / TimeBase.TicksPerQuarterNote;
+    public const double MinimumFitSemitoneHeight = 10.0;
 
     readonly UTAUVoicePronounce pronounce;
     readonly ObservableCollection<UTAUNote> source;
@@ -58,6 +61,8 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     bool isAutoFitEnabled = true;
     double lastFitWidth;
     double lastFitHeight;
+    double fitWidth;
+    double fitHeight;
     double[] pitchSampleTicks = [];
     double[] pitchSampleTones = [];
     UTAUNote[] noteBuffer = [];
@@ -87,7 +92,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         ResetPitchCommand = new ActionCommand(_ => SelectedNote is not null, _ => ResetPitch());
         ResetExpressionCommand = new ActionCommand(_ => true, _ => ResetExpression());
         SelectToneCommand = new ActionCommand(_ => SelectedNote is not null, ApplyTone);
-        FitCommand = new ActionCommand(_ => true, _ => EnableAutoFit());
+        FitCommand = new ActionCommand(_ => true, _ => FitToWindow());
         InvalidateLayout();
         SelectedNote = Notes.FirstOrDefault();
     }
@@ -849,15 +854,20 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         InvalidateScale();
     }
 
-    public static double CalculatePixelsPerTick(double viewportWidth, int totalTicks)
-        => Math.Clamp(viewportWidth * FitMarginRatio / Math.Max(totalTicks, 1), MinimumPixelsPerTick, MaximumPixelsPerTick);
+    public static double CalculatePixelsPerTick(double viewportWidth, int totalTicks, double minimumPixelsPerTick)
+        => Math.Clamp(viewportWidth * FitMarginRatio / Math.Max(totalTicks, 1), minimumPixelsPerTick, MaximumPixelsPerTick);
 
-    public static double CalculateSemitoneHeight(double viewportHeight, int visibleSemitones)
-        => Math.Clamp(viewportHeight * FitMarginRatio / Math.Max(visibleSemitones, 1), MinimumSemitoneHeight, MaximumSemitoneHeight);
+    public static double CalculateSemitoneHeight(double viewportHeight, int visibleSemitones, double minimumSemitoneHeight)
+        => Math.Clamp(viewportHeight * FitMarginRatio / Math.Max(visibleSemitones, 1), minimumSemitoneHeight, MaximumSemitoneHeight);
 
     public bool FitToViewport(double viewportWidth, double viewportHeight)
     {
-        if (!isAutoFitEnabled || viewportWidth <= 0.0 || viewportHeight <= 0.0)
+        if (viewportWidth <= 0.0 || viewportHeight <= 0.0)
+            return false;
+
+        fitWidth = viewportWidth;
+        fitHeight = viewportHeight;
+        if (!isAutoFitEnabled)
             return false;
         if (Math.Abs(viewportWidth - lastFitWidth) < ViewportChangeThreshold
             && Math.Abs(viewportHeight - lastFitHeight) < ViewportChangeThreshold)
@@ -865,17 +875,26 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
         lastFitWidth = viewportWidth;
         lastFitHeight = viewportHeight;
-        PixelsPerTick = CalculatePixelsPerTick(viewportWidth, TotalTicks);
-        SemitoneHeight = CalculateSemitoneHeight(viewportHeight, MaximumTone - MinimumTone + 1);
-        InvalidateScale();
+        ApplyFit(MinimumFitPixelsPerTick, MinimumFitSemitoneHeight);
         return true;
     }
 
-    public void EnableAutoFit()
+    public void FitToWindow()
     {
         isAutoFitEnabled = true;
-        lastFitWidth = 0.0;
-        lastFitHeight = 0.0;
+        lastFitWidth = fitWidth;
+        lastFitHeight = fitHeight;
+        ApplyFit(MinimumPixelsPerTick, MinimumSemitoneHeight);
+    }
+
+    void ApplyFit(double minimumPixelsPerTick, double minimumSemitoneHeight)
+    {
+        if (fitWidth <= 0.0 || fitHeight <= 0.0)
+            return;
+
+        PixelsPerTick = CalculatePixelsPerTick(fitWidth, TotalTicks, minimumPixelsPerTick);
+        SemitoneHeight = CalculateSemitoneHeight(fitHeight, MaximumTone - MinimumTone + 1, minimumSemitoneHeight);
+        InvalidateScale();
     }
 
     public void UpdateGuide(Point position)
