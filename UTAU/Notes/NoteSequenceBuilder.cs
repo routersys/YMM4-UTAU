@@ -32,6 +32,7 @@ internal static class NoteSequenceBuilder
         var notes = new List<UTAUNote>();
         var tone = options.BaseTone;
         int? pendingLength = null;
+        double? pendingTempo = null;
 
         foreach (var token in tokens)
         {
@@ -41,6 +42,7 @@ internal static class NoteSequenceBuilder
                     if (token.Tone is { } directiveTone)
                         tone = directiveTone;
                     pendingLength = token.LengthTicks ?? pendingLength;
+                    pendingTempo = token.Tempo ?? pendingTempo;
                     break;
 
                 case NotationTokenKind.Rest:
@@ -48,7 +50,9 @@ internal static class NoteSequenceBuilder
                         notes,
                         token.LengthTicks
                             ?? (NotationScanner.IsLongRest(token.Text) ? options.LongRestTicks : options.ShortRestTicks),
-                        tone);
+                        tone,
+                        pendingTempo);
+                    pendingTempo = null;
                     break;
 
                 case NotationTokenKind.Extend:
@@ -57,12 +61,14 @@ internal static class NoteSequenceBuilder
                     break;
 
                 case NotationTokenKind.Sokuon:
-                    notes.Add(CreateNote(token.Text, tone, options.SokuonTicks));
+                    notes.Add(CreateNote(token.Text, tone, options.SokuonTicks, pendingTempo));
+                    pendingTempo = null;
                     break;
 
                 case NotationTokenKind.Syllable:
-                    notes.Add(CreateNote(token.Text, tone, pendingLength ?? options.SyllableTicks));
+                    notes.Add(CreateNote(token.Text, tone, pendingLength ?? options.SyllableTicks, pendingTempo));
                     pendingLength = null;
+                    pendingTempo = null;
                     break;
             }
         }
@@ -70,20 +76,21 @@ internal static class NoteSequenceBuilder
         return notes;
     }
 
-    static void AppendRest(List<UTAUNote> notes, int lengthTicks, int tone)
+    static void AppendRest(List<UTAUNote> notes, int lengthTicks, int tone, double? tempo)
     {
-        if (notes.Count > 0 && notes[^1].IsRest)
+        if (tempo is null && notes.Count > 0 && notes[^1].IsRest)
         {
             notes[^1].LengthTicks += lengthTicks;
             return;
         }
-        notes.Add(CreateNote(UTAUNote.RestLyric, tone, lengthTicks));
+        notes.Add(CreateNote(UTAUNote.RestLyric, tone, lengthTicks, tempo));
     }
 
-    static UTAUNote CreateNote(string lyric, int tone, int lengthTicks) => new()
+    static UTAUNote CreateNote(string lyric, int tone, int lengthTicks, double? tempo) => new()
     {
         Lyric = lyric,
         Tone = tone,
         LengthTicks = lengthTicks,
+        TempoOverride = tempo ?? UTAUNote.FollowScoreValue,
     };
 }
