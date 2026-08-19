@@ -57,6 +57,8 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     double lastFitHeight;
     double[] pitchSampleTicks = [];
     double[] pitchSampleTones = [];
+    UTAUNote[] noteBuffer = [];
+    int pitchSampleCount;
 
     public NoteEditorViewModel(UTAUVoicePronounce pronounce)
     {
@@ -247,7 +249,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     public double StripCanvasHeight => StripHeight;
 
-    public int TotalTicks => Notes.Sum(x => x.Note.LengthTicks);
+    public int TotalTicks { get; private set; }
 
     public ObservableCollection<KeyRowViewModel> Keyboard { get; } = [];
 
@@ -264,6 +266,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
             note.RaiseLayoutChanged();
         }
 
+        TotalTicks = position;
         OnPropertyChanged(nameof(TotalTicks));
         UpdateKeyboard();
         UpdateTimeGridLines();
@@ -272,6 +275,18 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         UpdatePitchCurve();
         UpdatePitchHandles();
         UpdateExpression();
+    }
+
+    public void InvalidateTones()
+    {
+        UpdateToneRange();
+        foreach (var note in Notes)
+            note.RaiseLayoutChanged();
+
+        UpdateKeyboard();
+        OnPropertyChanged(nameof(CanvasHeight));
+        UpdatePitchCurve();
+        UpdatePitchHandles();
     }
 
     public void InvalidateScale()
@@ -310,6 +325,8 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         switch (propertyName)
         {
             case nameof(UTAUNote.Tone):
+                InvalidateTones();
+                break;
             case nameof(UTAUNote.LengthTicks):
                 InvalidateLayout();
                 break;
@@ -326,12 +343,30 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     public void UpdatePitchCurve()
     {
-        var tempoMap = TempoMap.Create([.. Notes.Select(x => x.Note)], Time);
-        var ticks = new List<double>(pitchSampleTicks.Length);
-        var tones = new List<double>(pitchSampleTones.Length);
+        var count = Notes.Count;
+        if (noteBuffer.Length < count)
+            noteBuffer = new UTAUNote[count];
+
+        var required = 0;
+        for (var index = 0; index < count; index++)
+        {
+            var note = Notes[index];
+            noteBuffer[index] = note.Note;
+            if (!note.IsRest)
+                required += note.Note.LengthTicks / PitchCurveIntervalTicks + 1;
+        }
+
+        if (pitchSampleTicks.Length < required)
+        {
+            pitchSampleTicks = new double[required];
+            pitchSampleTones = new double[required];
+        }
+
+        var tempoMap = TempoMap.Create(new ArraySegment<UTAUNote>(noteBuffer, 0, count), Time);
+        var written = 0;
         var position = 0;
 
-        for (var index = 0; index < Notes.Count; index++)
+        for (var index = 0; index < count; index++)
         {
             var note = Notes[index];
             var length = note.Note.LengthTicks;
@@ -345,15 +380,15 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
             for (var elapsed = 0; elapsed <= length; elapsed += PitchCurveIntervalTicks)
             {
                 var cents = note.Note.EvaluatePitchOffsetCents(elapsed / (double)length, lengthMilliseconds);
-                ticks.Add(position + elapsed);
-                tones.Add(note.Note.Tone + cents / 100.0);
+                pitchSampleTicks[written] = position + elapsed;
+                pitchSampleTones[written] = note.Note.Tone + cents / 100.0;
+                written++;
             }
 
             position += length;
         }
 
-        pitchSampleTicks = [.. ticks];
-        pitchSampleTones = [.. tones];
+        pitchSampleCount = written;
         ProjectPitchCurve();
     }
 
@@ -361,18 +396,18 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     {
         var spacing = PitchCurveIntervalTicks * PixelsPerTick;
         var step = spacing <= 0.0 ? 1 : Math.Max((int)(MinimumPitchCurveSpacing / spacing), 1);
-        var points = new PointCollection();
+        var points = new PointCollection(step == 1 ? pitchSampleCount : pitchSampleCount / step * 2 + 2);
 
         if (step == 1)
         {
-            for (var index = 0; index < pitchSampleTicks.Length; index++)
+            for (var index = 0; index < pitchSampleCount; index++)
                 points.Add(ToCanvasPoint(pitchSampleTicks[index], pitchSampleTones[index]));
         }
         else
         {
-            for (var start = 0; start < pitchSampleTicks.Length; start += step)
+            for (var start = 0; start < pitchSampleCount; start += step)
             {
-                var end = Math.Min(start + step, pitchSampleTicks.Length);
+                var end = Math.Min(start + step, pitchSampleCount);
                 var lowest = start;
                 var highest = start;
                 for (var index = start + 1; index < end; index++)
@@ -555,11 +590,13 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
             return;
 
         var shift = Math.Clamp(deltaSemitones, -transformOriginTones.Min(), 127 - transformOriginTones.Max());
-        Batch(() =>
-        {
-            for (var index = 0; index < transformTargets.Count; index++)
-                transformTargets[index].Tone = transformOriginTones[index] + shift;
-        });
+        Batch(
+            () =>
+            {
+                for (var index = 0; index < transformTargets.Count; index++)
+                    transformTargets[index].Note.PreviewTone(transformOriginTones[index] + shift);
+            },
+            InvalidateTones);
     }
 
     public void TransformLengths(int deltaTicks)
@@ -570,12 +607,34 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         Batch(() =>
         {
             for (var index = 0; index < transformTargets.Count; index++)
-                transformTargets[index].LengthTicks = SnapLength(transformOriginLengths[index] + deltaTicks);
+                transformTargets[index].Note.PreviewLength(SnapLength(transformOriginLengths[index] + deltaTicks));
         });
     }
 
     public void EndTransform()
     {
+        Batch(() =>
+        {
+            for (var index = 0; index < transformTargets.Count; index++)
+            {
+                var note = transformTargets[index].Note;
+                var tone = note.Tone;
+                var length = note.LengthTicks;
+
+                if (tone != transformOriginTones[index])
+                {
+                    note.PreviewTone(transformOriginTones[index]);
+                    note.Tone = tone;
+                }
+
+                if (length != transformOriginLengths[index])
+                {
+                    note.PreviewLength(transformOriginLengths[index]);
+                    note.LengthTicks = length;
+                }
+            }
+        });
+
         transformTargets.Clear();
         transformOriginTones = [];
         transformOriginLengths = [];
@@ -760,7 +819,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         OnPropertyChanged(nameof(SelectionBoxHeight));
     }
 
-    void Batch(Action action)
+    void Batch(Action action, Action? refresh = null)
     {
         if (isBatching)
         {
@@ -778,7 +837,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
             isBatching = false;
         }
 
-        InvalidateLayout();
+        (refresh ?? InvalidateLayout)();
     }
 
     ExpressionCurve CurrentCurve
@@ -909,11 +968,13 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         if (shift == 0)
             return;
 
-        Batch(() =>
-        {
-            foreach (var note in selectedNotes)
-                note.Tone += shift;
-        });
+        Batch(
+            () =>
+            {
+                foreach (var note in selectedNotes)
+                    note.Tone += shift;
+            },
+            InvalidateTones);
     }
 
     void InsertRest()
