@@ -164,8 +164,8 @@
 <data name="AboutUTAU" xml:space="preserve"><value>UTAU 정보</value></data>
 <data name="AboutUTAUDescription" xml:space="preserve"><value>UTAU 음원의 원음 설정을 그대로 읽어 WORLD로 재합성합니다. 단독음, 연속음, CVVC를 모두 지원합니다.</value></data>
 <data name="AboutUTAUHowTo" xml:space="preserve"><value>음원 폴더는 user/resources/utau에 두거나 탐색 폴더에 추가하세요. 발음은 가나로 씁니다.</value></data>
-<data name="AboutUTAUNotation" xml:space="preserve"><value>발음 안에 &lt;!음이름:길이&gt; 라고 쓰면 그 뒤 가나의 음정과 길이가 정해집니다. 길이는 밀리초나 1/4 같은 음표로 쓸 수 있습니다.</value></data>
-<data name="AboutUTAUNotationExample" xml:space="preserve"><value>예: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  쉼표는 &lt;!R:200&gt; 이라고 씁니다.</value></data>
+<data name="AboutUTAUNotation" xml:space="preserve"><value>발음 안에 &lt;!음이름:길이&gt; 라고 쓰면 그 뒤의 가나의 음정과 길이가 정해집니다. 길이는 틱이나 1/4 같은 음표로 쓸 수 있으며 4분음표는 480틱입니다. &lt;!T=140&gt; 이라고 쓰면 그 지점부터 템포가 바뀝니다.</value></data>
+<data name="AboutUTAUNotationExample" xml:space="preserve"><value>예: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  쉼표는 &lt;!R:200&gt;, 템포는 &lt;!T=140&gt; 이라고 씁니다.</value></data>
 <data name="AboutUTAUCredit" xml:space="preserve"><value>음성 분석과 합성에는 M. Morise의 WORLD를 이식한 WorldNet을 사용합니다.</value></data>
 <data name="NoteLyricDescription" xml:space="preserve"><value>원음 설정의 에일리어스를 그대로 쓸 수도 있습니다.</value></data>
 <data name="NoteVelocityDescription" xml:space="preserve"><value>자음 길이의 배율입니다. 100이 원음 그대로이며 배율은 2^((100-값)/100)입니다.</value></data>

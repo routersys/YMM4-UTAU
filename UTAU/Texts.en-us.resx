@@ -164,8 +164,8 @@
 <data name="AboutUTAU" xml:space="preserve"><value>About UTAU</value></data>
 <data name="AboutUTAUDescription" xml:space="preserve"><value>This plugin reads the oto.ini of a UTAU voicebank as it is and resynthesises it with WORLD. Single kana, VCV and CVVC voicebanks are all supported.</value></data>
 <data name="AboutUTAUHowTo" xml:space="preserve"><value>Put the voicebank folders under user/resources/utau or add them to the search folders. The pronunciation is written in kana.</value></data>
-<data name="AboutUTAUNotation" xml:space="preserve"><value>Writing &lt;!note:length&gt; in the pronunciation sets the pitch and the length of the kana that follows it. The length is written in milliseconds or as a note such as 1/4.</value></data>
-<data name="AboutUTAUNotationExample" xml:space="preserve"><value>Example: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  A rest is written as &lt;!R:200&gt;.</value></data>
+<data name="AboutUTAUNotation" xml:space="preserve"><value>Writing &lt;!note:length&gt; in the pronunciation sets the pitch and the length of the kana that follows it. The length is written in ticks or as a note such as 1/4, where a quarter note is 480 ticks. Writing &lt;!T=140&gt; changes the tempo from that point onward.</value></data>
+<data name="AboutUTAUNotationExample" xml:space="preserve"><value>Example: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  A rest is written as &lt;!R:200&gt; and the tempo as &lt;!T=140&gt;.</value></data>
 <data name="AboutUTAUCredit" xml:space="preserve"><value>WorldNet, a port of WORLD by M. Morise, is used for the analysis and the synthesis.</value></data>
 <data name="NoteLyricDescription" xml:space="preserve"><value>The alias of the oto.ini can also be written here directly.</value></data>
 <data name="NoteVelocityDescription" xml:space="preserve"><value>Scales the length of the consonant. 100 keeps the original length and the factor is 2^((100-value)/100).</value></data>

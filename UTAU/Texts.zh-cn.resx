@@ -164,8 +164,8 @@
 <data name="AboutUTAU" xml:space="preserve"><value>关于 UTAU</value></data>
 <data name="AboutUTAUDescription" xml:space="preserve"><value>本插件直接读取 UTAU 音源的原音设定，并使用 WORLD 重新合成。单独音、连续音与 CVVC 均受支持。</value></data>
 <data name="AboutUTAUHowTo" xml:space="preserve"><value>请将音源文件夹放在 user/resources/utau，或添加到搜索文件夹。发音以假名书写。</value></data>
-<data name="AboutUTAUNotation" xml:space="preserve"><value>在发音中书写 &lt;!音名:长度&gt; 可决定其后假名的音高与长度。长度可用毫秒或 1/4 之类的音符书写。</value></data>
-<data name="AboutUTAUNotationExample" xml:space="preserve"><value>例：&lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み　休止符写作 &lt;!R:200&gt;。</value></data>
+<data name="AboutUTAUNotation" xml:space="preserve"><value>在发音中写入 &lt;!音名:长度&gt; 可决定其后假名的音高与长度。长度可用刻或 1/4 这样的音符书写，四分音符为 480 刻。写入 &lt;!T=140&gt; 可从该处改变速度。</value></data>
+<data name="AboutUTAUNotationExample" xml:space="preserve"><value>例: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  休止符写作 &lt;!R:200&gt;，速度写作 &lt;!T=140&gt;。</value></data>
 <data name="AboutUTAUCredit" xml:space="preserve"><value>语音的分析与合成使用了 M. Morise 的 WORLD 的移植版 WorldNet。</value></data>
 <data name="NoteLyricDescription" xml:space="preserve"><value>也可以直接书写原音设定的别名。</value></data>
 <data name="NoteVelocityDescription" xml:space="preserve"><value>辅音长度的倍率。100 表示保持原始长度，倍率为 2^((100-值)/100)。</value></data>

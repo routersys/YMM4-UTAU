@@ -164,8 +164,8 @@
 <data name="AboutUTAU" xml:space="preserve"><value>Acerca de UTAU</value></data>
 <data name="AboutUTAUDescription" xml:space="preserve"><value>Este complemento lee el oto.ini de un banco de voz UTAU tal cual y lo resintetiza con WORLD. Admite bancos de kana simple, VCV y CVVC.</value></data>
 <data name="AboutUTAUHowTo" xml:space="preserve"><value>Coloque las carpetas de bancos de voz en user/resources/utau o añádalas a las carpetas de búsqueda. La pronunciación se escribe en kana.</value></data>
-<data name="AboutUTAUNotation" xml:space="preserve"><value>Escribir &lt;!nota:duración&gt; en la pronunciación fija el tono y la duración del kana que le sigue. La duración se escribe en milisegundos o como una nota tal como 1/4.</value></data>
-<data name="AboutUTAUNotationExample" xml:space="preserve"><value>Ejemplo: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  Un silencio se escribe como &lt;!R:200&gt;.</value></data>
+<data name="AboutUTAUNotation" xml:space="preserve"><value>Escribir &lt;!nota:duración&gt; en la pronunciación fija el tono y la duración del kana que le sigue. La duración se escribe en tics o como una figura tal como 1/4, donde una negra son 480 tics. Escribir &lt;!T=140&gt; cambia el tempo a partir de ese punto.</value></data>
+<data name="AboutUTAUNotationExample" xml:space="preserve"><value>Ejemplo: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  Un silencio se escribe como &lt;!R:200&gt; y el tempo como &lt;!T=140&gt;.</value></data>
 <data name="AboutUTAUCredit" xml:space="preserve"><value>Para el análisis y la síntesis se utiliza WorldNet, una adaptación de WORLD de M. Morise.</value></data>
 <data name="NoteLyricDescription" xml:space="preserve"><value>También se puede escribir directamente el alias del oto.ini.</value></data>
 <data name="NoteVelocityDescription" xml:space="preserve"><value>Escala la duración de la consonante. 100 conserva la duración original y el factor es 2^((100-valor)/100).</value></data>

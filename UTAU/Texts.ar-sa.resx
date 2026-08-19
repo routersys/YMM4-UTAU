@@ -164,8 +164,8 @@
 <data name="AboutUTAU" xml:space="preserve"><value>حول UTAU</value></data>
 <data name="AboutUTAUDescription" xml:space="preserve"><value>تقرأ هذه الإضافة ملف oto.ini الخاص ببنك صوت UTAU كما هو وتعيد توليفه باستخدام WORLD. وهي تدعم بنوك الكانا المفردة وVCV وCVVC.</value></data>
 <data name="AboutUTAUHowTo" xml:space="preserve"><value>ضع مجلدات بنوك الصوت في user/resources/utau أو أضفها إلى مجلدات البحث. يُكتب النطق بحروف الكانا.</value></data>
-<data name="AboutUTAUNotation" xml:space="preserve"><value>كتابة &lt;!النغمة:الطول&gt; داخل النطق تحدد درجة وطول الكانا التي تليها. ويُكتب الطول بالميلي ثانية أو كنوتة مثل 1/4.</value></data>
-<data name="AboutUTAUNotationExample" xml:space="preserve"><value>مثال: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  وتُكتب السكتة هكذا &lt;!R:200&gt;.</value></data>
+<data name="AboutUTAUNotation" xml:space="preserve"><value>كتابة &lt;!اسم النوتة:الطول&gt; داخل النطق تحدد درجة وطول الكانا التي تليها. ويُكتب الطول بالتِك أو كنوتة مثل 1/4، حيث تساوي نوتة الربع 480 تِك. وكتابة &lt;!T=140&gt; تغيّر الإيقاع بدءاً من تلك النقطة.</value></data>
+<data name="AboutUTAUNotationExample" xml:space="preserve"><value>مثال: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  تُكتب السكتة على شكل &lt;!R:200&gt; ويُكتب الإيقاع على شكل &lt;!T=140&gt;.</value></data>
 <data name="AboutUTAUCredit" xml:space="preserve"><value>يُستخدم WorldNet، وهو نقل لمكتبة WORLD من إعداد M. Morise، في التحليل والتوليف.</value></data>
 <data name="NoteLyricDescription" xml:space="preserve"><value>يمكن أيضاً كتابة الاسم البديل من ملف oto.ini مباشرة.</value></data>
 <data name="NoteVelocityDescription" xml:space="preserve"><value>يقيس طول الحرف الساكن. القيمة 100 تحافظ على الطول الأصلي والمعامل هو 2^((100-القيمة)/100).</value></data>

@@ -164,8 +164,8 @@
 <data name="AboutUTAU" xml:space="preserve"><value>UTAUについて</value></data>
 <data name="AboutUTAUDescription" xml:space="preserve"><value>UTAU音源の原音設定をそのまま読み込み、WORLDで再合成します。単独音・連続音・CVVCのいずれにも対応します。</value></data>
 <data name="AboutUTAUHowTo" xml:space="preserve"><value>音源フォルダは user/resources/utau に置くか、探索フォルダに追加してください。発音はかなで書きます。</value></data>
-<data name="AboutUTAUNotation" xml:space="preserve"><value>発音の中に &lt;!音名:長さ&gt; と書くと、その直後のかなの音程と長さが決まります。長さはミリ秒か 1/4 のような音符で書けます。</value></data>
-<data name="AboutUTAUNotationExample" xml:space="preserve"><value>例: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  休符は &lt;!R:200&gt; と書きます。</value></data>
+<data name="AboutUTAUNotation" xml:space="preserve"><value>発音の中に &lt;!音名:長さ&gt; と書くと、その直後のかなの音程と長さが決まります。長さはティックか 1/4 のような音符で書けます。四分音符は480ティックです。&lt;!T=140&gt; と書くと、そこから先のテンポが変わります。</value></data>
+<data name="AboutUTAUNotationExample" xml:space="preserve"><value>例: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  休符は &lt;!R:200&gt;、テンポは &lt;!T=140&gt; と書きます。</value></data>
 <data name="AboutUTAUCredit" xml:space="preserve"><value>音声の分析と合成には M. Morise 氏の WORLD を移植した WorldNet を使用しています。</value></data>
 <data name="NoteLyricDescription" xml:space="preserve"><value>原音設定のエイリアスをそのまま書くこともできます。</value></data>
 <data name="NoteVelocityDescription" xml:space="preserve"><value>子音の長さの倍率です。100が原音のままで、倍率は 2^((100-値)/100) になります。</value></data>

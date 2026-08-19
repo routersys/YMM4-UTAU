@@ -164,8 +164,8 @@
 <data name="AboutUTAU" xml:space="preserve"><value>Tentang UTAU</value></data>
 <data name="AboutUTAUDescription" xml:space="preserve"><value>Plugin ini membaca oto.ini bank suara UTAU apa adanya dan mensintesis ulang dengan WORLD. Bank kana tunggal, VCV, dan CVVC semuanya didukung.</value></data>
 <data name="AboutUTAUHowTo" xml:space="preserve"><value>Letakkan folder bank suara di user/resources/utau atau tambahkan ke folder pencarian. Pelafalan ditulis dengan kana.</value></data>
-<data name="AboutUTAUNotation" xml:space="preserve"><value>Menulis &lt;!nada:panjang&gt; di dalam pelafalan menentukan nada dan panjang kana yang mengikutinya. Panjang ditulis dalam milidetik atau sebagai not seperti 1/4.</value></data>
-<data name="AboutUTAUNotationExample" xml:space="preserve"><value>Contoh: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  Istirahat ditulis sebagai &lt;!R:200&gt;.</value></data>
+<data name="AboutUTAUNotation" xml:space="preserve"><value>Menulis &lt;!nama nada:panjang&gt; di dalam pengucapan menentukan nada dan panjang kana sesudahnya. Panjang ditulis dalam tik atau sebagai not seperti 1/4, dengan not seperempat sama dengan 480 tik. Menulis &lt;!T=140&gt; mengubah tempo mulai dari titik tersebut.</value></data>
+<data name="AboutUTAUNotationExample" xml:space="preserve"><value>Contoh: &lt;!C4:1/4&gt;ど&lt;!D4&gt;れ&lt;!E4&gt;み  Istirahat ditulis sebagai &lt;!R:200&gt; dan tempo sebagai &lt;!T=140&gt;.</value></data>
 <data name="AboutUTAUCredit" xml:space="preserve"><value>Analisis dan sintesis menggunakan WorldNet, hasil porting WORLD karya M. Morise.</value></data>
 <data name="NoteLyricDescription" xml:space="preserve"><value>Alias pada oto.ini juga dapat ditulis langsung di sini.</value></data>
 <data name="NoteVelocityDescription" xml:space="preserve"><value>Menskalakan panjang konsonan. Nilai 100 mempertahankan panjang asli dan faktornya adalah 2^((100-nilai)/100).</value></data>
