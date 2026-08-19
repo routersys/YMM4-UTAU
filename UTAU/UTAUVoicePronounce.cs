@@ -121,8 +121,6 @@ internal sealed class UTAUVoicePronounce : UndoRedoable, IVoicePronounce
         var parts = new List<string> { string.Format(Texts.UstImportedFormat, imported.Notes.Count) };
         if (imported.TrimmedRestTicks > 0)
             parts.Add(string.Format(Texts.UstRestTrimmedFormat, imported.TrimmedRestTicks));
-        if (imported.TempoChangeCount > 0)
-            parts.Add(Texts.UstTempoChangeIgnored);
         if (imported.LegacyPitchNoteCount > 0)
             parts.Add(Texts.UstLegacyPitchIgnored);
         return string.Join("  ", parts);
