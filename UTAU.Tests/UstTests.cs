@@ -816,6 +816,7 @@ public sealed class UstPronounceTests
     }
 }
 
+[Collection("Render")]
 public sealed class UstRenderSourceTests
 {
     static string WriteUst(string directory, double tempo)
@@ -895,6 +896,7 @@ public sealed class UstRenderSourceTests
     }
 }
 
+[Collection("Render")]
 public sealed class UstTempoChangeRenderTests
 {
     static string WriteUst(string directory, string name, string secondNoteTempo)

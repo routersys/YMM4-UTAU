@@ -107,6 +107,7 @@ public sealed class WorldAnalyzerTests
     }
 }
 
+[Collection("Render")]
 public sealed class UtauRendererTests : IDisposable
 {
     readonly string directory = TestVoiceBank.CreateTemporaryDirectory();
@@ -314,6 +315,7 @@ public sealed class UtauRendererTests : IDisposable
     }
 }
 
+[Collection("Render")]
 public sealed class SegmentedRenderTests : IDisposable
 {
     const int TailSamples = 2205;
