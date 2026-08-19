@@ -41,6 +41,8 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     NoteViewModel? selectedNote;
     int[] transformOriginTones = [];
     int[] transformOriginLengths = [];
+    int transformToneShift;
+    int transformLengthDelta;
     Rect selectionBox;
     bool isSelectionBoxVisible;
     bool isBatching;
@@ -738,6 +740,8 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         transformTargets.AddRange(selectedNotes);
         transformOriginTones = [.. transformTargets.Select(x => x.Note.Tone)];
         transformOriginLengths = [.. transformTargets.Select(x => x.Note.LengthTicks)];
+        transformToneShift = 0;
+        transformLengthDelta = 0;
     }
 
     public void TransformTones(int deltaSemitones)
@@ -746,6 +750,10 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
             return;
 
         var shift = Math.Clamp(deltaSemitones, -transformOriginTones.Min(), 127 - transformOriginTones.Max());
+        if (shift == transformToneShift)
+            return;
+
+        transformToneShift = shift;
         Batch(
             () =>
             {
@@ -757,9 +765,10 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     public void TransformLengths(int deltaTicks)
     {
-        if (transformTargets.Count == 0)
+        if (transformTargets.Count == 0 || deltaTicks == transformLengthDelta)
             return;
 
+        transformLengthDelta = deltaTicks;
         Batch(() =>
         {
             for (var index = 0; index < transformTargets.Count; index++)
