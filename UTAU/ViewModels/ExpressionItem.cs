@@ -42,31 +42,61 @@ internal sealed class ExpressionBarViewModel : Bindable
     public NoteViewModel? Note
     {
         get => note;
-        set => Set(ref note, value);
+        set
+        {
+            if (ReferenceEquals(note, value))
+                return;
+            note = value;
+            OnPropertyChanged();
+        }
     }
 
     public double Left
     {
         get => left;
-        set => Set(ref left, value);
+        set
+        {
+            if (left == value)
+                return;
+            left = value;
+            OnPropertyChanged();
+        }
     }
 
     public double Width
     {
         get => width;
-        set => Set(ref width, value);
+        set
+        {
+            if (width == value)
+                return;
+            width = value;
+            OnPropertyChanged();
+        }
     }
 
     public double Top
     {
         get => top;
-        set => Set(ref top, value);
+        set
+        {
+            if (top == value)
+                return;
+            top = value;
+            OnPropertyChanged();
+        }
     }
 
     public double Height
     {
         get => height;
-        set => Set(ref height, value);
+        set
+        {
+            if (height == value)
+                return;
+            height = value;
+            OnPropertyChanged();
+        }
     }
 }
 

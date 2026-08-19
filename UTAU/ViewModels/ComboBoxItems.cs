@@ -36,31 +36,61 @@ internal sealed class KeyRowViewModel : Bindable
     public string Name
     {
         get => name;
-        set => Set(ref name, value);
+        set
+        {
+            if (name == value)
+                return;
+            name = value;
+            OnPropertyChanged();
+        }
     }
 
     public bool IsAccidental
     {
         get => isAccidental;
-        set => Set(ref isAccidental, value);
+        set
+        {
+            if (isAccidental == value)
+                return;
+            isAccidental = value;
+            OnPropertyChanged();
+        }
     }
 
     public int NoteNumber
     {
         get => noteNumber;
-        set => Set(ref noteNumber, value);
+        set
+        {
+            if (noteNumber == value)
+                return;
+            noteNumber = value;
+            OnPropertyChanged();
+        }
     }
 
     public double Height
     {
         get => height;
-        set => Set(ref height, value);
+        set
+        {
+            if (height == value)
+                return;
+            height = value;
+            OnPropertyChanged();
+        }
     }
 
     public double RollWidth
     {
         get => rollWidth;
-        set => Set(ref rollWidth, value);
+        set
+        {
+            if (rollWidth == value)
+                return;
+            rollWidth = value;
+            OnPropertyChanged();
+        }
     }
 }
 
@@ -73,18 +103,36 @@ internal sealed class GridLineViewModel : Bindable
     public double Left
     {
         get => left;
-        set => Set(ref left, value);
+        set
+        {
+            if (left == value)
+                return;
+            left = value;
+            OnPropertyChanged();
+        }
     }
 
     public double Height
     {
         get => height;
-        set => Set(ref height, value);
+        set
+        {
+            if (height == value)
+                return;
+            height = value;
+            OnPropertyChanged();
+        }
     }
 
     public bool IsBar
     {
         get => isBar;
-        set => Set(ref isBar, value);
+        set
+        {
+            if (isBar == value)
+                return;
+            isBar = value;
+            OnPropertyChanged();
+        }
     }
 }
