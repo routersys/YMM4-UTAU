@@ -47,7 +47,7 @@ internal static class UstImporter
             var sectionTempo = ParseNumber(section.Find(UstKeys.Tempo));
             var isTempoChange = IsUsableTempo(sectionTempo) && Math.Abs(sectionTempo!.Value - currentTempo) > TempoEpsilon;
             if (isTempoChange)
-                currentTempo = Math.Clamp(sectionTempo!.Value, TimeBase.MinimumTempo, TimeBase.MaximumTempo);
+                currentTempo = ClampTempo(sectionTempo!.Value);
 
             var note = CreateNote(section, noteLength, new TimeBase(currentTempo, 1.0));
             if (isTempoChange)
@@ -186,17 +186,20 @@ internal static class UstImporter
     {
         var declared = ParseNumber(document.Setting?.Find(UstKeys.Tempo));
         if (IsUsableTempo(declared))
-            return declared!.Value;
+            return ClampTempo(declared!.Value);
 
         foreach (var section in document.NoteSections)
         {
             var noteTempo = ParseNumber(section.Find(UstKeys.Tempo));
             if (IsUsableTempo(noteTempo))
-                return noteTempo!.Value;
+                return ClampTempo(noteTempo!.Value);
         }
 
         return TimeBase.DefaultTempo;
     }
+
+    static double ClampTempo(double tempo)
+        => Math.Clamp(tempo, TimeBase.MinimumTempo, TimeBase.MaximumTempo);
 
     static bool IsUsableTempo(double? tempo) => tempo is > 0.0 and <= MaximumDeclaredTempo;
 
