@@ -1,4 +1,5 @@
 using UTAU.Notes;
+using YukkuriMovieMaker.Commons;
 
 namespace UTAU.ViewModels;
 
@@ -30,6 +31,43 @@ internal sealed record ExpressionItem(
     ];
 }
 
-internal sealed record ExpressionBarViewModel(NoteViewModel Note, double Left, double Width, double Top, double Height);
+internal sealed class ExpressionBarViewModel : Bindable
+{
+    NoteViewModel? note;
+    double left;
+    double width;
+    double top;
+    double height;
+
+    public NoteViewModel? Note
+    {
+        get => note;
+        set => Set(ref note, value);
+    }
+
+    public double Left
+    {
+        get => left;
+        set => Set(ref left, value);
+    }
+
+    public double Width
+    {
+        get => width;
+        set => Set(ref width, value);
+    }
+
+    public double Top
+    {
+        get => top;
+        set => Set(ref top, value);
+    }
+
+    public double Height
+    {
+        get => height;
+        set => Set(ref height, value);
+    }
+}
 
 internal sealed record PitchHandleViewModel(PitchPoint Point, double Left, double Top, double Size);
