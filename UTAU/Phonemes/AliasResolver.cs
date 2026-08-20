@@ -15,14 +15,14 @@ internal static class AliasResolver
             return entry;
         }
 
-        alias = lyric;
+        alias = AliasNormalizer.Normalize(lyric);
         return null;
     }
 
     public static IEnumerable<string> EnumerateCandidates(string lyric, string previousVowel)
     {
         var seen = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var candidate in Generate(lyric, previousVowel))
+        foreach (var candidate in Generate(AliasNormalizer.Normalize(lyric), previousVowel))
             if (candidate.Length > 0 && seen.Add(candidate))
                 yield return candidate;
     }

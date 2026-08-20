@@ -1,3 +1,5 @@
+using UTAU.Models;
+
 namespace UTAU.Phonemes;
 
 internal static class KanaRomanization
@@ -72,8 +74,9 @@ internal static class KanaRomanization
 
     public static string ToMora(string lyric)
     {
-        var separator = lyric.LastIndexOf(AliasSeparator);
-        var hiragana = ToHiragana(separator >= 0 ? lyric[(separator + 1)..] : lyric);
+        var normalized = AliasNormalizer.Normalize(lyric);
+        var separator = normalized.LastIndexOf(AliasSeparator);
+        var hiragana = ToHiragana(separator >= 0 ? normalized[(separator + 1)..] : normalized);
         if (Table.ContainsKey(hiragana))
             return hiragana;
 

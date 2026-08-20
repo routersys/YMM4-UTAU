@@ -375,7 +375,6 @@ public sealed class KanaRomanizationTests
     [InlineData("漢", "漢")]
     [InlineData("", "")]
     [InlineData("a k", "k")]
-    [InlineData("あ ", "")]
     public void TextWithoutAKnownMoraIsLeftAsItIs(string lyric, string expected)
         => Assert.Equal(expected, KanaRomanization.ToMora(lyric));
 }

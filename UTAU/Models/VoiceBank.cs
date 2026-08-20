@@ -1,5 +1,4 @@
 using System.IO;
-using System.Text;
 
 namespace UTAU.Models;
 
@@ -30,7 +29,7 @@ internal sealed class VoiceBank
 
         aliases = new Dictionary<string, OtoEntry>(StringComparer.Ordinal);
         foreach (var entry in otoSets.SelectMany(x => x.Entries))
-            aliases.TryAdd(NormalizeKey(entry.Alias), entry);
+            aliases.TryAdd(AliasNormalizer.Normalize(entry.Alias), entry);
 
         Colors = subBanks
             .Select(x => x.Color)
@@ -68,94 +67,16 @@ internal sealed class VoiceBank
 
     public IEnumerable<OtoEntry> Entries => aliases.Values;
 
-    public bool Contains(string alias) => aliases.ContainsKey(NormalizeKey(alias));
+    public bool Contains(string alias) => aliases.ContainsKey(AliasNormalizer.Normalize(alias));
 
-    public OtoEntry? Find(string alias) => aliases.GetValueOrDefault(NormalizeKey(alias));
+    public OtoEntry? Find(string alias) => aliases.GetValueOrDefault(AliasNormalizer.Normalize(alias));
 
     public OtoEntry? Resolve(string lyric, int noteNumber, string? color, bool ignorePrefixMap = false)
     {
         foreach (var alias in EnumerateAliasCandidates(lyric, noteNumber, color, ignorePrefixMap))
-            if (aliases.TryGetValue(NormalizeKey(alias), out var entry))
+            if (aliases.TryGetValue(AliasNormalizer.Normalize(alias), out var entry))
                 return entry;
         return null;
-    }
-
-    public static string NormalizeKey(string alias)
-    {
-        if (!NeedsNormalization(alias))
-            return alias;
-
-        var source = SafeCompose(alias);
-        var builder = new StringBuilder(source.Length);
-        var pendingSpace = false;
-
-        foreach (var c in source)
-        {
-            if (char.IsWhiteSpace(c))
-            {
-                pendingSpace = builder.Length > 0;
-                continue;
-            }
-
-            if (pendingSpace)
-            {
-                builder.Append(' ');
-                pendingSpace = false;
-            }
-            builder.Append(c);
-        }
-
-        return builder.ToString();
-    }
-
-    static bool NeedsNormalization(string alias)
-    {
-        var previousWasSpace = true;
-        var composed = true;
-
-        foreach (var c in alias)
-        {
-            if (char.IsWhiteSpace(c))
-            {
-                if (previousWasSpace || c != ' ')
-                    return true;
-                previousWasSpace = true;
-                continue;
-            }
-
-            previousWasSpace = false;
-            if (!char.IsAscii(c))
-                composed = false;
-        }
-
-        if (previousWasSpace && alias.Length > 0)
-            return true;
-
-        return !composed && !SafeIsComposed(alias);
-    }
-
-    static bool SafeIsComposed(string alias)
-    {
-        try
-        {
-            return alias.IsNormalized(NormalizationForm.FormC);
-        }
-        catch (ArgumentException)
-        {
-            return true;
-        }
-    }
-
-    static string SafeCompose(string alias)
-    {
-        try
-        {
-            return alias.Normalize(NormalizationForm.FormC);
-        }
-        catch (ArgumentException)
-        {
-            return alias;
-        }
     }
 
     public IEnumerable<string> EnumerateAliasCandidates(string lyric, int noteNumber, string? color, bool ignorePrefixMap = false)
