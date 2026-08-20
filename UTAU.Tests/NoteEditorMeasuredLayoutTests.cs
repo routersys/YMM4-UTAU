@@ -202,16 +202,41 @@ public sealed class NoteEditorMeasuredLayoutTests
         Assert.Equal(0.0, worst, 6);
     }
 
+    static StackPanel Toolbar(Border host)
+        => Descend(host)
+            .OfType<StackPanel>()
+            .First(x => x.Orientation == Orientation.Horizontal
+                && x.Children.OfType<ComboBox>().Any());
+
+    [Fact]
+    public void TheToolbarComboBoxTextIsCentredInItsRow()
+    {
+        var gaps = RunSta(() =>
+        {
+            var (_, _, host) = Build();
+            return Toolbar(host).Children
+                .OfType<ComboBox>()
+                .Select(combo =>
+                {
+                    var text = Descend(combo).OfType<TextBlock>().First();
+                    var above = TopOf(text, combo);
+                    return (Above: above, Below: combo.ActualHeight - above - text.ActualHeight);
+                })
+                .ToArray();
+        });
+
+        Assert.NotEmpty(gaps);
+        Assert.All(gaps, x => Assert.True(x.Above > 0.0, $"above={x.Above}"));
+        Assert.All(gaps, x => Assert.Equal(x.Above, x.Below, 6));
+    }
+
     [Fact]
     public void TheToolbarControlsAllFillTheToolbarRow()
     {
         var boxes = RunSta(() =>
         {
             var (_, _, host) = Build();
-            var toolbar = Descend(host)
-                .OfType<StackPanel>()
-                .First(x => x.Orientation == Orientation.Horizontal
-                    && x.Children.OfType<ComboBox>().Any());
+            var toolbar = Toolbar(host);
 
             return toolbar.Children
                 .OfType<Control>()

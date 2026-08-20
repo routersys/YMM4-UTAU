@@ -54,12 +54,12 @@
                     <Button Width="26" Height="26" Command="{Binding SelectAllCommand}" ToolTip="{x:Static root:Texts.SelectAllNotes}"
                             Content="{DynamicResource {x:Static icons:IconKeys.SelectAll}}"/>
                     <TextBlock Text="{x:Static root:Texts.SnapLabel}" VerticalAlignment="Center" Margin="6,0,3,0"/>
-                    <ComboBox Width="88" Height="26"
+                    <ComboBox Width="88" Height="26" VerticalContentAlignment="Center"
                               ItemsSource="{Binding SnapDivisions}"
                               SelectedItem="{Binding SnapDivision}"
                               DisplayMemberPath="Name"/>
                     <TextBlock Text="{x:Static root:Texts.ExpressionLabel}" VerticalAlignment="Center" Margin="12,0,3,0"/>
-                    <ComboBox Width="110" Height="26"
+                    <ComboBox Width="110" Height="26" VerticalContentAlignment="Center"
                               ItemsSource="{Binding Expressions}"
                               SelectedItem="{Binding SelectedExpression}"
                               DisplayMemberPath="Name"/>
