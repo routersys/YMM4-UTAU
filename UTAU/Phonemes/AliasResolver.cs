@@ -16,9 +16,10 @@ internal static class AliasResolver
                 previousVowel,
                 work.Pool,
                 stackalloc int[AliasCandidates.BoundsLength],
-                work.Scratch);
+                work.Scratch,
+                work.Emitted);
 
-            while (candidates.MoveNext(work.Candidate, out var current))
+            while (candidates.MoveNext(out var current))
             {
                 var entry = bank.Resolve(current, tone, color, ignorePrefixMap);
                 if (entry is null)
@@ -55,9 +56,10 @@ internal static class AliasResolver
                 previousVowel,
                 work.Pool,
                 stackalloc int[AliasCandidates.BoundsLength],
-                work.Scratch);
+                work.Scratch,
+                work.Emitted);
 
-            while (candidates.MoveNext(work.Candidate, out var current))
+            while (candidates.MoveNext(out var current))
             {
                 var text = current.ToString();
                 if (!found.Contains(text, StringComparer.Ordinal))
@@ -72,14 +74,14 @@ internal static class AliasResolver
 
     public static OtoEntry? ResolveTransition(VoiceBank bank, ReadOnlySpan<char> vowel, ReadOnlySpan<char> consonant, int tone, string? color, bool ignorePrefixMap, out string alias)
     {
-        Span<char> buffer = stackalloc char[KanaRomanization.StackTextLength];
         var length = vowel.Length + 1 + consonant.Length;
-        if (length > buffer.Length)
+        if (length > KanaRomanization.StackTextLength)
         {
             alias = string.Empty;
             return null;
         }
 
+        Span<char> buffer = stackalloc char[KanaRomanization.StackTextLength];
         vowel.CopyTo(buffer);
         buffer[vowel.Length] = KanaRomanization.AliasSeparator;
         consonant.CopyTo(buffer[(vowel.Length + 1)..]);

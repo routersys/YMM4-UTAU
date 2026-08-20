@@ -3,7 +3,8 @@ namespace UTAU.Phonemes;
 internal ref struct AliasCandidates
 {
     public const int FormCount = 6;
-    public const int BoundsLength = FormCount * 2;
+    public const int StepCount = 14;
+    public const int BoundsLength = (FormCount + StepCount) * 2;
 
     const byte PreviousVowelStage = 0;
     const byte WildcardStage = 1;
@@ -21,28 +22,37 @@ internal ref struct AliasCandidates
     readonly Span<char> pool;
     readonly Span<int> starts;
     readonly Span<int> lengths;
+    readonly Span<char> emitted;
+    readonly Span<int> emittedStarts;
+    readonly Span<int> emittedLengths;
     readonly ReadOnlySpan<char> previousVowel;
     readonly bool prefixed;
     readonly bool wildcard;
     int step;
+    int emittedCount;
+    int written;
 
     public AliasCandidates(
         ReadOnlySpan<char> lyric,
         ReadOnlySpan<char> previousVowel,
         Span<char> pool,
         Span<int> bounds,
-        Span<char> scratch)
+        Span<char> scratch,
+        Span<char> emitted)
     {
         this.pool = pool;
         this.previousVowel = previousVowel;
+        this.emitted = emitted;
         starts = bounds[..FormCount];
         lengths = bounds.Slice(FormCount, FormCount);
+        emittedStarts = bounds.Slice(FormCount * 2, StepCount);
+        emittedLengths = bounds.Slice(FormCount * 2 + StepCount, StepCount);
         prefixed = previousVowel.Length > 0;
         wildcard = prefixed && !previousVowel.SequenceEqual(KanaRomanization.StartVowel);
         BuildForms(lyric, pool, starts, lengths, scratch);
     }
 
-    public bool MoveNext(Span<char> candidate, out ReadOnlySpan<char> current)
+    public bool MoveNext(out ReadOnlySpan<char> current)
     {
         while (step < Steps.Length)
         {
@@ -50,9 +60,16 @@ internal ref struct AliasCandidates
             if (!IsEnabled(stage) || lengths[form] == 0)
                 continue;
 
-            current = Compose(stage, form, candidate);
-            if (current.Length > 0)
-                return true;
+            var candidate = Compose(stage, form);
+            if (candidate.Length == 0 || IsRepeat(candidate))
+                continue;
+
+            emittedStarts[emittedCount] = written;
+            emittedLengths[emittedCount] = candidate.Length;
+            emittedCount++;
+            written += candidate.Length;
+            current = candidate;
+            return true;
         }
 
         current = default;
@@ -66,7 +83,7 @@ internal ref struct AliasCandidates
         _ => true,
     };
 
-    readonly ReadOnlySpan<char> Compose(byte stage, byte form, Span<char> candidate)
+    readonly ReadOnlySpan<char> Compose(byte stage, byte form)
     {
         var body = pool.Slice(starts[form], lengths[form]);
         var prefix = stage switch
@@ -76,17 +93,33 @@ internal ref struct AliasCandidates
             _ => default,
         };
 
-        if (prefix.Length == 0)
-            return body;
-
-        var length = prefix.Length + 1 + body.Length;
-        if (length > candidate.Length)
+        var length = prefix.Length == 0 ? body.Length : prefix.Length + 1 + body.Length;
+        if (written + length > emitted.Length)
             return default;
 
-        prefix.CopyTo(candidate);
-        candidate[prefix.Length] = KanaRomanization.AliasSeparator;
-        body.CopyTo(candidate[(prefix.Length + 1)..]);
-        return candidate[..length];
+        var target = emitted.Slice(written, length);
+        if (prefix.Length == 0)
+        {
+            body.CopyTo(target);
+            return target;
+        }
+
+        prefix.CopyTo(target);
+        target[prefix.Length] = KanaRomanization.AliasSeparator;
+        body.CopyTo(target[(prefix.Length + 1)..]);
+        return target;
+    }
+
+    readonly bool IsRepeat(ReadOnlySpan<char> candidate)
+    {
+        for (var i = 0; i < emittedCount; i++)
+        {
+            if (emittedLengths[i] != candidate.Length)
+                continue;
+            if (emitted.Slice(emittedStarts[i], emittedLengths[i]).SequenceEqual(candidate))
+                return true;
+        }
+        return false;
     }
 
     static void BuildForms(ReadOnlySpan<char> lyric, Span<char> pool, Span<int> starts, Span<int> lengths, Span<char> scratch)
@@ -98,12 +131,10 @@ internal ref struct AliasCandidates
         Append(KanaRomanization.ToMora(lyric, scratch), pool, starts, lengths, 3, ref written);
         Append(KanaRomanization.ToKatakana(pool.Slice(starts[3], lengths[3]), scratch), pool, starts, lengths, 4, ref written);
 
-        if (KanaRomanization.TryGetRomaji(lyric, scratch, out var romaji))
+        if (KanaRomanization.TryGetRomajiForMora(pool.Slice(starts[3], lengths[3]), out var romaji))
             Append(romaji, pool, starts, lengths, 5, ref written);
         else
             Append(default, pool, starts, lengths, 5, ref written);
-
-        Deduplicate(pool, starts, lengths);
     }
 
     static void Append(ReadOnlySpan<char> text, Span<char> pool, Span<int> starts, Span<int> lengths, int index, ref int written)
@@ -118,25 +149,5 @@ internal ref struct AliasCandidates
         text.CopyTo(pool[written..]);
         lengths[index] = text.Length;
         written += text.Length;
-    }
-
-    static void Deduplicate(Span<char> pool, Span<int> starts, Span<int> lengths)
-    {
-        for (var i = 1; i < FormCount; i++)
-        {
-            if (lengths[i] == 0)
-                continue;
-
-            var current = pool.Slice(starts[i], lengths[i]);
-            for (var j = 0; j < i; j++)
-            {
-                if (lengths[j] != lengths[i])
-                    continue;
-                if (!pool.Slice(starts[j], lengths[j]).SequenceEqual(current))
-                    continue;
-                lengths[i] = 0;
-                break;
-            }
-        }
     }
 }

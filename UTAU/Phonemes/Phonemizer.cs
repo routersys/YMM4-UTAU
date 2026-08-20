@@ -37,14 +37,14 @@ internal static class Phonemizer
 
             if (note.IsRest)
             {
-                Emit(bank, units, ref pending, new PhonemeUnit(note, null, UTAUNote.RestLyric, start, length, start, length, note.Tone), color, options);
+                Emit(bank, units, ref pending, new PhonemeUnit(note, null, UTAUNote.RestLyric, start, length, start, length, note.Tone), color, options, vowelBuffer);
                 previousVowel = KanaRomanization.StartVowel;
                 continue;
             }
 
             var context = note.SuppressAutoVcv ? default : previousVowel;
             var entry = AliasResolver.Resolve(bank, note.Lyric, context, note.Tone, color, note.IgnorePrefixMap, out var alias);
-            Emit(bank, units, ref pending, new PhonemeUnit(note, entry, alias, start, length, start, length, note.Tone), color, options);
+            Emit(bank, units, ref pending, new PhonemeUnit(note, entry, alias, start, length, start, length, note.Tone), color, options, vowelBuffer);
 
             var vowel = KanaRomanization.GetVowel(note.Lyric, vowelBuffer);
             previousVowel = entry is null ? KanaRomanization.StartVowel : vowel;
@@ -53,7 +53,7 @@ internal static class Phonemizer
         if (pending is { } trailing)
             units.Add(trailing);
 
-        AppendEnding(bank, units, color, options);
+        AppendEnding(bank, units, color, options, vowelBuffer);
         return units;
     }
 
@@ -63,11 +63,12 @@ internal static class Phonemizer
         ref PhonemeUnit? pending,
         PhonemeUnit current,
         string? color,
-        PhonemizeOptions options)
+        PhonemizeOptions options,
+        scoped Span<char> buffer)
     {
         if (pending is { } previous)
         {
-            if (TryBuildTransition(bank, previous, current, color, options) is { } transition)
+            if (TryBuildTransition(bank, previous, current, color, options, buffer) is { } transition)
             {
                 units.Add(previous with { LengthMilliseconds = previous.LengthMilliseconds - transition.LengthMilliseconds });
                 units.Add(transition);
@@ -86,17 +87,16 @@ internal static class Phonemizer
         PhonemeUnit current,
         PhonemeUnit next,
         string? color,
-        PhonemizeOptions options)
+        PhonemizeOptions options,
+        scoped Span<char> buffer)
     {
         if (current.IsSilent || next.IsSilent)
             return null;
         if (next.Alias.Contains(KanaRomanization.AliasSeparator))
             return null;
 
-        Span<char> vowelBuffer = stackalloc char[KanaRomanization.StackTextLength];
-        Span<char> consonantBuffer = stackalloc char[KanaRomanization.StackTextLength];
-        var vowel = KanaRomanization.GetVowel(current.Note.Lyric, vowelBuffer);
-        var consonant = KanaRomanization.GetConsonant(next.Note.Lyric, consonantBuffer);
+        var vowel = KanaRomanization.GetVowel(current.Note.Lyric, buffer);
+        var consonant = KanaRomanization.GetConsonant(next.Note.Lyric, buffer);
         if (vowel.IsEmpty || consonant.IsEmpty)
             return null;
 
@@ -120,15 +120,14 @@ internal static class Phonemizer
             current.Tone);
     }
 
-    static void AppendEnding(VoiceBank bank, List<PhonemeUnit> units, string? color, PhonemizeOptions options)
+    static void AppendEnding(VoiceBank bank, List<PhonemeUnit> units, string? color, PhonemizeOptions options, scoped Span<char> buffer)
     {
         if (units.Count == 0 || units[^1].IsSilent)
             return;
 
         var last = units[^1];
 
-        Span<char> vowelBuffer = stackalloc char[KanaRomanization.StackTextLength];
-        var vowel = KanaRomanization.GetVowel(last.Note.Lyric, vowelBuffer);
+        var vowel = KanaRomanization.GetVowel(last.Note.Lyric, buffer);
         if (vowel.IsEmpty)
             return;
 

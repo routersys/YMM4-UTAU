@@ -3,11 +3,12 @@ namespace UTAU.Phonemes;
 internal readonly ref struct AliasWorkspace
 {
     const int Margin = 8;
+    const int Units = AliasCandidates.FormCount + 3 + (AliasCandidates.StepCount * 2);
 
     public readonly Span<char> Pool;
     public readonly Span<char> Scratch;
     public readonly Span<char> Source;
-    public readonly Span<char> Candidate;
+    public readonly Span<char> Emitted;
 
     public AliasWorkspace(Span<char> buffer, int lyricLength)
     {
@@ -17,9 +18,9 @@ internal readonly ref struct AliasWorkspace
         Scratch = rest[..(2 * unit)];
         rest = rest[Scratch.Length..];
         Source = rest[..unit];
-        Candidate = rest.Slice(unit, unit + Margin);
+        rest = rest[Source.Length..];
+        Emitted = rest[..(AliasCandidates.StepCount * 2 * unit)];
     }
 
-    public static int RequiredLength(int lyricLength)
-        => (AliasCandidates.FormCount + 4) * (lyricLength + Margin) + Margin;
+    public static int RequiredLength(int lyricLength) => Units * (lyricLength + Margin);
 }
