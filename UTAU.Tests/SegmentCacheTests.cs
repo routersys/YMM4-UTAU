@@ -13,6 +13,8 @@ public sealed class SegmentCacheTests : IDisposable
     readonly AnalysisCache analysis = new(AnalysisCache.DefaultBudgetBytes);
     readonly SegmentCache segments = new(SegmentCache.DefaultBudgetBytes);
 
+    const double SampleMilliseconds = 300.0;
+
     public void Dispose() => TestVoiceBank.DeleteDirectory(directory);
 
     VoiceBank Bank()
@@ -27,24 +29,23 @@ public sealed class SegmentCacheTests : IDisposable
                 "ka.wav=か,50,120,-500,140,50",
                 "sa.wav=さ,50,120,-500,140,50",
             ]));
-        TestVoiceBank.WriteSample(directory, "a.wav");
-        TestVoiceBank.WriteSample(directory, "ka.wav");
-        TestVoiceBank.WriteSample(directory, "sa.wav");
+        foreach (var name in new[] { "a.wav", "ka.wav", "sa.wav" })
+            TestVoiceBank.WriteSample(directory, name, TestVoiceBank.CreateVowel(durationMilliseconds: SampleMilliseconds));
         return VoiceBankLoader.Load("cache", directory);
     }
 
     static UTAUNote[] Score() =>
     [
-        new() { Lyric = "あ", LengthTicks = 480, Tone = 60 },
-        new() { Lyric = "か", LengthTicks = 480, Tone = 62 },
-        new() { Lyric = "さ", LengthTicks = 480, Tone = 64 },
+        new() { Lyric = "あ", LengthTicks = 240, Tone = 60 },
+        new() { Lyric = "か", LengthTicks = 240, Tone = 62 },
+        new() { Lyric = "さ", LengthTicks = 240, Tone = 64 },
     ];
 
     static UTAUNote[] SplitScore() =>
     [
-        new() { Lyric = "あ", LengthTicks = 480, Tone = 60 },
+        new() { Lyric = "あ", LengthTicks = 240, Tone = 60 },
         new() { Lyric = UTAUNote.RestLyric, LengthTicks = 240, Tone = 60 },
-        new() { Lyric = "か", LengthTicks = 480, Tone = 62 },
+        new() { Lyric = "か", LengthTicks = 240, Tone = 62 },
     ];
 
     double[] Render(VoiceBank bank, UTAUNote[] notes, RenderSettings? settings = null)
@@ -132,7 +133,7 @@ public sealed class SegmentCacheTests : IDisposable
         {
             case nameof(UTAUNote.Lyric): note.Lyric = "さ"; break;
             case nameof(UTAUNote.Tone): note.Tone = 67; break;
-            case nameof(UTAUNote.LengthTicks): note.LengthTicks = 720; break;
+            case nameof(UTAUNote.LengthTicks): note.LengthTicks = 360; break;
             case nameof(UTAUNote.Velocity): note.Velocity = 150.0; break;
             case nameof(UTAUNote.Intensity): note.Intensity = 50.0; break;
             case nameof(UTAUNote.Modulation): note.Modulation = 80.0; break;
@@ -147,7 +148,7 @@ public sealed class SegmentCacheTests : IDisposable
                 break;
             case nameof(UTAUNote.PitchPoints):
                 note.PitchPoints.Add(new PitchPoint(0, -400.0));
-                note.PitchPoints.Add(new PitchPoint(240, 400.0));
+                note.PitchPoints.Add(new PitchPoint(120, 400.0));
                 break;
             case nameof(UTAUNote.IgnorePrefixMap): note.IgnorePrefixMap = true; break;
             case nameof(UTAUNote.SuppressAutoVcv): note.SuppressAutoVcv = true; break;
