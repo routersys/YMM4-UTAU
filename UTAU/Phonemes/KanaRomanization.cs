@@ -83,7 +83,7 @@ internal static class KanaRomanization
         return TryGetRomaji(mora.AsSpan(), buffer, out romaji);
     }
 
-    public static bool TryGetRomaji(ReadOnlySpan<char> mora, Span<char> buffer, out string romaji)
+    public static bool TryGetRomaji(ReadOnlySpan<char> mora, scoped Span<char> buffer, out string romaji)
         => TableLookup.TryGetValue(ToMora(mora, buffer), out romaji!);
 
     public static string ToMora(string lyric)
@@ -129,7 +129,7 @@ internal static class KanaRomanization
         return vowel.IsEmpty ? null : vowel.ToString();
     }
 
-    public static ReadOnlySpan<char> GetVowel(ReadOnlySpan<char> mora, Span<char> buffer)
+    public static ReadOnlySpan<char> GetVowel(ReadOnlySpan<char> mora, scoped Span<char> buffer)
     {
         if (!TryGetRomaji(mora, buffer, out var romaji))
             return default;
@@ -147,7 +147,7 @@ internal static class KanaRomanization
         return consonant.IsEmpty ? null : consonant.ToString();
     }
 
-    public static ReadOnlySpan<char> GetConsonant(ReadOnlySpan<char> mora, Span<char> buffer)
+    public static ReadOnlySpan<char> GetConsonant(ReadOnlySpan<char> mora, scoped Span<char> buffer)
     {
         if (!TryGetRomaji(mora, buffer, out var romaji))
             return default;

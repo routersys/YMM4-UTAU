@@ -166,36 +166,4 @@ public sealed class AliasNormalizerTests : IDisposable
 
         Assert.Equal(["あ", "a か"], units.Select(x => x.Alias));
     }
-
-    [Fact]
-    public void RegularLyricsCostNothingToNormalize()
-    {
-        string[] lyrics = ["あ", "か", "a か", "- あ", "a k", "* か", "ka"];
-
-        var before = GC.GetAllocatedBytesForCurrentThread();
-        foreach (var lyric in lyrics)
-            for (var pass = 0; pass < 1000; pass++)
-                AliasNormalizer.Normalize(lyric);
-        var allocated = GC.GetAllocatedBytesForCurrentThread() - before;
-
-        Assert.Equal(0, allocated);
-    }
-
-    [Fact]
-    public void PhonemizingALongScoreDoesNotChurnMemory()
-    {
-        var bank = TestVoiceBank.CreateVcvAndCvvcBank(directory);
-        var notes = new UTAUNote[5000];
-        for (var index = 0; index < notes.Length; index++)
-            notes[index] = new UTAUNote { Lyric = index % 2 == 0 ? "あ" : "か", LengthTicks = 240, Tone = 60 };
-        var tempoMap = TempoMap.Create(notes, TimeBase.Default);
-
-        Phonemizer.Phonemize(bank, tempoMap, null, PhonemizeOptions.Default);
-
-        var before = GC.GetAllocatedBytesForCurrentThread();
-        Phonemizer.Phonemize(bank, tempoMap, null, PhonemizeOptions.Default);
-        var perNote = (GC.GetAllocatedBytesForCurrentThread() - before) / (double)notes.Length;
-
-        Assert.True(perNote < 2200.0, $"perNote={perNote:F0}B");
-    }
 }

@@ -1,18 +1,36 @@
+using System.Buffers;
 using UTAU.Models;
 
 namespace UTAU.Phonemes;
 
 internal static class AliasResolver
 {
-    public static OtoEntry? Resolve(VoiceBank bank, string lyric, string previousVowel, int tone, string? color, bool ignorePrefixMap, out string alias)
+    public static OtoEntry? Resolve(VoiceBank bank, string lyric, ReadOnlySpan<char> previousVowel, int tone, string? color, bool ignorePrefixMap, out string alias)
     {
-        foreach (var candidate in EnumerateCandidates(lyric, previousVowel))
+        var rented = ArrayPool<char>.Shared.Rent(AliasWorkspace.RequiredLength(lyric.Length));
+        try
         {
-            var entry = bank.Resolve(candidate, tone, color, ignorePrefixMap);
-            if (entry is null)
-                continue;
-            alias = candidate;
-            return entry;
+            var work = new AliasWorkspace(rented, lyric.Length);
+            var candidates = new AliasCandidates(
+                AliasNormalizer.Normalize(lyric, work.Source),
+                previousVowel,
+                work.Pool,
+                stackalloc int[AliasCandidates.BoundsLength],
+                work.Scratch);
+
+            while (candidates.MoveNext(work.Candidate, out var current))
+            {
+                var entry = bank.Resolve(current, tone, color, ignorePrefixMap);
+                if (entry is null)
+                    continue;
+
+                alias = current.ToString();
+                return entry;
+            }
+        }
+        finally
+        {
+            ArrayPool<char>.Shared.Return(rented);
         }
 
         alias = AliasNormalizer.Normalize(lyric);
@@ -21,48 +39,54 @@ internal static class AliasResolver
 
     public static IEnumerable<string> EnumerateCandidates(string lyric, string previousVowel)
     {
-        var seen = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var candidate in Generate(AliasNormalizer.Normalize(lyric), previousVowel))
-            if (candidate.Length > 0 && seen.Add(candidate))
-                yield return candidate;
+        var found = new List<string>(AliasCandidates.FormCount * 3);
+        Collect(lyric, previousVowel, found);
+        return found;
     }
 
-    static IEnumerable<string> Generate(string lyric, string previousVowel)
+    static void Collect(string lyric, ReadOnlySpan<char> previousVowel, List<string> found)
     {
-        var hiragana = KanaRomanization.ToHiragana(lyric);
-        var katakana = KanaRomanization.ToKatakana(lyric);
-        var mora = KanaRomanization.ToMora(lyric);
-        var moraKatakana = KanaRomanization.ToKatakana(mora);
-        KanaRomanization.TryGetRomaji(lyric, out var romaji);
-
-        if (previousVowel.Length > 0)
+        var rented = ArrayPool<char>.Shared.Rent(AliasWorkspace.RequiredLength(lyric.Length));
+        try
         {
-            yield return previousVowel + " " + lyric;
-            yield return previousVowel + " " + hiragana;
-            yield return previousVowel + " " + katakana;
-            yield return previousVowel + " " + mora;
-            yield return previousVowel + " " + moraKatakana;
-            if (romaji is not null)
-                yield return previousVowel + " " + romaji;
-            if (previousVowel != KanaRomanization.StartVowel)
+            var work = new AliasWorkspace(rented, lyric.Length);
+            var candidates = new AliasCandidates(
+                AliasNormalizer.Normalize(lyric, work.Source),
+                previousVowel,
+                work.Pool,
+                stackalloc int[AliasCandidates.BoundsLength],
+                work.Scratch);
+
+            while (candidates.MoveNext(work.Candidate, out var current))
             {
-                yield return KanaRomanization.AnyVowel + " " + lyric;
-                yield return KanaRomanization.AnyVowel + " " + mora;
+                var text = current.ToString();
+                if (!found.Contains(text, StringComparer.Ordinal))
+                    found.Add(text);
             }
         }
-
-        yield return lyric;
-        yield return hiragana;
-        yield return katakana;
-        yield return mora;
-        yield return moraKatakana;
-        if (romaji is not null)
-            yield return romaji;
+        finally
+        {
+            ArrayPool<char>.Shared.Return(rented);
+        }
     }
 
-    public static OtoEntry? ResolveTransition(VoiceBank bank, string vowel, string consonant, int tone, string? color, bool ignorePrefixMap, out string alias)
+    public static OtoEntry? ResolveTransition(VoiceBank bank, ReadOnlySpan<char> vowel, ReadOnlySpan<char> consonant, int tone, string? color, bool ignorePrefixMap, out string alias)
     {
-        alias = vowel + " " + consonant;
-        return bank.Resolve(alias, tone, color, ignorePrefixMap);
+        Span<char> buffer = stackalloc char[KanaRomanization.StackTextLength];
+        var length = vowel.Length + 1 + consonant.Length;
+        if (length > buffer.Length)
+        {
+            alias = string.Empty;
+            return null;
+        }
+
+        vowel.CopyTo(buffer);
+        buffer[vowel.Length] = KanaRomanization.AliasSeparator;
+        consonant.CopyTo(buffer[(vowel.Length + 1)..]);
+
+        var key = buffer[..length];
+        var entry = bank.Resolve(key, tone, color, ignorePrefixMap);
+        alias = entry is null ? string.Empty : key.ToString();
+        return entry;
     }
 }
