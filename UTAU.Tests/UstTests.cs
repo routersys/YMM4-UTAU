@@ -832,6 +832,48 @@ public sealed class UstPronounceTests
     }
 
     [Fact]
+    public async Task UnresolvedLyricsBecomeAWarningWhileTheRestIsRendered()
+    {
+        var directory = TestVoiceBank.CreateTemporaryDirectory();
+        try
+        {
+            var speaker = new UTAUVoiceSpeaker(TestVoiceBank.CreateSingleKanaBank(directory));
+            var output = Path.Combine(directory, "partial.wav");
+
+            var pronounce = (UTAUVoicePronounce?)await speaker.CreateVoiceAsync("あぱあ", null, new UTAUVoiceParameter(), output);
+
+            Assert.NotNull(pronounce);
+            Assert.Equal(string.Format(Texts.AliasNotFoundMessage, "ぱ"), pronounce.RenderMessage);
+            Assert.True(File.Exists(output));
+        }
+        finally
+        {
+            TestVoiceBank.DeleteDirectory(directory);
+        }
+    }
+
+    [Fact]
+    public async Task NothingResolvableFailsWithTheMissingLyrics()
+    {
+        var directory = TestVoiceBank.CreateTemporaryDirectory();
+        try
+        {
+            var speaker = new UTAUVoiceSpeaker(TestVoiceBank.CreateSingleKanaBank(directory));
+            var output = Path.Combine(directory, "none.wav");
+
+            var error = await Assert.ThrowsAsync<InvalidOperationException>(
+                () => speaker.CreateVoiceAsync("ぱぴ", null, new UTAUVoiceParameter(), output));
+
+            Assert.Equal(string.Format(Texts.AliasNotFoundMessage, "ぱ, ぴ"), error.Message);
+            Assert.False(File.Exists(output));
+        }
+        finally
+        {
+            TestVoiceBank.DeleteDirectory(directory);
+        }
+    }
+
+    [Fact]
     public async Task PlainTextIsStillNormalised()
     {
         var directory = TestVoiceBank.CreateTemporaryDirectory();
