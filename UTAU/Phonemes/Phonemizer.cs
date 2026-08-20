@@ -64,6 +64,8 @@ internal static class Phonemizer
             var next = units[i + 1];
             if (current.IsSilent || next.IsSilent)
                 continue;
+            if (next.Alias.Contains(KanaRomanization.AliasSeparator))
+                continue;
 
             var vowel = KanaRomanization.GetVowel(current.Note.Lyric);
             var consonant = KanaRomanization.GetConsonant(next.Note.Lyric);

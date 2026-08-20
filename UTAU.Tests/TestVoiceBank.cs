@@ -105,6 +105,30 @@ internal static class TestVoiceBank
         return VoiceBankLoader.Load("vcv", directory);
     }
 
+    public static VoiceBank CreateVcvAndCvvcBank(string directory)
+    {
+        WriteText(directory, VoiceBankLoader.CharacterFileName, "name=連続音CVVC\r\n");
+        WriteText(
+            directory,
+            VoiceBankLoader.OtoFileName,
+            string.Join("\r\n",
+            [
+                "a.wav=あ,50,80,-500,100,40",
+                "ka.wav=か,50,120,-500,140,50",
+                "start.wav=- あ,50,80,-500,100,40",
+                "aka.wav=a か,50,120,-500,140,50",
+                "ak.wav=a k,50,40,-200,60,20",
+                "aend.wav=a -,50,40,-200,60,20",
+            ]));
+        WriteSample(directory, "a.wav");
+        WriteSample(directory, "ka.wav");
+        WriteSample(directory, "start.wav");
+        WriteSample(directory, "aka.wav");
+        WriteSample(directory, "ak.wav");
+        WriteSample(directory, "aend.wav");
+        return VoiceBankLoader.Load("vcvcvvc", directory);
+    }
+
     public static VoiceBank CreateCvvcBank(string directory)
     {
         WriteText(directory, VoiceBankLoader.CharacterFileName, "name=CVVC\r\n");

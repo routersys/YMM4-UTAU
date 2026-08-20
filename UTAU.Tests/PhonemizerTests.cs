@@ -275,6 +275,24 @@ public sealed class PhonemizerTests : IDisposable
     }
 
     [Fact]
+    public void ContinuousAliasesDoNotTakeAnExtraTransition()
+    {
+        var bank = TestVoiceBank.CreateVcvAndCvvcBank(directory);
+        var units = Phonemize(bank, Lyrics("- あ", "a か"));
+
+        Assert.Equal(["- あ", "a か", "a -"], units.Select(x => x.Alias));
+    }
+
+    [Fact]
+    public void SingleLyricsPreferTheContinuousAliasInTheSameBank()
+    {
+        var bank = TestVoiceBank.CreateVcvAndCvvcBank(directory);
+        var units = Phonemize(bank, Lyrics("あ", "か"));
+
+        Assert.Equal(["- あ", "a か", "a -"], units.Select(x => x.Alias));
+    }
+
+    [Fact]
     public void UnresolvedLyricsAreReportedWithoutAnEntry()
     {
         var bank = TestVoiceBank.CreateSingleKanaBank(directory);
