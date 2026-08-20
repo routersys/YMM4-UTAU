@@ -3,6 +3,7 @@ using System.Windows.Controls;
 
 namespace UTAU.Tests;
 
+[Collection("Wpf")]
 public sealed class ToolbarHeightTests
 {
     const double RowHeight = 26.0;

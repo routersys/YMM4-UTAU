@@ -8,6 +8,7 @@ using YukkuriMovieMaker.Controls;
 
 namespace UTAU.Tests;
 
+[Collection("Wpf")]
 public sealed class NoteEditorMeasuredLayoutTests
 {
     const double PopupWidth = 980.0;

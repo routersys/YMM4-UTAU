@@ -5,6 +5,7 @@ using UTAU.ViewModels;
 
 namespace UTAU.Tests;
 
+[Collection("Wpf")]
 public sealed class CanvasAlignmentTests
 {
     static T RunSta<T>(Func<T> action)
@@ -117,6 +118,7 @@ public sealed class CanvasAlignmentTests
     }
 }
 
+[Collection("Wpf")]
 public sealed class KeyboardRowAlignmentTests
 {
     const int RowCount = 60;

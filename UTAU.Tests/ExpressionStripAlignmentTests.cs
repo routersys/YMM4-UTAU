@@ -8,6 +8,7 @@ using YukkuriMovieMaker.Controls;
 
 namespace UTAU.Tests;
 
+[Collection("Wpf")]
 public sealed class ExpressionStripAlignmentTests
 {
     const double PopupWidth = 980.0;
