@@ -3,11 +3,27 @@ using UTAU.Models;
 
 namespace UTAU.Notes;
 
+internal readonly record struct UstPhraseRange(int Start, int Count)
+{
+    public static UstPhraseRange All => default;
+
+    public bool CoversEverything => Start <= 1 && Count <= 0;
+
+    public bool Contains(int phrase)
+    {
+        if (phrase < Math.Max(Start, 1))
+            return false;
+        return Count <= 0 || phrase < Math.Max(Start, 1) + Count;
+    }
+}
+
 internal sealed record UstImportResult(
     IReadOnlyList<UTAUNote> Notes,
     double Tempo,
     int LegacyPitchNoteCount,
-    int TrimmedRestTicks);
+    int TrimmedRestTicks,
+    int TotalPhrases,
+    int StartTicks);
 
 internal static class UstImporter
 {
@@ -16,7 +32,9 @@ internal static class UstImporter
     public const int EnvelopeFieldCount = 7;
     const double TempoEpsilon = 1e-9;
 
-    public static UstImportResult Import(UstDocument document)
+    public static UstImportResult Import(UstDocument document) => Import(document, UstPhraseRange.All);
+
+    public static UstImportResult Import(UstDocument document, UstPhraseRange range)
     {
         ArgumentNullException.ThrowIfNull(document);
 
@@ -61,8 +79,75 @@ internal static class UstImporter
             end = start + noteLength;
         }
 
-        var trimmedRestTicks = TrimSurroundingRests(notes);
-        return new UstImportResult(notes, tempo, legacyPitchNoteCount, trimmedRestTicks);
+        var totalPhrases = CountPhrases(notes);
+        var skippedTicks = SelectPhrases(notes, range);
+        var (leadingTicks, trimmedRestTicks) = TrimSurroundingRests(notes);
+        return new UstImportResult(notes, tempo, legacyPitchNoteCount, trimmedRestTicks, totalPhrases, skippedTicks + leadingTicks);
+    }
+
+    static int CountPhrases(List<UTAUNote> notes)
+    {
+        var phrases = 0;
+        var inPhrase = false;
+
+        foreach (var note in notes)
+        {
+            if (note.IsRest)
+            {
+                inPhrase = false;
+                continue;
+            }
+
+            if (!inPhrase)
+                phrases++;
+            inPhrase = true;
+        }
+
+        return phrases;
+    }
+
+    static int SelectPhrases(List<UTAUNote> notes, UstPhraseRange range)
+    {
+        if (range.CoversEverything)
+            return 0;
+
+        var kept = new List<UTAUNote>(notes.Count);
+        var skippedTicks = 0;
+        var phrase = 0;
+        var inPhrase = false;
+        var started = false;
+
+        foreach (var note in notes)
+        {
+            if (note.IsRest)
+                inPhrase = false;
+            else
+            {
+                if (!inPhrase)
+                    phrase++;
+                inPhrase = true;
+            }
+
+            if (!note.IsRest && range.Contains(phrase))
+            {
+                started = true;
+                kept.Add(note);
+                continue;
+            }
+
+            if (note.IsRest && started && range.Contains(phrase + 1))
+            {
+                kept.Add(note);
+                continue;
+            }
+
+            if (!started)
+                skippedTicks += note.LengthTicks;
+        }
+
+        notes.Clear();
+        notes.AddRange(kept);
+        return skippedTicks;
     }
 
     static UTAUNote CreateNote(UstSection section, int lengthTicks, TimeBase timeBase)
@@ -167,23 +252,24 @@ internal static class UstImporter
         }
     }
 
-    static int TrimSurroundingRests(List<UTAUNote> notes)
+    static (int Leading, int Total) TrimSurroundingRests(List<UTAUNote> notes)
     {
-        var trimmed = 0;
+        var leadingTicks = 0;
         var leading = 0;
         while (leading < notes.Count && notes[leading].IsRest)
         {
-            trimmed += notes[leading].LengthTicks;
+            leadingTicks += notes[leading].LengthTicks;
             leading++;
         }
         notes.RemoveRange(0, leading);
 
+        var trimmed = leadingTicks;
         while (notes.Count > 0 && notes[^1].IsRest)
         {
             trimmed += notes[^1].LengthTicks;
             notes.RemoveAt(notes.Count - 1);
         }
-        return trimmed;
+        return (leadingTicks, trimmed);
     }
 
     static double ResolveTempo(UstDocument document)
