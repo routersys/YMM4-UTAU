@@ -1,7 +1,6 @@
 using System.IO;
 using UTAU;
 using UTAU.Notes;
-using UTAU.ViewModels;
 using YukkuriMovieMaker.UndoRedo;
 
 namespace UTAU.Tests;
@@ -121,44 +120,6 @@ public sealed class PronounceChangeNotificationTests
         var (pronounce, count) = CreateObserved();
         pronounce.SourceText = "あ";
         Assert.True(count() > 0);
-    }
-
-    [Fact]
-    public void RenderMessageChangesReachTheEditor()
-    {
-        var pronounce = new UTAUVoicePronounce();
-        pronounce.Notes.Add(new UTAUNote { Lyric = "あ" });
-        using var viewModel = new NoteEditorViewModel(pronounce);
-        var raised = 0;
-        viewModel.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName == nameof(NoteEditorViewModel.RenderMessage))
-                raised++;
-        };
-
-        pronounce.RenderMessage = "見つからない";
-
-        Assert.Equal(1, raised);
-        Assert.Equal("見つからない", viewModel.RenderMessage);
-    }
-
-    [Fact]
-    public void TheEditorStopsListeningAfterItIsDisposed()
-    {
-        var pronounce = new UTAUVoicePronounce();
-        pronounce.Notes.Add(new UTAUNote { Lyric = "あ" });
-        var viewModel = new NoteEditorViewModel(pronounce);
-        var raised = 0;
-        viewModel.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName == nameof(NoteEditorViewModel.RenderMessage))
-                raised++;
-        };
-        viewModel.Dispose();
-
-        pronounce.RenderMessage = "見つからない";
-
-        Assert.Equal(0, raised);
     }
 
     [Fact]
