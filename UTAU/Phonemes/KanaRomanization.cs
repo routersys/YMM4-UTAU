@@ -48,6 +48,20 @@ internal static class KanaRomanization
         ["ぐぁ"] = "gwa", ["ぐぃ"] = "gwi", ["ぐぇ"] = "gwe", ["ぐぉ"] = "gwo",
     };
 
+    static readonly Dictionary<string, string> RomajiAliases = new(StringComparer.Ordinal)
+    {
+        ["si"] = "し", ["ti"] = "ち", ["tu"] = "つ", ["zi"] = "じ", ["hu"] = "ふ",
+        ["di"] = "ぢ", ["du"] = "づ", ["wo"] = "を",
+        ["sya"] = "しゃ", ["syu"] = "しゅ", ["syo"] = "しょ", ["sye"] = "しぇ",
+        ["shya"] = "しゃ", ["shyu"] = "しゅ", ["shyo"] = "しょ", ["shye"] = "しぇ",
+        ["tya"] = "ちゃ", ["tyu"] = "ちゅ", ["tyo"] = "ちょ", ["tye"] = "ちぇ",
+        ["cya"] = "ちゃ", ["cyu"] = "ちゅ", ["cyo"] = "ちょ", ["cye"] = "ちぇ",
+        ["chya"] = "ちゃ", ["chyu"] = "ちゅ", ["chyo"] = "ちょ", ["chye"] = "ちぇ",
+        ["zya"] = "じゃ", ["zyu"] = "じゅ", ["zyo"] = "じょ", ["zye"] = "じぇ",
+        ["jya"] = "じゃ", ["jyu"] = "じゅ", ["jyo"] = "じょ", ["jye"] = "じぇ",
+        ["dya"] = "ぢゃ", ["dyu"] = "ぢゅ", ["dyo"] = "ぢょ",
+    };
+
     static readonly char[] Vowels = ['a', 'i', 'u', 'e', 'o'];
 
     static readonly Dictionary<string, string> Kana = BuildKana();
@@ -74,6 +88,9 @@ internal static class KanaRomanization
                 continue;
             kana[pair.Value] = pair.Key;
         }
+
+        foreach (var pair in RomajiAliases)
+            kana[pair.Key] = pair.Value;
         return kana;
     }
 

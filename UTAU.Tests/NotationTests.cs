@@ -315,6 +315,46 @@ public sealed class KanaRomanizationTests
         => Assert.Equal(expected, KanaRomanization.ToMora(lyric));
 
     [Theory]
+    [InlineData("si", "し")]
+    [InlineData("ti", "ち")]
+    [InlineData("tu", "つ")]
+    [InlineData("zi", "じ")]
+    [InlineData("hu", "ふ")]
+    [InlineData("di", "ぢ")]
+    [InlineData("du", "づ")]
+    [InlineData("wo", "を")]
+    [InlineData("sya", "しゃ")]
+    [InlineData("tyo", "ちょ")]
+    [InlineData("zyu", "じゅ")]
+    [InlineData("jya", "じゃ")]
+    [InlineData("cyo", "ちょ")]
+    public void KunreiRomajiReadsAsItsOwnKana(string lyric, string expected)
+        => Assert.Equal(expected, KanaRomanization.ToMora(lyric));
+
+    [Theory]
+    [InlineData("すぃ", "si")]
+    [InlineData("てぃ", "ti")]
+    [InlineData("とぅ", "tu")]
+    [InlineData("うぉ", "wo")]
+    public void ExtendedKanaKeepsItsOwnRomaji(string mora, string expected)
+    {
+        Assert.True(KanaRomanization.TryGetRomaji(mora, out var romaji));
+        Assert.Equal(expected, romaji);
+    }
+
+    [Theory]
+    [InlineData("si", "sh", "i")]
+    [InlineData("ti", "ch", "i")]
+    [InlineData("tu", "ts", "u")]
+    [InlineData("hu", "f", "u")]
+    [InlineData("wo", null, "o")]
+    public void KunreiRomajiExposesTheKanaVowelAndConsonant(string lyric, string? consonant, string vowel)
+    {
+        Assert.Equal(consonant, KanaRomanization.GetConsonant(lyric));
+        Assert.Equal(vowel, KanaRomanization.GetVowel(lyric));
+    }
+
+    [Theory]
     [InlineData("a あ", "あ")]
     [InlineData("- あ", "あ")]
     [InlineData("a カ", "か")]
