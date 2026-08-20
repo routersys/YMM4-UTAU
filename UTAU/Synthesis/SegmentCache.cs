@@ -37,12 +37,12 @@ internal sealed class SegmentCache(long budgetBytes)
         {
             if (!entries.TryGetValue(key, out var node))
                 return false;
-            if (node.Value.Samples.Length != destination.Length)
+            if (node.Value.Samples.Length < destination.Length)
                 return false;
 
             order.Remove(node);
             order.AddFirst(node);
-            node.Value.Samples.CopyTo(destination);
+            node.Value.Samples.AsSpan(0, destination.Length).CopyTo(destination);
             return true;
         }
     }

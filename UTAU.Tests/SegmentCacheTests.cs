@@ -90,6 +90,49 @@ public sealed class SegmentCacheTests : IDisposable
         Assert.Equal(fresh.Render(units).Samples, cached);
     }
 
+    static UTAUNote[] LongScore(int phrases)
+    {
+        var notes = new List<UTAUNote>();
+        for (var phrase = 0; phrase < phrases; phrase++)
+        {
+            if (phrase > 0)
+                notes.Add(new UTAUNote { Lyric = UTAUNote.RestLyric, LengthTicks = 240, Tone = 60 });
+            notes.Add(new UTAUNote { Lyric = "あ", LengthTicks = 240, Tone = 60 });
+            notes.Add(new UTAUNote { Lyric = "か", LengthTicks = 240, Tone = 62 });
+        }
+        return [.. notes];
+    }
+
+    [Fact]
+    public void ShiftingTheWholeScoreReusesEveryLaterSegment()
+    {
+        var bank = Bank();
+        var notes = LongScore(8);
+
+        Render(bank, notes);
+        var before = segments.Count;
+
+        notes[0].PreutteranceOverride = 200.0;
+        Render(bank, notes);
+
+        Assert.Equal(before + 1, segments.Count);
+    }
+
+    [Fact]
+    public void AnEditThatMovesLaterNotesRebuildsFewerThanEverySegment()
+    {
+        var bank = Bank();
+        var notes = LongScore(8);
+
+        Render(bank, notes);
+        var before = segments.Count;
+
+        notes[0].LengthTicks = 480;
+        Render(bank, notes);
+
+        Assert.True(segments.Count - before < before, $"rebuilt={segments.Count - before} of {before}");
+    }
+
     [Fact]
     public void EditingOneNoteLeavesTheOtherSegmentCached()
     {

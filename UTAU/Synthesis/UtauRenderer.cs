@@ -185,7 +185,7 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
             samples);
 
         if (key is not null)
-            segmentCache.Store(key, samples.AsSpan(start, length));
+            segmentCache.Store(key, state.Buffers.Output.AsSpan(0, produced));
     }
 
     static int ToSampleIndex(int frame, double framePeriod, int sampleRate)
@@ -199,6 +199,7 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
         double framePeriod,
         int sampleRate)
     {
+        var origin = offset + segment.StartFrame * framePeriod;
         var units = new UnitKey[segment.TimingIndices.Count];
 
         for (var i = 0; i < units.Length; i++)
@@ -219,11 +220,11 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
                         request.RegionEnd,
                         request.ConsonantEnd)
                     : null,
-                timing.AudioStartMilliseconds,
+                timing.AudioStartMilliseconds - origin,
                 timing.RenderLengthMilliseconds,
                 timing.FadeInMilliseconds,
                 timing.FadeOutMilliseconds,
-                unit.NoteStartMilliseconds,
+                unit.NoteStartMilliseconds - origin,
                 unit.NoteLengthMilliseconds,
                 unit.Tone,
                 note.LengthTicks,
@@ -234,7 +235,7 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
                 [.. note.PitchPoints]);
         }
 
-        return new SegmentKey(settings, segment.StartFrame, segment.FrameCount, sampleRate, offset, framePeriod, units);
+        return new SegmentKey(settings, segment.FrameCount, sampleRate, framePeriod, units);
     }
 
     static IReadOnlyList<Segment> BuildSegments(

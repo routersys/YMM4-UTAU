@@ -93,27 +93,21 @@ internal sealed class SegmentKey : IEquatable<SegmentKey>
 
     public SegmentKey(
         RenderSettings settings,
-        int startFrame,
         int frameCount,
         int sampleRate,
-        double offset,
         double framePeriod,
         UnitKey[] units)
     {
         Settings = settings;
-        StartFrame = startFrame;
         FrameCount = frameCount;
         SampleRate = sampleRate;
-        Offset = offset;
         FramePeriod = framePeriod;
         this.units = units;
 
         var code = new HashCode();
         code.Add(settings);
-        code.Add(startFrame);
         code.Add(frameCount);
         code.Add(sampleRate);
-        code.Add(offset);
         code.Add(framePeriod);
         foreach (var unit in units)
             code.Add(unit);
@@ -122,13 +116,9 @@ internal sealed class SegmentKey : IEquatable<SegmentKey>
 
     public RenderSettings Settings { get; }
 
-    public int StartFrame { get; }
-
     public int FrameCount { get; }
 
     public int SampleRate { get; }
-
-    public double Offset { get; }
 
     public double FramePeriod { get; }
 
@@ -136,10 +126,8 @@ internal sealed class SegmentKey : IEquatable<SegmentKey>
         => other is not null
             && hash == other.hash
             && Settings == other.Settings
-            && StartFrame == other.StartFrame
             && FrameCount == other.FrameCount
             && SampleRate == other.SampleRate
-            && Offset.Equals(other.Offset)
             && FramePeriod.Equals(other.FramePeriod)
             && units.AsSpan().SequenceEqual(other.units.AsSpan());
 
