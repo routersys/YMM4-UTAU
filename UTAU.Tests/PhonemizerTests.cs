@@ -307,7 +307,7 @@ public sealed class PhonemizerTests : IDisposable
     [Fact]
     public void VoicedConsonantNotesLeaveTheFollowingNotePlain()
     {
-        var bank = TestVoiceBank.CreateCvvcBank(directory);
+        var bank = TestVoiceBank.CreateVcvAndCvvcBank(directory);
         var units = Phonemize(bank, Lyrics("か", "a k", "あ"));
 
         Assert.Equal(["か", "a k", "あ", "a -"], units.Select(x => x.Alias));
