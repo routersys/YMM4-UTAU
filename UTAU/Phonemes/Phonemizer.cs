@@ -73,7 +73,7 @@ internal static class Phonemizer
             if (vowel is null || consonant is null)
                 continue;
 
-            var entry = AliasResolver.ResolveTransition(bank, vowel, consonant, current.Tone, color, out var alias);
+            var entry = AliasResolver.ResolveTransition(bank, vowel, consonant, current.Tone, color, current.Note.IgnorePrefixMap, out var alias);
             if (entry is null)
                 continue;
 
@@ -105,7 +105,7 @@ internal static class Phonemizer
         if (vowel is null)
             return;
 
-        var entry = AliasResolver.ResolveTransition(bank, vowel, KanaRomanization.SilenceConsonant, last.Tone, color, out var alias);
+        var entry = AliasResolver.ResolveTransition(bank, vowel, KanaRomanization.SilenceConsonant, last.Tone, color, last.Note.IgnorePrefixMap, out var alias);
         if (entry is null)
             return;
 

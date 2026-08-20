@@ -60,9 +60,9 @@ internal static class AliasResolver
             yield return romaji;
     }
 
-    public static OtoEntry? ResolveTransition(VoiceBank bank, string vowel, string consonant, int tone, string? color, out string alias)
+    public static OtoEntry? ResolveTransition(VoiceBank bank, string vowel, string consonant, int tone, string? color, bool ignorePrefixMap, out string alias)
     {
         alias = vowel + " " + consonant;
-        return bank.Resolve(alias, tone, color);
+        return bank.Resolve(alias, tone, color, ignorePrefixMap);
     }
 }

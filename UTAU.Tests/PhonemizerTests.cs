@@ -347,6 +347,41 @@ public sealed class PhonemizerTests : IDisposable
     }
 
     [Fact]
+    public void TheIgnoredPrefixMapFollowsTheNoteThatOwnsEachUnit()
+    {
+        TestVoiceBank.WriteText(directory, VoiceBankLoader.CharacterFileName, "name=owner\r\n");
+        TestVoiceBank.WriteText(directory, VoiceBankLoader.PrefixMapFileName, "C4\t\t_C4\r\n");
+        TestVoiceBank.WriteText(
+            directory,
+            VoiceBankLoader.OtoFileName,
+            string.Join("\r\n",
+            [
+                "a.wav=あ,50,80,-500,100,40",
+                "am.wav=あ_C4,50,80,-500,100,40",
+                "ka.wav=か,50,120,-500,140,50",
+                "kam.wav=か_C4,50,120,-500,140,50",
+                "ak.wav=a k,50,40,-200,60,20",
+                "akm.wav=a k_C4,50,40,-200,60,20",
+                "ae.wav=a -,50,40,-200,60,20",
+                "aem.wav=a -_C4,50,40,-200,60,20",
+            ]));
+        foreach (var name in new[] { "a.wav", "am.wav", "ka.wav", "kam.wav", "ak.wav", "akm.wav", "ae.wav", "aem.wav" })
+            TestVoiceBank.WriteSample(directory, name);
+        var bank = VoiceBankLoader.Load("owner", directory);
+
+        var mapped = Lyrics("あ", "か");
+        Assert.Equal(["あ_C4", "a k_C4", "か_C4", "a -_C4"], Phonemize(bank, mapped).Select(x => x.Entry?.Alias));
+
+        var firstIgnored = Lyrics("あ", "か");
+        firstIgnored[0].IgnorePrefixMap = true;
+        Assert.Equal(["あ", "a k", "か_C4", "a -_C4"], Phonemize(bank, firstIgnored).Select(x => x.Entry?.Alias));
+
+        var lastIgnored = Lyrics("あ", "か");
+        lastIgnored[1].IgnorePrefixMap = true;
+        Assert.Equal(["あ_C4", "a k_C4", "か", "a -"], Phonemize(bank, lastIgnored).Select(x => x.Entry?.Alias));
+    }
+
+    [Fact]
     public void TheWildcardAliasIsUsedWhenThePreviousVowelHasNoEntry()
     {
         TestVoiceBank.WriteText(directory, VoiceBankLoader.CharacterFileName, "name=wild\r\n");
