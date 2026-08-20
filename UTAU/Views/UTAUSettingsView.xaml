@@ -153,6 +153,7 @@
                         <RowDefinition Height="26"/>
                         <RowDefinition Height="26"/>
                         <RowDefinition Height="26"/>
+                        <RowDefinition Height="26"/>
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="{x:Static root:Texts.F0EstimatorLabel}" VerticalAlignment="Center"/>
                     <c:EnumComboBox Grid.Row="0" Grid.Column="1" EnumType="{x:Type syn:F0Estimator}"
@@ -168,6 +169,11 @@
                         <Button Width="26" Command="{Binding ClearCacheCommand}" ToolTip="{x:Static root:Texts.ClearCache}"
                                 Content="{DynamicResource {x:Static icons:IconKeys.Delete}}"/>
                     </StackPanel>
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="{x:Static root:Texts.SegmentCacheLabel}" VerticalAlignment="Center"/>
+                    <c:TextBoxSlider Grid.Row="3" Grid.Column="1" Width="160" HorizontalAlignment="Left"
+                                     Value="{Binding Settings.SegmentCacheMegabytes}"
+                                     StringFormat="F0" Unit="MB" DefaultValue="256"
+                                     DefaultMin="64" DefaultMax="4096" Min="64" Max="4096" Delay="-1"/>
                 </Grid>
             </Expander>
 

@@ -73,6 +73,7 @@
 <data name="StretchModeStretchDescription" xml:space="preserve"><value>Scales the sustained region uniformly in time.</value></data>
 <data name="EngineSettings" xml:space="preserve"><value>Engine settings</value></data>
 <data name="AnalysisCacheLabel" xml:space="preserve"><value>Analysis cache</value></data>
+<data name="SegmentCacheLabel" xml:space="preserve"><value>Synthesis reuse</value></data>
 <data name="ClearCache" xml:space="preserve"><value>Clear the cache</value></data>
 <data name="SearchDirectories" xml:space="preserve"><value>Search folders</value></data>
 <data name="AddDirectory" xml:space="preserve"><value>Add a folder</value></data>

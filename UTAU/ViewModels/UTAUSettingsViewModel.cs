@@ -20,7 +20,11 @@ internal sealed class UTAUSettingsViewModel : Bindable
         AddDirectoryCommand = new ActionCommand(_ => !IsLoading, _ => AddDirectory());
         RemoveDirectoryCommand = new ActionCommand(_ => SelectedDirectory is not null, _ => RemoveDirectory());
         OpenDefaultDirectoryCommand = new ActionCommand(_ => true, _ => OpenDefaultDirectory());
-        ClearCacheCommand = new ActionCommand(_ => true, _ => AnalysisCache.Shared.Clear());
+        ClearCacheCommand = new ActionCommand(_ => true, _ =>
+        {
+            AnalysisCache.Shared.Clear();
+            SegmentCache.Shared.Clear();
+        });
         UpdateBanks();
     }
 

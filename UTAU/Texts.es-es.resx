@@ -73,6 +73,7 @@
 <data name="StretchModeStretchDescription" xml:space="preserve"><value>Escala la región sostenida de forma uniforme en el tiempo.</value></data>
 <data name="EngineSettings" xml:space="preserve"><value>Ajustes del motor</value></data>
 <data name="AnalysisCacheLabel" xml:space="preserve"><value>Caché de análisis</value></data>
+<data name="SegmentCacheLabel" xml:space="preserve"><value>Reutilización de síntesis</value></data>
 <data name="ClearCache" xml:space="preserve"><value>Vaciar la caché</value></data>
 <data name="SearchDirectories" xml:space="preserve"><value>Carpetas de búsqueda</value></data>
 <data name="AddDirectory" xml:space="preserve"><value>Añadir una carpeta</value></data>

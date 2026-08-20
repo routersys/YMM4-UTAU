@@ -13,6 +13,7 @@ StretchModeStretch,,ストレッチ,Stretch,拉伸,拉伸,스트레치,Estiramie
 StretchModeStretchDescription,,伸ばす区間の時間を一様に引き伸ばします。,Scales the sustained region uniformly in time.,将延长区间的时间均匀拉伸。,將延長區間的時間均勻拉伸。,늘리는 구간의 시간을 균일하게 늘립니다.,Escala la región sostenida de forma uniforme en el tiempo.,يمدد زمن المقطع الممتد بشكل منتظم.,Meregangkan waktu bagian sustain secara seragam.
 EngineSettings,,エンジン設定,Engine settings,引擎设置,引擎設定,엔진 설정,Ajustes del motor,إعدادات المحرك,Pengaturan mesin
 AnalysisCacheLabel,,解析キャッシュ,Analysis cache,解析缓存,解析快取,해석 캐시,Caché de análisis,ذاكرة التحليل المؤقتة,Cache analisis
+SegmentCacheLabel,,合成の再利用,Synthesis reuse,合成复用,合成重複使用,합성 재사용,Reutilización de síntesis,إعادة استخدام التركيب,Penggunaan ulang sintesis
 ClearCache,,キャッシュを破棄,Clear the cache,清除缓存,清除快取,캐시 삭제,Vaciar la caché,مسح الذاكرة المؤقتة,Hapus cache
 SearchDirectories,,探索フォルダ,Search folders,搜索文件夹,搜尋資料夾,탐색 폴더,Carpetas de búsqueda,مجلدات البحث,Folder pencarian
 AddDirectory,,フォルダを追加,Add a folder,添加文件夹,新增資料夾,폴더 추가,Añadir una carpeta,إضافة مجلد,Tambah folder

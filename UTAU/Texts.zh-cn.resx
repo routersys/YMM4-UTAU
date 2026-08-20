@@ -73,6 +73,7 @@
 <data name="StretchModeStretchDescription" xml:space="preserve"><value>将延长区间的时间均匀拉伸。</value></data>
 <data name="EngineSettings" xml:space="preserve"><value>引擎设置</value></data>
 <data name="AnalysisCacheLabel" xml:space="preserve"><value>解析缓存</value></data>
+<data name="SegmentCacheLabel" xml:space="preserve"><value>合成复用</value></data>
 <data name="ClearCache" xml:space="preserve"><value>清除缓存</value></data>
 <data name="SearchDirectories" xml:space="preserve"><value>搜索文件夹</value></data>
 <data name="AddDirectory" xml:space="preserve"><value>添加文件夹</value></data>

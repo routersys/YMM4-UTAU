@@ -73,6 +73,7 @@
 <data name="StretchModeStretchDescription" xml:space="preserve"><value>伸ばす区間の時間を一様に引き伸ばします。</value></data>
 <data name="EngineSettings" xml:space="preserve"><value>エンジン設定</value></data>
 <data name="AnalysisCacheLabel" xml:space="preserve"><value>解析キャッシュ</value></data>
+<data name="SegmentCacheLabel" xml:space="preserve"><value>合成の再利用</value></data>
 <data name="ClearCache" xml:space="preserve"><value>キャッシュを破棄</value></data>
 <data name="SearchDirectories" xml:space="preserve"><value>探索フォルダ</value></data>
 <data name="AddDirectory" xml:space="preserve"><value>フォルダを追加</value></data>

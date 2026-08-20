@@ -73,6 +73,7 @@
 <data name="StretchModeStretchDescription" xml:space="preserve"><value>Meregangkan waktu bagian sustain secara seragam.</value></data>
 <data name="EngineSettings" xml:space="preserve"><value>Pengaturan mesin</value></data>
 <data name="AnalysisCacheLabel" xml:space="preserve"><value>Cache analisis</value></data>
+<data name="SegmentCacheLabel" xml:space="preserve"><value>Penggunaan ulang sintesis</value></data>
 <data name="ClearCache" xml:space="preserve"><value>Hapus cache</value></data>
 <data name="SearchDirectories" xml:space="preserve"><value>Folder pencarian</value></data>
 <data name="AddDirectory" xml:space="preserve"><value>Tambah folder</value></data>

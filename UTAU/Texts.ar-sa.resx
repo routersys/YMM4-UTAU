@@ -73,6 +73,7 @@
 <data name="StretchModeStretchDescription" xml:space="preserve"><value>يمدد زمن المقطع الممتد بشكل منتظم.</value></data>
 <data name="EngineSettings" xml:space="preserve"><value>إعدادات المحرك</value></data>
 <data name="AnalysisCacheLabel" xml:space="preserve"><value>ذاكرة التحليل المؤقتة</value></data>
+<data name="SegmentCacheLabel" xml:space="preserve"><value>إعادة استخدام التركيب</value></data>
 <data name="ClearCache" xml:space="preserve"><value>مسح الذاكرة المؤقتة</value></data>
 <data name="SearchDirectories" xml:space="preserve"><value>مجلدات البحث</value></data>
 <data name="AddDirectory" xml:space="preserve"><value>إضافة مجلد</value></data>

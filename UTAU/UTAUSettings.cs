@@ -15,6 +15,7 @@ internal sealed class UTAUSettings : SettingsBase<UTAUSettings>
     F0Estimator f0Estimator = F0Estimator.Harvest;
     StretchMode stretchMode = StretchMode.Loop;
     int analysisCacheMegabytes = 512;
+    int segmentCacheMegabytes = 256;
 
     public override SettingsCategory Category => SettingsCategory.Voice;
 
@@ -48,9 +49,23 @@ internal sealed class UTAUSettings : SettingsBase<UTAUSettings>
         }
     }
 
+    public int SegmentCacheMegabytes
+    {
+        get => segmentCacheMegabytes;
+        set
+        {
+            if (Set(ref segmentCacheMegabytes, Math.Clamp(value, MinimumCacheMegabytes, MaximumCacheMegabytes)))
+                ApplyCacheBudget();
+        }
+    }
+
     public override void Initialize() => ApplyCacheBudget();
 
-    void ApplyCacheBudget() => AnalysisCache.Shared.BudgetBytes = (long)analysisCacheMegabytes * 1024 * 1024;
+    void ApplyCacheBudget()
+    {
+        AnalysisCache.Shared.BudgetBytes = (long)analysisCacheMegabytes * 1024 * 1024;
+        SegmentCache.Shared.BudgetBytes = (long)segmentCacheMegabytes * 1024 * 1024;
+    }
 
     public IReadOnlyList<string> EnumerateSearchDirectories()
     {
