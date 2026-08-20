@@ -5,7 +5,6 @@ using UTAU.Notes;
 using UTAU.Phonemes;
 using UTAU.Synthesis;
 using UTAU.ViewModels;
-using WorldNet;
 
 namespace UTAU.Tests;
 
@@ -457,9 +456,8 @@ public sealed class CurveRenderingTests : IDisposable
     {
         var notes = NoteSequenceBuilder.Build("<!C4:1/4>あ", NoteBuildOptions.Create(60));
         var units = Phonemizer.Phonemize(bank, TempoMap.Create(notes, TimeBase.Default), null, PhonemizeOptions.Default);
-        using var arena = new WorldArena();
         var settings = RenderSettings.Default with { Estimator = F0Estimator.Dio };
-        return new UtauRenderer(settings, curves, cache, new SegmentCache(SegmentCache.DefaultBudgetBytes)).Render(units, arena).Samples;
+        return new UtauRenderer(settings, curves, cache, new SegmentCache(SegmentCache.DefaultBudgetBytes)).Render(units).Samples;
     }
 
     [Fact]

@@ -2,7 +2,6 @@ using UTAU.Models;
 using UTAU.Notes;
 using UTAU.Phonemes;
 using UTAU.Synthesis;
-using WorldNet;
 using YukkuriMovieMaker.Commons;
 using YukkuriMovieMaker.Plugin.Voice;
 
@@ -90,9 +89,8 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
             parameter.Breathiness,
             parameter.Brightness);
 
-        using var arena = new WorldArena();
         var renderer = new UtauRenderer(settings, BuildCurves(pronounce, tempoMap), AnalysisCache.Shared, SegmentCache.Shared);
-        var result = renderer.Render(units, arena);
+        var result = renderer.Render(units);
         if (result.Samples.Length == 0)
             throw new InvalidOperationException(unresolved.Length > 0 ? unresolved : Texts.NoRenderableNoteMessage);
 

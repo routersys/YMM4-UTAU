@@ -38,16 +38,47 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
         double RegionEnd,
         double ConsonantEnd);
 
+    sealed class RenderState : IDisposable
+    {
+        public required WorldArena Arena { get; init; }
+
+        public required SegmentBuffers Buffers { get; init; }
+
+        public required double[] FrameSpectrum { get; init; }
+
+        public required double[] WarpedSpectrum { get; init; }
+
+        public required double[] FrameAperiodicity { get; init; }
+
+        public static RenderState Create(int widest, int spectrumSize, int outputSamples) => new()
+        {
+            Arena = new WorldArena(),
+            Buffers = new SegmentBuffers(
+                new double[widest],
+                new double[(long)widest * spectrumSize],
+                new double[(long)widest * spectrumSize],
+                new double[widest],
+                new double[widest],
+                new double[widest],
+                new double[outputSamples]),
+            FrameSpectrum = new double[spectrumSize],
+            WarpedSpectrum = new double[spectrumSize],
+            FrameAperiodicity = new double[spectrumSize],
+        };
+
+        public void Dispose() => Arena.Dispose();
+    }
+
+    const long RenderBufferBudgetBytes = 768L * 1024 * 1024;
     const long MaximumFrameElements = 1L << 24;
     const double FrameCountEpsilon = 1e-9;
     const int SegmentGapFrames = 10;
 
     readonly Dictionary<string, AudioSample> loadedSamples = new(StringComparer.OrdinalIgnoreCase);
 
-    public RenderResult Render(IReadOnlyList<PhonemeUnit> units, WorldArena arena)
+    public RenderResult Render(IReadOnlyList<PhonemeUnit> units)
     {
         ArgumentNullException.ThrowIfNull(units);
-        ArgumentNullException.ThrowIfNull(arena);
 
         var timings = UnitTimingBuilder.Build(units);
         if (timings.Count == 0)
@@ -76,58 +107,85 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
 
         var outputLength = ToSampleIndex(frameCount - 1, framePeriod, sampleRate) + 1;
         var samples = new double[outputLength];
-        var frameSpectrum = new double[spectrumSize];
-        var warpedSpectrum = new double[spectrumSize];
-        var frameAperiodicity = new double[spectrumSize];
-
         var widest = segments.Max(x => x.FrameCount);
-        var buffers = new SegmentBuffers(
-            new double[widest],
-            new double[widest * spectrumSize],
-            new double[widest * spectrumSize],
-            new double[widest],
-            new double[widest],
-            new double[widest],
-            new double[ToSampleIndex(widest - 1, framePeriod, sampleRate) + 1]);
-
         var cacheable = ReferenceEquals(curves, RenderCurves.Empty);
+        var outputSamples = ToSampleIndex(widest - 1, framePeriod, sampleRate) + 1;
 
-        foreach (var segment in segments)
-        {
-            var produced = ToSampleIndex(segment.FrameCount - 1, framePeriod, sampleRate) + 1;
-            var start = ToSampleIndex(segment.StartFrame, framePeriod, sampleRate);
-            var length = Math.Min(produced, samples.Length - start);
-            if (length <= 0)
-                continue;
-
-            var key = cacheable
-                ? BuildSegmentKey(segment, timings, requests, offset, framePeriod, sampleRate)
-                : null;
-
-            if (key is not null && segmentCache.TryCopyInto(key, samples.AsSpan(start, length)))
-                continue;
-
-            RenderSegment(
-                segment,
-                timings,
-                requests,
-                arena,
-                offset,
-                framePeriod,
-                sampleRate,
-                fftSize,
-                spectrumSize,
-                frameSpectrum,
-                warpedSpectrum,
-                frameAperiodicity,
-                buffers,
-                samples);
-
-            if (key is not null)
-                segmentCache.Store(key, samples.AsSpan(start, length));
-        }
+        Parallel.For(
+            0,
+            segments.Count,
+            new ParallelOptions { MaxDegreeOfParallelism = DetermineParallelism(widest, spectrumSize, segments.Count) },
+            () => RenderState.Create(widest, spectrumSize, outputSamples),
+            (index, _, state) =>
+            {
+                var limit = index + 1 < segments.Count
+                    ? ToSampleIndex(segments[index + 1].StartFrame, framePeriod, sampleRate)
+                    : samples.Length;
+                RenderOne(segments[index], limit, timings, requests, state, offset, framePeriod, sampleRate, fftSize, spectrumSize, samples, cacheable);
+                return state;
+            },
+            state => state.Dispose());
 
         return new RenderResult(samples, sampleRate, timings, offset);
+    }
+
+    static int DetermineParallelism(int widest, int spectrumSize, int segmentCount)
+    {
+        var perWorker = (long)widest * spectrumSize * sizeof(double) * 2;
+        if (perWorker <= 0)
+            return 1;
+
+        var affordable = (int)Math.Clamp(RenderBufferBudgetBytes / perWorker, 1, Environment.ProcessorCount);
+        return Math.Min(affordable, Math.Max(segmentCount, 1));
+    }
+
+    void RenderOne(
+        Segment segment,
+        int outputLimit,
+        IReadOnlyList<UnitTiming> timings,
+        IReadOnlyList<AnalysisRequest?> requests,
+        RenderState state,
+        double offset,
+        double framePeriod,
+        int sampleRate,
+        int fftSize,
+        int spectrumSize,
+        double[] samples,
+        bool cacheable)
+    {
+        var produced = ToSampleIndex(segment.FrameCount - 1, framePeriod, sampleRate) + 1;
+        var start = ToSampleIndex(segment.StartFrame, framePeriod, sampleRate);
+        var length = Math.Min(Math.Min(produced, samples.Length - start), outputLimit - start);
+        if (length <= 0)
+            return;
+
+        var key = cacheable
+            ? BuildSegmentKey(segment, timings, requests, offset, framePeriod, sampleRate)
+            : null;
+
+        if (key is not null && segmentCache.TryCopyInto(key, samples.AsSpan(start, length)))
+            return;
+
+        RenderSegment(
+            segment,
+            start,
+            length,
+            timings,
+            requests,
+            state.Arena,
+            offset,
+            framePeriod,
+            sampleRate,
+            fftSize,
+            spectrumSize,
+            state.FrameSpectrum,
+            state.WarpedSpectrum,
+            state.FrameAperiodicity,
+            state.Buffers,
+            samples);
+
+        if (key is not null)
+            segmentCache.Store(key, samples.AsSpan(start, length));
     }
 
     static int ToSampleIndex(int frame, double framePeriod, int sampleRate)
@@ -215,6 +273,8 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
 
     void RenderSegment(
         Segment segment,
+        int outputStart,
+        int outputLength,
         IReadOnlyList<UnitTiming> timings,
         IReadOnlyList<AnalysisRequest?> requests,
         WorldArena arena,
@@ -284,10 +344,7 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
             output,
             arena);
 
-        var start = ToSampleIndex(segment.StartFrame, framePeriod, sampleRate);
-        var length = Math.Min(produced, samples.Length - start);
-        if (length > 0)
-            Array.Copy(buffers.Output, 0, samples, start, length);
+        Array.Copy(buffers.Output, 0, samples, outputStart, outputLength);
     }
 
     void AccumulateUnit(

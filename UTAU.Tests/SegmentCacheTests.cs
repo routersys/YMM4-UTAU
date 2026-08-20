@@ -3,7 +3,6 @@ using UTAU.Models;
 using UTAU.Notes;
 using UTAU.Phonemes;
 using UTAU.Synthesis;
-using WorldNet;
 
 namespace UTAU.Tests;
 
@@ -51,13 +50,12 @@ public sealed class SegmentCacheTests : IDisposable
     double[] Render(VoiceBank bank, UTAUNote[] notes, RenderSettings? settings = null)
     {
         var units = Phonemizer.Phonemize(bank, TempoMap.Create(notes, TimeBase.Default), null, PhonemizeOptions.Default);
-        using var arena = new WorldArena();
         var renderer = new UtauRenderer(
             settings ?? RenderSettings.Default with { Estimator = F0Estimator.Dio },
             RenderCurves.Empty,
             analysis,
             segments);
-        return renderer.Render(units, arena).Samples;
+        return renderer.Render(units).Samples;
     }
 
     [Fact]
@@ -87,10 +85,9 @@ public sealed class SegmentCacheTests : IDisposable
             RenderCurves.Empty,
             analysis,
             new SegmentCache(SegmentCache.DefaultBudgetBytes));
-        using var arena = new WorldArena();
         var units = Phonemizer.Phonemize(bank, TempoMap.Create(notes, TimeBase.Default), null, PhonemizeOptions.Default);
 
-        Assert.Equal(fresh.Render(units, arena).Samples, cached);
+        Assert.Equal(fresh.Render(units).Samples, cached);
     }
 
     [Fact]
@@ -159,13 +156,12 @@ public sealed class SegmentCacheTests : IDisposable
     double[] RenderFresh(VoiceBank bank, UTAUNote[] notes, RenderSettings? settings = null)
     {
         var units = Phonemizer.Phonemize(bank, TempoMap.Create(notes, TimeBase.Default), null, PhonemizeOptions.Default);
-        using var arena = new WorldArena();
         var renderer = new UtauRenderer(
             settings ?? RenderSettings.Default with { Estimator = F0Estimator.Dio },
             RenderCurves.Empty,
             analysis,
             new SegmentCache(SegmentCache.DefaultBudgetBytes));
-        return renderer.Render(units, arena).Samples;
+        return renderer.Render(units).Samples;
     }
 
     [Theory]
