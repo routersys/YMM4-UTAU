@@ -40,11 +40,12 @@ internal static class Phonemizer
                 continue;
             }
 
-            var entry = AliasResolver.Resolve(bank, note.Lyric, previousVowel, note.Tone, color, out var alias);
+            var context = note.SuppressAutoVcv ? string.Empty : previousVowel;
+            var entry = AliasResolver.Resolve(bank, note.Lyric, context, note.Tone, color, note.IgnorePrefixMap, out var alias);
             units.Add(new PhonemeUnit(note, entry, alias, start, length, start, length, note.Tone));
 
             var vowel = KanaRomanization.GetVowel(note.Lyric);
-            previousVowel = entry is null || vowel is null ? KanaRomanization.StartVowel : vowel;
+            previousVowel = entry is null ? KanaRomanization.StartVowel : vowel ?? string.Empty;
         }
 
         InsertTransitions(bank, units, color, options);

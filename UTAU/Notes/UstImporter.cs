@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using UTAU.Models;
 
 namespace UTAU.Notes;
@@ -67,9 +68,12 @@ internal static class UstImporter
 
     static UTAUNote CreateNote(UstSection section, int lengthTicks, TimeBase timeBase)
     {
+        var lyric = ReadLyric(section.Find(UstKeys.Lyric));
         var note = new UTAUNote
         {
-            Lyric = NormalizeLyric(section.Find(UstKeys.Lyric)),
+            Lyric = lyric.Text,
+            IgnorePrefixMap = lyric.IgnorePrefixMap,
+            SuppressAutoVcv = lyric.SuppressAutoVcv,
             LengthTicks = lengthTicks,
             Tone = ParseInteger(section.Find(UstKeys.NoteNum)) ?? MusicalTone.MiddleC.NoteNumber,
         };
@@ -204,13 +208,48 @@ internal static class UstImporter
 
     static bool IsUsableTempo(double? tempo) => tempo is > 0.0 and <= MaximumDeclaredTempo;
 
-    static string NormalizeLyric(string? text)
+    static (string Text, bool IgnorePrefixMap, bool SuppressAutoVcv) ReadLyric(string? text)
     {
         var lyric = (text ?? string.Empty).Trim();
-        while (lyric.Length > 0 && lyric[0] is UstKeys.IgnorePrefixMapMarker or UstKeys.SuppressAutoVcvMarker)
-            lyric = lyric[1..].Trim();
+        var ignorePrefixMap = false;
+        var suppressAutoVcv = false;
 
-        return lyric.Equals(UstKeys.RestLyric, StringComparison.OrdinalIgnoreCase) ? UTAUNote.RestLyric : lyric;
+        while (lyric.Length > 0 && lyric[0] is UstKeys.IgnorePrefixMapMarker or UstKeys.SuppressAutoVcvMarker)
+        {
+            ignorePrefixMap |= lyric[0] == UstKeys.IgnorePrefixMapMarker;
+            suppressAutoVcv |= lyric[0] == UstKeys.SuppressAutoVcvMarker;
+            lyric = lyric[1..].Trim();
+        }
+
+        return (NormalizeLyric(lyric), ignorePrefixMap, suppressAutoVcv);
+    }
+
+    static string NormalizeLyric(string lyric)
+    {
+        if (lyric.Equals(UstKeys.RestLyric, StringComparison.OrdinalIgnoreCase))
+            return UTAUNote.RestLyric;
+
+        var normalized = lyric.Normalize(NormalizationForm.FormC);
+        var builder = new StringBuilder(normalized.Length);
+        var pendingSpace = false;
+
+        foreach (var c in normalized)
+        {
+            if (char.IsWhiteSpace(c))
+            {
+                pendingSpace = builder.Length > 0;
+                continue;
+            }
+
+            if (pendingSpace)
+            {
+                builder.Append(' ');
+                pendingSpace = false;
+            }
+            builder.Append(c);
+        }
+
+        return builder.ToString();
     }
 
     static (double Milliseconds, double Cents) ParsePitchBendStart(string? text)

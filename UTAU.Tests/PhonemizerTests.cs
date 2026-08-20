@@ -145,6 +145,18 @@ public sealed class AliasResolverTests
     }
 
     [Fact]
+    public void TheWildcardFormFollowsARealPreviousVowel()
+    {
+        var following = AliasResolver.EnumerateCandidates("か", "a").ToArray();
+        Assert.Contains("* か", following);
+        Assert.True(Array.IndexOf(following, "* か") > Array.IndexOf(following, "a か"));
+        Assert.True(Array.IndexOf(following, "* か") < Array.IndexOf(following, "か"));
+
+        Assert.DoesNotContain("* か", AliasResolver.EnumerateCandidates("か", "-").ToArray());
+        Assert.DoesNotContain("* か", AliasResolver.EnumerateCandidates("か", string.Empty).ToArray());
+    }
+
+    [Fact]
     public void AddedCandidatesStayDistinct()
     {
         var candidates = AliasResolver.EnumerateCandidates("a カ", "i").ToArray();
@@ -290,6 +302,63 @@ public sealed class PhonemizerTests : IDisposable
         var units = Phonemize(bank, Lyrics("あ", "か"));
 
         Assert.Equal(["- あ", "a か", "a -"], units.Select(x => x.Alias));
+    }
+
+    [Fact]
+    public void VoicedConsonantNotesLeaveTheFollowingNotePlain()
+    {
+        var bank = TestVoiceBank.CreateCvvcBank(directory);
+        var units = Phonemize(bank, Lyrics("か", "a k", "あ"));
+
+        Assert.Equal(["か", "a k", "あ", "a -"], units.Select(x => x.Alias));
+    }
+
+    [Fact]
+    public void SuppressedAutoVcvKeepsTheWrittenLyric()
+    {
+        var bank = TestVoiceBank.CreateVcvAndCvvcBank(directory);
+        var plain = Phonemize(bank, Lyrics("あ", "か"));
+        Assert.Equal(["- あ", "a か", "a -"], plain.Select(x => x.Alias));
+
+        var notes = Lyrics("あ", "か");
+        notes[1].SuppressAutoVcv = true;
+        Assert.Equal(["- あ", "a k", "か", "a -"], Phonemize(bank, notes).Select(x => x.Alias));
+    }
+
+    [Fact]
+    public void IgnoredPrefixMapFallsBackToTheUnmappedAlias()
+    {
+        TestVoiceBank.WriteText(directory, VoiceBankLoader.CharacterFileName, "name=map\r\n");
+        TestVoiceBank.WriteText(directory, VoiceBankLoader.PrefixMapFileName, "C4\t\t_C4\r\n");
+        TestVoiceBank.WriteText(
+            directory,
+            VoiceBankLoader.OtoFileName,
+            "a.wav=あ,50,80,-500,100,40\r\nam.wav=あ_C4,50,80,-500,100,40");
+        TestVoiceBank.WriteSample(directory, "a.wav");
+        TestVoiceBank.WriteSample(directory, "am.wav");
+        var bank = VoiceBankLoader.Load("map", directory);
+
+        var mapped = Lyrics("あ");
+        Assert.Equal("あ_C4", Phonemize(bank, mapped)[0].Entry?.Alias);
+
+        var ignored = Lyrics("あ");
+        ignored[0].IgnorePrefixMap = true;
+        Assert.Equal("あ", Phonemize(bank, ignored)[0].Entry?.Alias);
+    }
+
+    [Fact]
+    public void TheWildcardAliasIsUsedWhenThePreviousVowelHasNoEntry()
+    {
+        TestVoiceBank.WriteText(directory, VoiceBankLoader.CharacterFileName, "name=wild\r\n");
+        TestVoiceBank.WriteText(
+            directory,
+            VoiceBankLoader.OtoFileName,
+            "s.wav=- あ,50,80,-500,100,40\r\nw.wav=* か,50,120,-500,140,50");
+        TestVoiceBank.WriteSample(directory, "s.wav");
+        TestVoiceBank.WriteSample(directory, "w.wav");
+        var bank = VoiceBankLoader.Load("wild", directory);
+
+        Assert.Equal(["- あ", "* か"], Phonemize(bank, Lyrics("あ", "か")).Select(x => x.Alias));
     }
 
     [Fact]

@@ -4,6 +4,7 @@ internal static class KanaRomanization
 {
     public const string StartVowel = "-";
     public const string SilenceConsonant = "-";
+    public const string AnyVowel = "*";
     public const char AliasSeparator = ' ';
 
     static readonly Dictionary<string, string> Table = new(StringComparer.Ordinal)

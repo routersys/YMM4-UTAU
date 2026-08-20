@@ -71,18 +71,18 @@ internal sealed class VoiceBank
 
     public OtoEntry? Find(string alias) => aliases.GetValueOrDefault(alias);
 
-    public OtoEntry? Resolve(string lyric, int noteNumber, string? color)
+    public OtoEntry? Resolve(string lyric, int noteNumber, string? color, bool ignorePrefixMap = false)
     {
-        foreach (var alias in EnumerateAliasCandidates(lyric, noteNumber, color))
+        foreach (var alias in EnumerateAliasCandidates(lyric, noteNumber, color, ignorePrefixMap))
             if (aliases.TryGetValue(alias, out var entry))
                 return entry;
         return null;
     }
 
-    public IEnumerable<string> EnumerateAliasCandidates(string lyric, int noteNumber, string? color)
+    public IEnumerable<string> EnumerateAliasCandidates(string lyric, int noteNumber, string? color, bool ignorePrefixMap = false)
     {
         var seen = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var (prefix, suffix) in EnumerateAffixes(noteNumber, color))
+        foreach (var (prefix, suffix) in EnumerateAffixes(noteNumber, color, ignorePrefixMap))
         {
             var candidate = prefix + lyric + suffix;
             if (seen.Add(candidate))
@@ -90,7 +90,7 @@ internal sealed class VoiceBank
         }
     }
 
-    IEnumerable<(string Prefix, string Suffix)> EnumerateAffixes(int noteNumber, string? color)
+    IEnumerable<(string Prefix, string Suffix)> EnumerateAffixes(int noteNumber, string? color, bool ignorePrefixMap)
     {
         foreach (var subBank in SubBanks)
         {
@@ -99,7 +99,7 @@ internal sealed class VoiceBank
             yield return (subBank.Prefix, subBank.Suffix);
         }
 
-        if (PrefixMap is not null)
+        if (PrefixMap is not null && !ignorePrefixMap)
         {
             var mapped = PrefixMap.Resolve(noteNumber);
             if (mapped.Prefix.Length > 0 || mapped.Suffix.Length > 0)

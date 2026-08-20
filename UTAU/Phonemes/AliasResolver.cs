@@ -4,11 +4,11 @@ namespace UTAU.Phonemes;
 
 internal static class AliasResolver
 {
-    public static OtoEntry? Resolve(VoiceBank bank, string lyric, string previousVowel, int tone, string? color, out string alias)
+    public static OtoEntry? Resolve(VoiceBank bank, string lyric, string previousVowel, int tone, string? color, bool ignorePrefixMap, out string alias)
     {
         foreach (var candidate in EnumerateCandidates(lyric, previousVowel))
         {
-            var entry = bank.Resolve(candidate, tone, color);
+            var entry = bank.Resolve(candidate, tone, color, ignorePrefixMap);
             if (entry is null)
                 continue;
             alias = candidate;
@@ -44,6 +44,11 @@ internal static class AliasResolver
             yield return previousVowel + " " + moraKatakana;
             if (romaji is not null)
                 yield return previousVowel + " " + romaji;
+            if (previousVowel != KanaRomanization.StartVowel)
+            {
+                yield return KanaRomanization.AnyVowel + " " + lyric;
+                yield return KanaRomanization.AnyVowel + " " + mora;
+            }
         }
 
         yield return lyric;

@@ -20,6 +20,8 @@ internal sealed class UTAUNote : UndoRedoable
     public const string RestLyric = "R";
 
     string lyric = string.Empty;
+    bool ignorePrefixMap;
+    bool suppressAutoVcv;
     int tone = MusicalTone.MiddleC.NoteNumber;
     int lengthTicks = DefaultLengthTicks;
     double velocity = 100.0;
@@ -44,6 +46,20 @@ internal sealed class UTAUNote : UndoRedoable
     {
         get => lyric;
         set => Set(ref lyric, value ?? string.Empty);
+    }
+
+    [Browsable(false)]
+    public bool IgnorePrefixMap
+    {
+        get => ignorePrefixMap;
+        set => Set(ref ignorePrefixMap, value);
+    }
+
+    [Browsable(false)]
+    public bool SuppressAutoVcv
+    {
+        get => suppressAutoVcv;
+        set => Set(ref suppressAutoVcv, value);
     }
 
     [Display(GroupName = nameof(Texts.NoteGroupBasic), Name = nameof(Texts.NoteTone), ResourceType = typeof(Texts))]
@@ -181,6 +197,8 @@ internal sealed class UTAUNote : UndoRedoable
         var clone = new UTAUNote
         {
             Lyric = Lyric,
+            IgnorePrefixMap = IgnorePrefixMap,
+            SuppressAutoVcv = SuppressAutoVcv,
             Tone = Tone,
             LengthTicks = LengthTicks,
             TempoOverride = TempoOverride,

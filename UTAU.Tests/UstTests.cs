@@ -34,6 +34,38 @@ public sealed class UstTests
 
     static string[] Sung(params string[] lines) => ["Length=480", "Lyric=a", "NoteNum=60", .. lines];
 
+    static UTAUNote SingleNote(string lyric)
+        => Import(Document(
+            ExactTempo,
+            ["Length=480", "Lyric=あ", "NoteNum=60"],
+            ["Length=480", $"Lyric={lyric}", "NoteNum=60"],
+            ["Length=480", "Lyric=あ", "NoteNum=60"])).Notes[1];
+
+    [Theory]
+    [InlineData("?か", "か", true, false)]
+    [InlineData("!a か", "a か", false, true)]
+    [InlineData("?!か", "か", true, true)]
+    [InlineData("!?か", "か", true, true)]
+    [InlineData("か", "か", false, false)]
+    public void LyricMarkersBecomeNoteFlags(string written, string expected, bool ignorePrefixMap, bool suppressAutoVcv)
+    {
+        var note = SingleNote(written);
+
+        Assert.Equal(expected, note.Lyric);
+        Assert.Equal(ignorePrefixMap, note.IgnorePrefixMap);
+        Assert.Equal(suppressAutoVcv, note.SuppressAutoVcv);
+    }
+
+    [Theory]
+    [InlineData("a　か", "a か")]
+    [InlineData("a  か", "a か")]
+    [InlineData("が", "が")]
+    [InlineData("- あ", "- あ")]
+    [InlineData("R", "R")]
+    [InlineData("-", "-")]
+    public void ImportedLyricsAreComposedAndSpacedConsistently(string written, string expected)
+        => Assert.Equal(expected, SingleNote(written).Lyric);
+
     [Fact]
     public void ShiftJisIsTheDefaultEncoding()
     {
