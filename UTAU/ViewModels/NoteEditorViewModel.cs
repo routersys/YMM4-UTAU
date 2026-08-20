@@ -80,6 +80,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         source = pronounce.Notes;
         Notes = [.. source.Select(x => new NoteViewModel(x, this))];
         Notes.CollectionChanged += OnNotesChanged;
+        pronounce.PropertyChanged += OnPronounceChanged;
         ZoomInCommand = new ActionCommand(_ => pixelsPerTick < MaximumPixelsPerTick, _ => ZoomHorizontally(ZoomStep));
         ZoomOutCommand = new ActionCommand(_ => pixelsPerTick > MinimumPixelsPerTick, _ => ZoomHorizontally(1.0 / ZoomStep));
         ZoomVerticalInCommand = new ActionCommand(_ => semitoneHeight < MaximumSemitoneHeight, _ => ZoomVertically(ZoomStep));
@@ -116,6 +117,8 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public ICommand SelectAllCommand { get; }
 
     public string ImportMessage => pronounce.ImportMessage;
+
+    public string RenderMessage => pronounce.RenderMessage;
 
     public ICommand AddPitchPointCommand { get; }
 
@@ -951,6 +954,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public void Dispose()
     {
         ObservePitchPoints(null);
+        pronounce.PropertyChanged -= OnPronounceChanged;
         Notes.CollectionChanged -= OnNotesChanged;
         VisibleNotes.Clear();
         selectedNotes.Clear();
@@ -958,6 +962,12 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         foreach (var note in Notes)
             note.Dispose();
         Notes.Clear();
+    }
+
+    void OnPronounceChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(UTAUVoicePronounce.RenderMessage))
+            OnPropertyChanged(nameof(RenderMessage));
     }
 
     void ClearSelection()

@@ -79,7 +79,8 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
     void Render(string source, UTAUVoicePronounce pronounce, UTAUVoiceParameter parameter, TempoMap tempoMap, string filePath)
     {
         var units = Phonemizer.Phonemize(bank, tempoMap, parameter.Color, PhonemizeOptions.Default);
-        ThrowIfUnresolved(units);
+        var unresolved = DescribeUnresolved(units);
+        pronounce.RenderMessage = unresolved;
 
         var settings = new RenderSettings(
             UTAUSettings.Default.F0Estimator,
@@ -93,7 +94,7 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
         var renderer = new UtauRenderer(settings, BuildCurves(pronounce, tempoMap), AnalysisCache.Shared);
         var result = renderer.Render(units, arena);
         if (result.Samples.Length == 0)
-            throw new InvalidOperationException(Texts.NoRenderableNoteMessage);
+            throw new InvalidOperationException(unresolved.Length > 0 ? unresolved : Texts.NoRenderableNoteMessage);
 
         WaveIo.Write(filePath, result.Samples, result.SampleRate);
         pronounce.SourceText = source;
@@ -109,7 +110,7 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
         return new RenderCurves(resampled.Formant, resampled.Breathiness, resampled.IntervalMilliseconds);
     }
 
-    static void ThrowIfUnresolved(IReadOnlyList<PhonemeUnit> units)
+    static string DescribeUnresolved(IReadOnlyList<PhonemeUnit> units)
     {
         var unresolved = units
             .Where(x => x.IsUnresolved)
@@ -117,12 +118,12 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
             .Distinct(StringComparer.Ordinal)
             .ToArray();
         if (unresolved.Length == 0)
-            return;
+            return string.Empty;
 
         var listed = string.Join(", ", unresolved.Take(MaximumReportedUnresolvedLyrics));
         if (unresolved.Length > MaximumReportedUnresolvedLyrics)
             listed += " ...";
-        throw new InvalidOperationException(string.Format(Texts.AliasNotFoundMessage, listed));
+        return string.Format(Texts.AliasNotFoundMessage, listed);
     }
 
     static LipSyncFrame[] BuildLipSyncFrames(TempoMap tempoMap, double offsetMilliseconds)

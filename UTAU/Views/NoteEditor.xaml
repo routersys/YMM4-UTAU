@@ -7,6 +7,7 @@
              xmlns:vm="clr-namespace:UTAU.ViewModels"
              xmlns:c="clr-namespace:YukkuriMovieMaker.Controls;assembly=YukkuriMovieMaker.Controls"
              xmlns:icons="clr-namespace:YukkuriMovieMaker.Resources.Icons;assembly=YukkuriMovieMaker.Plugin"
+             xmlns:theme="clr-namespace:YukkuriMovieMaker.Theme;assembly=YukkuriMovieMaker.Plugin"
              mc:Ignorable="d"
              d:DesignHeight="440" d:DesignWidth="960"
              d:DataContext="{d:DesignInstance Type={x:Type vm:NoteEditorViewModel}}">
@@ -67,6 +68,9 @@
                     <TextBlock Text="{Binding SelectionText}" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.75"/>
                     <TextBlock Text="{Binding GuideText}" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.75"/>
                     <TextBlock Text="{Binding ImportMessage}" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.75"
+                               TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding RenderMessage}" VerticalAlignment="Center" Margin="12,0,0,0"
+                               Foreground="{DynamicResource {x:Static theme:YMM4Colors.WarningBannerForegroundBrushKey}}"
                                TextTrimming="CharacterEllipsis"/>
                 </StackPanel>
 

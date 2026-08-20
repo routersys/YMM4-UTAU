@@ -282,6 +282,16 @@ public sealed class UtauRendererTests : IDisposable
     }
 
     [Fact]
+    public void UnknownLyricsAreSkippedWithoutStoppingTheRest()
+    {
+        var bank = TestVoiceBank.CreateSingleKanaBank(directory);
+        var result = Render(bank, "<!C4:1/4>あ<!C4:1/4>ぱ<!C4:1/4>あ");
+
+        Assert.Equal(2, result.Timings.Count);
+        Assert.True(Peak(result.Samples) > 0.01);
+    }
+
+    [Fact]
     public void UnitsWithoutAnyRenderableEntryProduceAnEmptyResult()
     {
         using var arena = new WorldArena();

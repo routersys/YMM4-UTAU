@@ -13,6 +13,7 @@ internal sealed class UTAUVoicePronounce : UndoRedoable, IVoicePronounce
 {
     string sourceText = string.Empty;
     string importMessage = string.Empty;
+    string renderMessage = string.Empty;
     double tempo = TimeBase.DefaultTempo;
     double speed = 1.0;
     LipSyncFrame[]? lipSyncFrames;
@@ -63,6 +64,13 @@ internal sealed class UTAUVoicePronounce : UndoRedoable, IVoicePronounce
     {
         get => importMessage;
         set => Set(ref importMessage, value ?? string.Empty);
+    }
+
+    [Browsable(false)]
+    public string RenderMessage
+    {
+        get => renderMessage;
+        set => Set(ref renderMessage, value ?? string.Empty);
     }
 
     [Browsable(false)]
