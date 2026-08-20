@@ -119,6 +119,10 @@
 <data name="ParameterBreathinessDescription" xml:space="preserve"><value>Raises the aperiodicity so that the breath component increases.</value></data>
 <data name="ParameterBrightness" xml:space="preserve"><value>High frequency emphasis</value></data>
 <data name="ParameterBrightnessDescription" xml:space="preserve"><value>Tilts the spectrum by the gain given at the Nyquist frequency.</value></data>
+<data name="ParameterUstPhraseStart" xml:space="preserve"><value>Start phrase</value></data>
+<data name="ParameterUstPhraseStartDescription" xml:space="preserve"><value>The phrase to start from. Phrases are separated by rests. 1 starts at the beginning.</value></data>
+<data name="ParameterUstPhraseCount" xml:space="preserve"><value>Phrase count</value></data>
+<data name="ParameterUstPhraseCountDescription" xml:space="preserve"><value>How many phrases to load. 0 loads to the end. Splitting a long UST across items narrows what has to be synthesised again after each edit.</value></data>
 <data name="PronounceNotes" xml:space="preserve"><value>Notes</value></data>
 <data name="PronounceNotesDescription" xml:space="preserve"><value>Edits the note sequence built from the pronunciation.</value></data>
 <data name="EditNotes" xml:space="preserve"><value>Edit the notes</value></data>
@@ -198,6 +202,9 @@
 <data name="UstImportEmpty" xml:space="preserve"><value>The file has no notes to load</value></data>
 <data name="UstLegacyPitchIgnored" xml:space="preserve"><value>The legacy pitch data was not imported</value></data>
 <data name="UstRestTrimmedFormat" xml:space="preserve"><value>Trimmed {0} ticks of leading and trailing rests</value></data>
+<data name="UstPhraseTotalFormat" xml:space="preserve"><value>{0} phrases in total</value></data>
+<data name="UstPhraseRangeFormat" xml:space="preserve"><value>Loaded {1} phrases starting at phrase {0}</value></data>
+<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>Starts {0} ticks into the original</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>Tempo</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>0 follows the tempo of the score. A value changes the tempo from this note onward.</value></data>
 </root>

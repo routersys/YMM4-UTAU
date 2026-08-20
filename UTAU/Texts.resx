@@ -119,6 +119,10 @@
 <data name="ParameterBreathinessDescription" xml:space="preserve"><value>非周期性指標を強めて息の成分を増やします。</value></data>
 <data name="ParameterBrightness" xml:space="preserve"><value>高域の強調</value></data>
 <data name="ParameterBrightnessDescription" xml:space="preserve"><value>ナイキスト周波数における利得を指定して周波数特性を傾けます。</value></data>
+<data name="ParameterUstPhraseStart" xml:space="preserve"><value>開始フレーズ</value></data>
+<data name="ParameterUstPhraseStartDescription" xml:space="preserve"><value>休符で区切られた何番目のフレーズから読み込むかを決めます。1 で先頭からです。</value></data>
+<data name="ParameterUstPhraseCount" xml:space="preserve"><value>フレーズ数</value></data>
+<data name="ParameterUstPhraseCountDescription" xml:space="preserve"><value>読み込むフレーズの数です。0 で最後までです。長い UST を分けて置くと、編集のたびに合成し直す範囲が狭くなります。</value></data>
 <data name="PronounceNotes" xml:space="preserve"><value>ノート</value></data>
 <data name="PronounceNotesDescription" xml:space="preserve"><value>発音から組み立てたノート列を編集します。</value></data>
 <data name="EditNotes" xml:space="preserve"><value>ノートを編集</value></data>
@@ -198,6 +202,9 @@
 <data name="UstImportEmpty" xml:space="preserve"><value>読み込めるノートがありません</value></data>
 <data name="UstLegacyPitchIgnored" xml:space="preserve"><value>旧式の音程は取り込めません</value></data>
 <data name="UstRestTrimmedFormat" xml:space="preserve"><value>前後の休符 {0} ティックを除きました</value></data>
+<data name="UstPhraseTotalFormat" xml:space="preserve"><value>全 {0} フレーズ</value></data>
+<data name="UstPhraseRangeFormat" xml:space="preserve"><value>フレーズ {0} から {1} 個を読み込みました</value></data>
+<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>元の {0} ティック目から始まります</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>テンポ</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>0でこの譜面のテンポに従います。値を入れるとこのノートから先のテンポが変わります。</value></data>
 </root>

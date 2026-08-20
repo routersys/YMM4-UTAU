@@ -788,7 +788,9 @@ public sealed class UstPronounceTests
         {
             var pronounce = UTAUVoicePronounce.FromUst(Write(directory, Sample), new UTAUVoiceParameter());
 
-            Assert.Equal(string.Format(Texts.UstImportedFormat, 2), pronounce.ImportMessage);
+            Assert.Equal(
+                string.Format(Texts.UstImportedFormat, 2) + "  " + string.Format(Texts.UstPhraseTotalFormat, 1),
+                pronounce.ImportMessage);
         }
         finally
         {

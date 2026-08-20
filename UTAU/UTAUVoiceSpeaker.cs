@@ -57,7 +57,7 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
             throw new InvalidOperationException(Texts.EmptyTextMessage);
 
         var result = pronounce as UTAUVoicePronounce;
-        if (result is null || result.SourceText != source || result.Notes.Count == 0)
+        if (result is null || result.SourceText != source || result.Notes.Count == 0 || (isUst && result.ImportedRange != param.UstRange))
             result = isUst ? UTAUVoicePronounce.FromUst(ustPath, param) : UTAUVoicePronounce.FromText(source, param);
 
         var timeBase = isUst ? new TimeBase(result.Tempo, param.Speed) : new TimeBase(param.Tempo, param.Speed);

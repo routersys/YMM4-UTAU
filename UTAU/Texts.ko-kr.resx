@@ -119,6 +119,10 @@
 <data name="ParameterBreathinessDescription" xml:space="preserve"><value>비주기성 지표를 높여 숨 성분을 늘립니다.</value></data>
 <data name="ParameterBrightness" xml:space="preserve"><value>고역 강조</value></data>
 <data name="ParameterBrightnessDescription" xml:space="preserve"><value>나이퀴스트 주파수에서의 이득을 지정해 주파수 특성을 기울입니다.</value></data>
+<data name="ParameterUstPhraseStart" xml:space="preserve"><value>시작 프레이즈</value></data>
+<data name="ParameterUstPhraseStartDescription" xml:space="preserve"><value>쉼표로 나뉜 몇 번째 프레이즈부터 불러올지 정합니다. 1이면 처음부터입니다.</value></data>
+<data name="ParameterUstPhraseCount" xml:space="preserve"><value>프레이즈 수</value></data>
+<data name="ParameterUstPhraseCountDescription" xml:space="preserve"><value>불러올 프레이즈 수입니다. 0이면 끝까지입니다. 긴 UST를 나누어 배치하면 편집할 때마다 다시 합성하는 범위가 좁아집니다.</value></data>
 <data name="PronounceNotes" xml:space="preserve"><value>노트</value></data>
 <data name="PronounceNotesDescription" xml:space="preserve"><value>발음에서 만든 노트 열을 편집합니다.</value></data>
 <data name="EditNotes" xml:space="preserve"><value>노트 편집</value></data>
@@ -198,6 +202,9 @@
 <data name="UstImportEmpty" xml:space="preserve"><value>불러올 노트가 없습니다</value></data>
 <data name="UstLegacyPitchIgnored" xml:space="preserve"><value>구형 음정 자료는 가져오지 않았습니다</value></data>
 <data name="UstRestTrimmedFormat" xml:space="preserve"><value>앞뒤 쉼표 {0}틱을 제거했습니다</value></data>
+<data name="UstPhraseTotalFormat" xml:space="preserve"><value>전체 {0} 프레이즈</value></data>
+<data name="UstPhraseRangeFormat" xml:space="preserve"><value>프레이즈 {0}부터 {1}개를 불러왔습니다</value></data>
+<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>원곡의 {0}틱부터 시작합니다</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>템포</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>0이면 악보의 템포를 따릅니다. 값을 넣으면 이 노트부터 템포가 바뀝니다.</value></data>
 </root>

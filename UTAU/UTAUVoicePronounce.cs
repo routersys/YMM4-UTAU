@@ -17,6 +17,7 @@ internal sealed class UTAUVoicePronounce : UndoRedoable, IVoicePronounce
     double tempo = TimeBase.DefaultTempo;
     double speed = 1.0;
     LipSyncFrame[]? lipSyncFrames;
+    UstPhraseRange importedRange;
 
     public UTAUVoicePronounce()
     {
@@ -74,6 +75,13 @@ internal sealed class UTAUVoicePronounce : UndoRedoable, IVoicePronounce
     }
 
     [Browsable(false)]
+    public UstPhraseRange ImportedRange
+    {
+        get => importedRange;
+        set => SetWithoutUndoRedo(ref importedRange, value);
+    }
+
+    [Browsable(false)]
     public LipSyncFrame[]? LipSyncFrames
     {
         get => lipSyncFrames;
@@ -108,7 +116,7 @@ internal sealed class UTAUVoicePronounce : UndoRedoable, IVoicePronounce
         if (UstParser.ParseFile(path) is not { } document)
             throw new InvalidOperationException(Texts.UstImportFailed);
 
-        var imported = UstImporter.Import(document);
+        var imported = UstImporter.Import(document, parameter.UstRange);
         if (imported.Notes.Count == 0)
             throw new InvalidOperationException(Texts.UstImportEmpty);
 
@@ -117,16 +125,30 @@ internal sealed class UTAUVoicePronounce : UndoRedoable, IVoicePronounce
             SourceText = path,
             Tempo = imported.Tempo,
             Speed = parameter.Speed,
-            ImportMessage = BuildImportMessage(imported),
+            ImportedRange = parameter.UstRange,
+            ImportMessage = BuildImportMessage(imported, parameter.UstRange),
         };
         foreach (var note in imported.Notes)
             pronounce.Notes.Add(note);
         return pronounce;
     }
 
-    static string BuildImportMessage(UstImportResult imported)
+    static string BuildImportMessage(UstImportResult imported, UstPhraseRange range)
     {
-        var parts = new List<string> { string.Format(Texts.UstImportedFormat, imported.Notes.Count) };
+        var parts = new List<string>
+        {
+            string.Format(Texts.UstImportedFormat, imported.Notes.Count),
+            string.Format(Texts.UstPhraseTotalFormat, imported.TotalPhrases),
+        };
+
+        if (!range.CoversEverything)
+        {
+            var taken = range.Count > 0 ? range.Count : imported.TotalPhrases - range.Start + 1;
+            parts.Add(string.Format(Texts.UstPhraseRangeFormat, range.Start, Math.Max(taken, 0)));
+        }
+
+        if (imported.StartTicks > 0)
+            parts.Add(string.Format(Texts.UstPhraseOffsetFormat, imported.StartTicks));
         if (imported.TrimmedRestTicks > 0)
             parts.Add(string.Format(Texts.UstRestTrimmedFormat, imported.TrimmedRestTicks));
         if (imported.LegacyPitchNoteCount > 0)

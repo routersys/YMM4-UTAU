@@ -119,6 +119,10 @@
 <data name="ParameterBreathinessDescription" xml:space="preserve"><value>增强非周期性指标以增加气声成分。</value></data>
 <data name="ParameterBrightness" xml:space="preserve"><value>高频强调</value></data>
 <data name="ParameterBrightnessDescription" xml:space="preserve"><value>按奈奎斯特频率处的增益倾斜频率特性。</value></data>
+<data name="ParameterUstPhraseStart" xml:space="preserve"><value>起始乐句</value></data>
+<data name="ParameterUstPhraseStartDescription" xml:space="preserve"><value>指定从以休止符分隔的第几个乐句开始载入。1 表示从开头。</value></data>
+<data name="ParameterUstPhraseCount" xml:space="preserve"><value>乐句数</value></data>
+<data name="ParameterUstPhraseCountDescription" xml:space="preserve"><value>要载入的乐句数。0 表示载入到最后。将较长的 UST 分开放置，可缩小每次编辑后重新合成的范围。</value></data>
 <data name="PronounceNotes" xml:space="preserve"><value>音符</value></data>
 <data name="PronounceNotesDescription" xml:space="preserve"><value>编辑由发音生成的音符序列。</value></data>
 <data name="EditNotes" xml:space="preserve"><value>编辑音符</value></data>
@@ -198,6 +202,9 @@
 <data name="UstImportEmpty" xml:space="preserve"><value>文件中没有可载入的音符</value></data>
 <data name="UstLegacyPitchIgnored" xml:space="preserve"><value>未导入旧式音高数据</value></data>
 <data name="UstRestTrimmedFormat" xml:space="preserve"><value>已去除首尾休止符 {0} 刻</value></data>
+<data name="UstPhraseTotalFormat" xml:space="preserve"><value>共 {0} 个乐句</value></data>
+<data name="UstPhraseRangeFormat" xml:space="preserve"><value>从第 {0} 个乐句起载入了 {1} 个</value></data>
+<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>从原曲第 {0} 刻开始</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>速度</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>0 表示沿用乐谱的速度。填入数值则从该音符起改变速度。</value></data>
 </root>

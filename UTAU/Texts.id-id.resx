@@ -119,6 +119,10 @@
 <data name="ParameterBreathinessDescription" xml:space="preserve"><value>Menaikkan aperiodisitas sehingga komponen napas bertambah.</value></data>
 <data name="ParameterBrightness" xml:space="preserve"><value>Penekanan frekuensi tinggi</value></data>
 <data name="ParameterBrightnessDescription" xml:space="preserve"><value>Memiringkan spektrum sebesar penguatan pada frekuensi Nyquist.</value></data>
+<data name="ParameterUstPhraseStart" xml:space="preserve"><value>Frasa awal</value></data>
+<data name="ParameterUstPhraseStartDescription" xml:space="preserve"><value>Frasa awal pemuatan. Frasa dipisahkan oleh istirahat. Nilai 1 mulai dari awal.</value></data>
+<data name="ParameterUstPhraseCount" xml:space="preserve"><value>Jumlah frasa</value></data>
+<data name="ParameterUstPhraseCountDescription" xml:space="preserve"><value>Jumlah frasa yang dimuat. Nilai 0 memuat sampai akhir. Membagi UST panjang ke beberapa item mempersempit bagian yang disintesis ulang setiap kali diedit.</value></data>
 <data name="PronounceNotes" xml:space="preserve"><value>Not</value></data>
 <data name="PronounceNotesDescription" xml:space="preserve"><value>Menyunting urutan not yang dibangun dari pelafalan.</value></data>
 <data name="EditNotes" xml:space="preserve"><value>Sunting not</value></data>
@@ -198,6 +202,9 @@
 <data name="UstImportEmpty" xml:space="preserve"><value>Berkas tidak memiliki not untuk dimuat</value></data>
 <data name="UstLegacyPitchIgnored" xml:space="preserve"><value>Data nada lawas tidak diimpor</value></data>
 <data name="UstRestTrimmedFormat" xml:space="preserve"><value>Memangkas {0} tik istirahat di awal dan akhir</value></data>
+<data name="UstPhraseTotalFormat" xml:space="preserve"><value>Total {0} frasa</value></data>
+<data name="UstPhraseRangeFormat" xml:space="preserve"><value>Memuat {1} frasa mulai dari frasa {0}</value></data>
+<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>Dimulai pada tik {0} dari aslinya</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>Tempo</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>0 mengikuti tempo partitur. Sebuah nilai mengubah tempo mulai dari not ini.</value></data>
 </root>

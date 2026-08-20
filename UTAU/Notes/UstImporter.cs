@@ -3,18 +3,26 @@ using UTAU.Models;
 
 namespace UTAU.Notes;
 
-internal readonly record struct UstPhraseRange(int Start, int Count)
+internal readonly record struct UstPhraseRange
 {
+    readonly int skip;
+    readonly int take;
+
+    public UstPhraseRange(int start, int count)
+    {
+        skip = Math.Max(start, 1) - 1;
+        take = Math.Max(count, 0);
+    }
+
     public static UstPhraseRange All => default;
 
-    public bool CoversEverything => Start <= 1 && Count <= 0;
+    public int Start => skip + 1;
 
-    public bool Contains(int phrase)
-    {
-        if (phrase < Math.Max(Start, 1))
-            return false;
-        return Count <= 0 || phrase < Math.Max(Start, 1) + Count;
-    }
+    public int Count => take;
+
+    public bool CoversEverything => skip == 0 && take == 0;
+
+    public bool Contains(int phrase) => phrase > skip && (take == 0 || phrase <= skip + take);
 }
 
 internal sealed record UstImportResult(

@@ -119,6 +119,10 @@
 <data name="ParameterBreathinessDescription" xml:space="preserve"><value>يرفع مؤشر اللادورية لزيادة مكوّن النفَس.</value></data>
 <data name="ParameterBrightness" xml:space="preserve"><value>تعزيز الترددات العالية</value></data>
 <data name="ParameterBrightnessDescription" xml:space="preserve"><value>يميل الطيف بمقدار الكسب المحدد عند تردد نايكويست.</value></data>
+<data name="ParameterUstPhraseStart" xml:space="preserve"><value>العبارة الأولى</value></data>
+<data name="ParameterUstPhraseStartDescription" xml:space="preserve"><value>العبارة التي يبدأ منها التحميل. تفصل السكتات بين العبارات. القيمة 1 تعني البداية.</value></data>
+<data name="ParameterUstPhraseCount" xml:space="preserve"><value>عدد العبارات</value></data>
+<data name="ParameterUstPhraseCountDescription" xml:space="preserve"><value>عدد العبارات التي يتم تحميلها. القيمة 0 تعني حتى النهاية. توزيع ملف UST طويل على عدة عناصر يقلّص ما يعاد تركيبه بعد كل تعديل.</value></data>
 <data name="PronounceNotes" xml:space="preserve"><value>النوتات</value></data>
 <data name="PronounceNotesDescription" xml:space="preserve"><value>يحرر تسلسل النوتات المبني من النطق.</value></data>
 <data name="EditNotes" xml:space="preserve"><value>تحرير النوتات</value></data>
@@ -198,6 +202,9 @@
 <data name="UstImportEmpty" xml:space="preserve"><value>لا توجد نوتات لتحميلها في الملف</value></data>
 <data name="UstLegacyPitchIgnored" xml:space="preserve"><value>لم يتم استيراد بيانات الدرجة القديمة</value></data>
 <data name="UstRestTrimmedFormat" xml:space="preserve"><value>تمت إزالة {0} تِك من السكتات في البداية والنهاية</value></data>
+<data name="UstPhraseTotalFormat" xml:space="preserve"><value>{0} عبارة إجمالاً</value></data>
+<data name="UstPhraseRangeFormat" xml:space="preserve"><value>تم تحميل {1} عبارة بدءاً من العبارة {0}</value></data>
+<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>يبدأ عند التِك {0} من الأصل</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>الإيقاع</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>القيمة 0 تتبع إيقاع النوتة الموسيقية. وإدخال قيمة يغيّر الإيقاع بدءاً من هذه النوتة.</value></data>
 </root>

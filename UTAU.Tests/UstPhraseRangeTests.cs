@@ -1,4 +1,6 @@
+using System.IO;
 using System.Text;
+using UTAU;
 using UTAU.Models;
 using UTAU.Notes;
 using UTAU.Phonemes;
@@ -133,6 +135,49 @@ public sealed class UstPhraseRangeTests : IDisposable
         }
 
         Assert.Equal(expected, offsets);
+    }
+
+    [Fact]
+    public void TheParameterCarriesTheRangeIntoTheImport()
+    {
+        var path = Path.Combine(directory, "range.ust");
+        File.WriteAllBytes(path, VoiceBankTextReader.ShiftJis.GetBytes(Document(true, true)));
+
+        var whole = UTAUVoicePronounce.FromUst(path, new UTAUVoiceParameter());
+        var second = UTAUVoicePronounce.FromUst(path, new UTAUVoiceParameter { UstPhraseStart = 2, UstPhraseCount = 1 });
+
+        Assert.Equal(13, whole.Notes.Count);
+        Assert.Equal(["か", "あ"], second.Notes.Select(x => x.Lyric));
+        Assert.Equal(UstPhraseRange.All, whole.ImportedRange);
+        Assert.Equal(new UstPhraseRange(2, 1), second.ImportedRange);
+        Assert.Contains(string.Format(Texts.UstPhraseTotalFormat, Phrases.Length), second.ImportMessage);
+        Assert.Contains(string.Format(Texts.UstPhraseOffsetFormat, 2160), second.ImportMessage);
+    }
+
+    [Fact]
+    public void ChangingTheRangeRebuildsTheScore()
+    {
+        var path = Path.Combine(directory, "rebuild.ust");
+        File.WriteAllBytes(path, VoiceBankTextReader.ShiftJis.GetBytes(Document(true, true)));
+
+        var first = UTAUVoicePronounce.FromUst(path, new UTAUVoiceParameter { UstPhraseStart = 1, UstPhraseCount = 1 });
+        var changed = new UTAUVoiceParameter { UstPhraseStart = 3, UstPhraseCount = 1 };
+
+        Assert.NotEqual(changed.UstRange, first.ImportedRange);
+
+        var second = UTAUVoicePronounce.FromUst(path, changed);
+
+        Assert.Equal(["あ", "あ", "か", "あ"], second.Notes.Select(x => x.Lyric));
+    }
+
+    [Fact]
+    public void TheDefaultParameterTakesTheWholeFile()
+    {
+        var parameter = new UTAUVoiceParameter();
+
+        Assert.Equal(1, parameter.UstPhraseStart);
+        Assert.Equal(0, parameter.UstPhraseCount);
+        Assert.True(parameter.UstRange.CoversEverything);
     }
 
     VoiceBank Bank()

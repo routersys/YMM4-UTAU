@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using UTAU.Notes;
 using UTAU.Views;
 using YukkuriMovieMaker.Controls;
 using YukkuriMovieMaker.Plugin.Voice;
@@ -8,6 +9,8 @@ namespace UTAU;
 
 internal sealed class UTAUVoiceParameter : VoiceParameterBase
 {
+    public const int MaximumPhrase = 10000;
+
     string color = string.Empty;
     int baseTone = 60;
     double speed = 1.0;
@@ -17,6 +20,8 @@ internal sealed class UTAUVoiceParameter : VoiceParameterBase
     double formant;
     double breathiness;
     double brightness;
+    int ustPhraseStart = 1;
+    int ustPhraseCount;
 
     [Display(Name = nameof(Texts.ParameterColor), Description = nameof(Texts.ParameterColorDescription), ResourceType = typeof(Texts))]
     [VoiceColorComboBox]
@@ -107,4 +112,29 @@ internal sealed class UTAUVoiceParameter : VoiceParameterBase
         get => brightness;
         set => Set(ref brightness, value);
     }
+
+    [Display(Name = nameof(Texts.ParameterUstPhraseStart), Description = nameof(Texts.ParameterUstPhraseStartDescription), ResourceType = typeof(Texts))]
+    [TextBoxSlider("F0", "", 1.0, 100.0, Delay = -1)]
+    [Range(1, MaximumPhrase)]
+    [DefaultValue(1)]
+    [ShowForUstSource]
+    public int UstPhraseStart
+    {
+        get => ustPhraseStart;
+        set => Set(ref ustPhraseStart, Math.Clamp(value, 1, MaximumPhrase));
+    }
+
+    [Display(Name = nameof(Texts.ParameterUstPhraseCount), Description = nameof(Texts.ParameterUstPhraseCountDescription), ResourceType = typeof(Texts))]
+    [TextBoxSlider("F0", "", 0.0, 100.0, Delay = -1)]
+    [Range(0, MaximumPhrase)]
+    [DefaultValue(0)]
+    [ShowForUstSource]
+    public int UstPhraseCount
+    {
+        get => ustPhraseCount;
+        set => Set(ref ustPhraseCount, Math.Clamp(value, 0, MaximumPhrase));
+    }
+
+    [Browsable(false)]
+    public UstPhraseRange UstRange => new(UstPhraseStart, UstPhraseCount);
 }
