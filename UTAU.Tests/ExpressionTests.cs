@@ -459,7 +459,7 @@ public sealed class CurveRenderingTests : IDisposable
         var units = Phonemizer.Phonemize(bank, TempoMap.Create(notes, TimeBase.Default), null, PhonemizeOptions.Default);
         using var arena = new WorldArena();
         var settings = RenderSettings.Default with { Estimator = F0Estimator.Dio };
-        return new UtauRenderer(settings, curves, cache).Render(units, arena).Samples;
+        return new UtauRenderer(settings, curves, cache, new SegmentCache(SegmentCache.DefaultBudgetBytes)).Render(units, arena).Samples;
     }
 
     [Fact]

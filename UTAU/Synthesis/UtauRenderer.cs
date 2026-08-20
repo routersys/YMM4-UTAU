@@ -8,7 +8,7 @@ namespace UTAU.Synthesis;
 
 internal sealed record RenderResult(double[] Samples, int SampleRate, IReadOnlyList<UnitTiming> Timings, double OffsetMilliseconds);
 
-internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves, AnalysisCache cache)
+internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves, AnalysisCache cache, SegmentCache segmentCache)
 {
     sealed record UnitSource(
         WorldFeatures Features,
@@ -90,8 +90,23 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
             new double[widest],
             new double[ToSampleIndex(widest - 1, framePeriod, sampleRate) + 1]);
 
+        var cacheable = ReferenceEquals(curves, RenderCurves.Empty);
+
         foreach (var segment in segments)
         {
+            var produced = ToSampleIndex(segment.FrameCount - 1, framePeriod, sampleRate) + 1;
+            var start = ToSampleIndex(segment.StartFrame, framePeriod, sampleRate);
+            var length = Math.Min(produced, samples.Length - start);
+            if (length <= 0)
+                continue;
+
+            var key = cacheable
+                ? BuildSegmentKey(segment, timings, requests, offset, framePeriod, sampleRate)
+                : null;
+
+            if (key is not null && segmentCache.TryCopyInto(key, samples.AsSpan(start, length)))
+                continue;
+
             RenderSegment(
                 segment,
                 timings,
@@ -107,6 +122,9 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
                 frameAperiodicity,
                 buffers,
                 samples);
+
+            if (key is not null)
+                segmentCache.Store(key, samples.AsSpan(start, length));
         }
 
         return new RenderResult(samples, sampleRate, timings, offset);
@@ -114,6 +132,52 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
 
     static int ToSampleIndex(int frame, double framePeriod, int sampleRate)
         => (int)(frame * framePeriod / 1000.0 * sampleRate);
+
+    SegmentKey BuildSegmentKey(
+        Segment segment,
+        IReadOnlyList<UnitTiming> timings,
+        IReadOnlyList<AnalysisRequest?> requests,
+        double offset,
+        double framePeriod,
+        int sampleRate)
+    {
+        var units = new UnitKey[segment.TimingIndices.Count];
+
+        for (var i = 0; i < units.Length; i++)
+        {
+            var index = segment.TimingIndices[i];
+            var timing = timings[index];
+            var unit = timing.Unit;
+            var note = unit.Note;
+
+            units[i] = new UnitKey(
+                requests[index] is { } request
+                    ? new SourceKey(
+                        request.Path,
+                        request.WriteTimeTicks,
+                        request.StartSample,
+                        request.EndSample,
+                        request.RegionStart,
+                        request.RegionEnd,
+                        request.ConsonantEnd)
+                    : null,
+                timing.AudioStartMilliseconds,
+                timing.RenderLengthMilliseconds,
+                timing.FadeInMilliseconds,
+                timing.FadeOutMilliseconds,
+                unit.NoteStartMilliseconds,
+                unit.NoteLengthMilliseconds,
+                unit.Tone,
+                note.LengthTicks,
+                note.Velocity,
+                note.Intensity,
+                note.Modulation,
+                VibratoKey.From(note.Vibrato),
+                [.. note.PitchPoints]);
+        }
+
+        return new SegmentKey(settings, segment.StartFrame, segment.FrameCount, sampleRate, offset, framePeriod, units);
+    }
 
     static IReadOnlyList<Segment> BuildSegments(
         IReadOnlyList<UnitTiming> timings,

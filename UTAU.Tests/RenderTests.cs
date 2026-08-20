@@ -120,7 +120,7 @@ public sealed class UtauRendererTests : IDisposable
         var notes = NoteSequenceBuilder.Build(text, NoteBuildOptions.Create(60));
         var units = Phonemizer.Phonemize(bank, TempoMap.Create(notes, new TimeBase(tempo, speed)), null, PhonemizeOptions.Default);
         using var arena = new WorldArena();
-        return new UtauRenderer(settings ?? RenderSettings.Default with { Estimator = F0Estimator.Dio }, curves ?? RenderCurves.Empty, cache).Render(units, arena);
+        return new UtauRenderer(settings ?? RenderSettings.Default with { Estimator = F0Estimator.Dio }, curves ?? RenderCurves.Empty, cache, new SegmentCache(SegmentCache.DefaultBudgetBytes)).Render(units, arena);
     }
 
     static double Peak(double[] samples) => samples.Length == 0 ? 0.0 : samples.Max(Math.Abs);
@@ -295,7 +295,7 @@ public sealed class UtauRendererTests : IDisposable
     public void UnitsWithoutAnyRenderableEntryProduceAnEmptyResult()
     {
         using var arena = new WorldArena();
-        var result = new UtauRenderer(RenderSettings.Default with { Estimator = F0Estimator.Dio }, RenderCurves.Empty, cache).Render([], arena);
+        var result = new UtauRenderer(RenderSettings.Default with { Estimator = F0Estimator.Dio }, RenderCurves.Empty, cache, new SegmentCache(SegmentCache.DefaultBudgetBytes)).Render([], arena);
 
         Assert.Empty(result.Samples);
         Assert.Empty(result.Timings);
@@ -341,7 +341,7 @@ public sealed class SegmentedRenderTests : IDisposable
         var units = Phonemizer.Phonemize(bank, TempoMap.Create(notes, TimeBase.Default), null, PhonemizeOptions.Default);
         using var arena = new WorldArena();
         var settings = RenderSettings.Default with { Estimator = F0Estimator.Dio };
-        return new UtauRenderer(settings, RenderCurves.Empty, cache).Render(units, arena).Samples;
+        return new UtauRenderer(settings, RenderCurves.Empty, cache, new SegmentCache(SegmentCache.DefaultBudgetBytes)).Render(units, arena).Samples;
     }
 
     [Fact]

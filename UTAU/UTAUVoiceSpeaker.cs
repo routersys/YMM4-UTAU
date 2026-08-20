@@ -91,7 +91,7 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
             parameter.Brightness);
 
         using var arena = new WorldArena();
-        var renderer = new UtauRenderer(settings, BuildCurves(pronounce, tempoMap), AnalysisCache.Shared);
+        var renderer = new UtauRenderer(settings, BuildCurves(pronounce, tempoMap), AnalysisCache.Shared, SegmentCache.Shared);
         var result = renderer.Render(units, arena);
         if (result.Samples.Length == 0)
             throw new InvalidOperationException(unresolved.Length > 0 ? unresolved : Texts.NoRenderableNoteMessage);
