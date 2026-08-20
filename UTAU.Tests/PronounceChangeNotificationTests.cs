@@ -1,6 +1,7 @@
 using System.IO;
 using UTAU;
 using UTAU.Notes;
+using UTAU.ViewModels;
 using YukkuriMovieMaker.UndoRedo;
 
 namespace UTAU.Tests;
@@ -126,6 +127,38 @@ public sealed class PronounceChangeNotificationTests
     }
 
     [Fact]
+    public void TheEditorViewModelFollowsTheMessagesOnItsOwnThread()
+    {
+        var pronounce = new UTAUVoicePronounce();
+        pronounce.Notes.Add(new UTAUNote { Lyric = "あ" });
+        using var viewModel = new NoteEditorViewModel(pronounce);
+        var raised = new List<string>();
+        viewModel.PropertyChanged += (_, e) => raised.Add(e.PropertyName ?? string.Empty);
+
+        pronounce.RenderMessage = "警告";
+        pronounce.ImportMessage = "取り込み";
+
+        Assert.Contains(nameof(NoteEditorViewModel.RenderMessage), raised);
+        Assert.Contains(nameof(NoteEditorViewModel.ImportMessage), raised);
+        Assert.Equal("警告", viewModel.RenderMessage);
+    }
+
+    [Fact]
+    public void TheEditorViewModelStopsFollowingOnceDisposed()
+    {
+        var pronounce = new UTAUVoicePronounce();
+        pronounce.Notes.Add(new UTAUNote { Lyric = "あ" });
+        var viewModel = new NoteEditorViewModel(pronounce);
+        var raised = 0;
+        viewModel.PropertyChanged += (_, _) => raised++;
+        viewModel.Dispose();
+
+        pronounce.RenderMessage = "警告";
+
+        Assert.Equal(0, raised);
+    }
+
+    [Fact]
     public void SynthesisOutputsStillRaisePropertyChanged()
     {
         var pronounce = new UTAUVoicePronounce();
@@ -145,6 +178,8 @@ public sealed class PronounceChangeNotificationTests
         var note = new UTAUNote
         {
             Lyric = "か",
+            IgnorePrefixMap = true,
+            SuppressAutoVcv = true,
             Tone = 64,
             LengthTicks = 960,
             Velocity = 80.0,
@@ -163,6 +198,8 @@ public sealed class PronounceChangeNotificationTests
         var clone = note.Clone();
 
         Assert.Equal(note.Lyric, clone.Lyric);
+        Assert.Equal(note.IgnorePrefixMap, clone.IgnorePrefixMap);
+        Assert.Equal(note.SuppressAutoVcv, clone.SuppressAutoVcv);
         Assert.Equal(note.Tone, clone.Tone);
         Assert.Equal(note.LengthTicks, clone.LengthTicks);
         Assert.Equal(note.Velocity, clone.Velocity);

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using UTAU.Models;
 using UTAU.Notes;
 using YukkuriMovieMaker.Commons;
@@ -33,6 +34,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public const double MinimumFitSemitoneHeight = 10.0;
 
     readonly UTAUVoicePronounce pronounce;
+    readonly Dispatcher dispatcher;
     readonly ObservableCollection<UTAUNote> source;
     readonly List<NoteViewModel> selectedNotes = [];
     readonly List<NoteViewModel> transformTargets = [];
@@ -77,6 +79,8 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public NoteEditorViewModel(UTAUVoicePronounce pronounce)
     {
         this.pronounce = pronounce;
+        dispatcher = Dispatcher.CurrentDispatcher;
+        pronounce.PropertyChanged += OnPronouncePropertyChanged;
         source = pronounce.Notes;
         Notes = [.. source.Select(x => new NoteViewModel(x, this))];
         Notes.CollectionChanged += OnNotesChanged;
@@ -407,10 +411,15 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         }
     }
 
-    public void InvalidateMessages()
+    void OnPronouncePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        OnPropertyChanged(nameof(ImportMessage));
-        OnPropertyChanged(nameof(RenderMessage));
+        if (e.PropertyName is not (nameof(UTAUVoicePronounce.ImportMessage) or nameof(UTAUVoicePronounce.RenderMessage)))
+            return;
+
+        if (dispatcher.CheckAccess())
+            OnPropertyChanged(e.PropertyName);
+        else
+            dispatcher.BeginInvoke(() => OnPropertyChanged(e.PropertyName));
     }
 
     public void InvalidateTones()
@@ -958,6 +967,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     public void Dispose()
     {
+        pronounce.PropertyChanged -= OnPronouncePropertyChanged;
         ObservePitchPoints(null);
         Notes.CollectionChanged -= OnNotesChanged;
         VisibleNotes.Clear();

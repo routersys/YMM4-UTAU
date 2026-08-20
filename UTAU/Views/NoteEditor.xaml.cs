@@ -80,11 +80,7 @@ public partial class NoteEditor : UserControl, IPropertyEditorControl
 
     void Scroller_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateFit();
 
-    void PopupButton_BeginEdit(object sender, EventArgs e)
-    {
-        ViewModel?.InvalidateMessages();
-        BeginEdit?.Invoke(this, e);
-    }
+    void PopupButton_BeginEdit(object sender, EventArgs e) => BeginEdit?.Invoke(this, e);
 
     void PopupButton_EndEdit(object sender, EventArgs e) => EndEdit?.Invoke(this, e);
 

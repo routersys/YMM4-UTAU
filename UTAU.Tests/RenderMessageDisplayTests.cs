@@ -85,7 +85,6 @@ public sealed class RenderMessageDisplayTests
             var host = Build(viewModel);
 
             Task.Run(() => pronounce.RenderMessage = Warning).GetAwaiter().GetResult();
-            viewModel.InvalidateMessages();
             Dispatcher.CurrentDispatcher.Invoke(() => { }, DispatcherPriority.Background);
 
             return WarningBlock(host).Text;
