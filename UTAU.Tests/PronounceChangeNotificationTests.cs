@@ -115,11 +115,28 @@ public sealed class PronounceChangeNotificationTests
     }
 
     [Fact]
-    public void SourceTextChangesNotifyTheHost()
+    public void SynthesisOutputsDoNotReachTheUndoHistory()
     {
         var (pronounce, count) = CreateObserved();
         pronounce.SourceText = "あ";
-        Assert.True(count() > 0);
+        pronounce.ImportMessage = "取り込みました";
+        pronounce.RenderMessage = "見つかりません";
+        pronounce.LipSyncFrames = [];
+        Assert.Equal(0, count());
+    }
+
+    [Fact]
+    public void SynthesisOutputsStillRaisePropertyChanged()
+    {
+        var pronounce = new UTAUVoicePronounce();
+        var changed = new List<string>();
+        pronounce.PropertyChanged += (_, e) => changed.Add(e.PropertyName ?? string.Empty);
+
+        pronounce.SourceText = "あ";
+        pronounce.RenderMessage = "見つかりません";
+
+        Assert.Contains(nameof(UTAUVoicePronounce.SourceText), changed);
+        Assert.Contains(nameof(UTAUVoicePronounce.RenderMessage), changed);
     }
 
     [Fact]

@@ -56,28 +56,28 @@ internal sealed class UTAUVoicePronounce : UndoRedoable, IVoicePronounce
     public string SourceText
     {
         get => sourceText;
-        set => Set(ref sourceText, value ?? string.Empty);
+        set => SetWithoutUndoRedo(ref sourceText, value ?? string.Empty);
     }
 
     [Browsable(false)]
     public string ImportMessage
     {
         get => importMessage;
-        set => Set(ref importMessage, value ?? string.Empty);
+        set => SetWithoutUndoRedo(ref importMessage, value ?? string.Empty);
     }
 
     [Browsable(false)]
     public string RenderMessage
     {
         get => renderMessage;
-        set => Set(ref renderMessage, value ?? string.Empty);
+        set => SetWithoutUndoRedo(ref renderMessage, value ?? string.Empty);
     }
 
     [Browsable(false)]
     public LipSyncFrame[]? LipSyncFrames
     {
         get => lipSyncFrames;
-        set => Set(ref lipSyncFrames, value);
+        set => SetWithoutUndoRedo(ref lipSyncFrames, value);
     }
 
     public void BeginEdit()
