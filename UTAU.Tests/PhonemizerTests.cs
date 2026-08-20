@@ -123,6 +123,33 @@ public sealed class AliasResolverTests
     [Fact]
     public void UnknownMoraeStillOfferTheLiteralAlias()
         => Assert.Contains("漢", AliasResolver.EnumerateCandidates("漢", "-"));
+
+    [Fact]
+    public void RomajiLyricsAlsoOfferTheKanaForms()
+    {
+        var candidates = AliasResolver.EnumerateCandidates("ka", "a").ToArray();
+        Assert.Equal("a ka", candidates[0]);
+        Assert.Contains("a か", candidates);
+        Assert.Contains("か", candidates);
+        Assert.Contains("カ", candidates);
+    }
+
+    [Fact]
+    public void ContinuousLyricsAlsoOfferTheSingleForms()
+    {
+        var candidates = AliasResolver.EnumerateCandidates("a あ", "-").ToArray();
+        Assert.Contains("a あ", candidates);
+        Assert.Contains("- あ", candidates);
+        Assert.Contains("あ", candidates);
+        Assert.Contains("a", candidates);
+    }
+
+    [Fact]
+    public void AddedCandidatesStayDistinct()
+    {
+        var candidates = AliasResolver.EnumerateCandidates("a カ", "i").ToArray();
+        Assert.Equal(candidates.Length, candidates.Distinct(StringComparer.Ordinal).Count());
+    }
 }
 
 public sealed class PhonemizerTests : IDisposable
@@ -204,6 +231,47 @@ public sealed class PhonemizerTests : IDisposable
         var units = Phonemize(bank, Notes("あ。"));
 
         Assert.DoesNotContain("a -", units.Select(x => x.Alias));
+    }
+
+    static IReadOnlyList<UTAUNote> Lyrics(params string[] lyrics)
+        => [.. lyrics.Select(x => new UTAUNote { Lyric = x, LengthTicks = TimeBase.TicksPerQuarterNote, Tone = 60 })];
+
+    [Fact]
+    public void SingleKanaBankAcceptsRomajiLyrics()
+    {
+        var bank = TestVoiceBank.CreateSingleKanaBank(directory);
+        var units = Phonemize(bank, Lyrics("a", "ka", "sa"));
+
+        Assert.Equal(["あ", "か", "さ"], units.Select(x => x.Alias));
+        Assert.All(units, x => Assert.False(x.IsUnresolved));
+    }
+
+    [Fact]
+    public void SingleKanaBankAcceptsContinuousLyrics()
+    {
+        var bank = TestVoiceBank.CreateSingleKanaBank(directory);
+        var units = Phonemize(bank, Lyrics("- あ", "a か"));
+
+        Assert.Equal(["あ", "か"], units.Select(x => x.Alias));
+        Assert.All(units, x => Assert.False(x.IsUnresolved));
+    }
+
+    [Fact]
+    public void ContinuousBankAcceptsRomajiLyrics()
+    {
+        var bank = TestVoiceBank.CreateVcvBank(directory);
+        var units = Phonemize(bank, Lyrics("a", "ka"));
+
+        Assert.Equal(["- あ", "a か"], units.Select(x => x.Alias));
+    }
+
+    [Fact]
+    public void ContinuousLyricsFollowTheActualPreviousVowel()
+    {
+        var bank = TestVoiceBank.CreateVcvBank(directory);
+        var units = Phonemize(bank, Lyrics("i あ", "e か"));
+
+        Assert.Equal(["- あ", "a か"], units.Select(x => x.Alias));
     }
 
     [Fact]

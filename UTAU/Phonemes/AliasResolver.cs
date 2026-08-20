@@ -31,6 +31,8 @@ internal static class AliasResolver
     {
         var hiragana = KanaRomanization.ToHiragana(lyric);
         var katakana = KanaRomanization.ToKatakana(lyric);
+        var mora = KanaRomanization.ToMora(lyric);
+        var moraKatakana = KanaRomanization.ToKatakana(mora);
         KanaRomanization.TryGetRomaji(lyric, out var romaji);
 
         if (previousVowel.Length > 0)
@@ -38,6 +40,8 @@ internal static class AliasResolver
             yield return previousVowel + " " + lyric;
             yield return previousVowel + " " + hiragana;
             yield return previousVowel + " " + katakana;
+            yield return previousVowel + " " + mora;
+            yield return previousVowel + " " + moraKatakana;
             if (romaji is not null)
                 yield return previousVowel + " " + romaji;
         }
@@ -45,6 +49,8 @@ internal static class AliasResolver
         yield return lyric;
         yield return hiragana;
         yield return katakana;
+        yield return mora;
+        yield return moraKatakana;
         if (romaji is not null)
             yield return romaji;
     }

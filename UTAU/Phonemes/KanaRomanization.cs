@@ -4,6 +4,7 @@ internal static class KanaRomanization
 {
     public const string StartVowel = "-";
     public const string SilenceConsonant = "-";
+    public const char AliasSeparator = ' ';
 
     static readonly Dictionary<string, string> Table = new(StringComparer.Ordinal)
     {
@@ -49,8 +50,32 @@ internal static class KanaRomanization
 
     static readonly char[] Vowels = ['a', 'i', 'u', 'e', 'o'];
 
+    static readonly Dictionary<string, string> Kana = BuildKana();
+
     public static bool TryGetRomaji(string mora, out string romaji)
-        => Table.TryGetValue(ToHiragana(mora), out romaji!);
+        => Table.TryGetValue(ToMora(mora), out romaji!);
+
+    public static string ToMora(string lyric)
+    {
+        var separator = lyric.LastIndexOf(AliasSeparator);
+        var hiragana = ToHiragana(separator >= 0 ? lyric[(separator + 1)..] : lyric);
+        if (Table.ContainsKey(hiragana))
+            return hiragana;
+
+        return Kana.TryGetValue(hiragana, out var mapped) ? mapped : hiragana;
+    }
+
+    static Dictionary<string, string> BuildKana()
+    {
+        var kana = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var pair in Table)
+        {
+            if (kana.TryGetValue(pair.Value, out var existing) && string.CompareOrdinal(existing, pair.Key) <= 0)
+                continue;
+            kana[pair.Value] = pair.Key;
+        }
+        return kana;
+    }
 
     public static string? GetVowel(string mora)
     {

@@ -296,6 +296,48 @@ public sealed class KanaRomanizationTests
         Assert.Equal("アヴヶ", KanaRomanization.ToKatakana("あゔゖ"));
         Assert.Equal("ー", KanaRomanization.ToHiragana("ー"));
     }
+
+    [Theory]
+    [InlineData("ka", "か")]
+    [InlineData("KA", "か")]
+    [InlineData("shi", "し")]
+    [InlineData("n", "ん")]
+    [InlineData("kya", "きゃ")]
+    public void RomajiIsReadAsTheKanaMora(string lyric, string expected)
+        => Assert.Equal(expected, KanaRomanization.ToMora(lyric));
+
+    [Theory]
+    [InlineData("ji", "じ")]
+    [InlineData("zu", "ず")]
+    [InlineData("o", "お")]
+    [InlineData("ja", "じゃ")]
+    public void AmbiguousRomajiPicksTheCommonKana(string lyric, string expected)
+        => Assert.Equal(expected, KanaRomanization.ToMora(lyric));
+
+    [Theory]
+    [InlineData("a あ", "あ")]
+    [InlineData("- あ", "あ")]
+    [InlineData("a カ", "か")]
+    [InlineData("a ka", "か")]
+    public void TheContinuousPrefixIsDropped(string lyric, string expected)
+        => Assert.Equal(expected, KanaRomanization.ToMora(lyric));
+
+    [Fact]
+    public void RomajiAndContinuousLyricsExposeTheirVowelAndConsonant()
+    {
+        Assert.Equal("a", KanaRomanization.GetVowel("ka"));
+        Assert.Equal("k", KanaRomanization.GetConsonant("ka"));
+        Assert.Equal("a", KanaRomanization.GetVowel("a か"));
+        Assert.Equal("k", KanaRomanization.GetConsonant("a か"));
+    }
+
+    [Theory]
+    [InlineData("漢", "漢")]
+    [InlineData("", "")]
+    [InlineData("a k", "k")]
+    [InlineData("あ ", "")]
+    public void TextWithoutAKnownMoraIsLeftAsItIs(string lyric, string expected)
+        => Assert.Equal(expected, KanaRomanization.ToMora(lyric));
 }
 
 public sealed class TempoNotationTests
