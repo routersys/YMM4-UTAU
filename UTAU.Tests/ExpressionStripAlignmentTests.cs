@@ -40,7 +40,7 @@ public sealed class ExpressionStripAlignmentTests
     {
         var editor = new NoteEditor();
         var button = (PopupButton)editor.Content;
-        var root = (Grid)button.PopupContent;
+        var root = (Grid)button.PopupContent!;
         button.PopupContent = null;
 
         var pronounce = new UTAUVoicePronounce();
