@@ -7,7 +7,9 @@ internal static class KanaRomanization
     public const string StartVowel = "-";
     public const string SilenceConsonant = "-";
     public const string AnyVowel = "*";
+    public const string SyllabicNasal = "n";
     public const char AliasSeparator = ' ';
+    public const int StackTextLength = 128;
 
     static readonly Dictionary<string, string> Table = new(StringComparer.Ordinal)
     {
@@ -69,18 +71,40 @@ internal static class KanaRomanization
 
     static readonly Dictionary<string, string> Kana = BuildKana();
 
+    static readonly Dictionary<string, string>.AlternateLookup<ReadOnlySpan<char>> TableLookup
+        = Table.GetAlternateLookup<ReadOnlySpan<char>>();
+
+    static readonly Dictionary<string, string>.AlternateLookup<ReadOnlySpan<char>> KanaLookup
+        = Kana.GetAlternateLookup<ReadOnlySpan<char>>();
+
     public static bool TryGetRomaji(string mora, out string romaji)
-        => Table.TryGetValue(ToMora(mora), out romaji!);
+    {
+        Span<char> buffer = stackalloc char[StackTextLength];
+        return TryGetRomaji(mora.AsSpan(), buffer, out romaji);
+    }
+
+    public static bool TryGetRomaji(ReadOnlySpan<char> mora, Span<char> buffer, out string romaji)
+        => TableLookup.TryGetValue(ToMora(mora, buffer), out romaji!);
 
     public static string ToMora(string lyric)
     {
-        var normalized = AliasNormalizer.Normalize(lyric);
+        Span<char> buffer = stackalloc char[StackTextLength];
+        var mora = ToMora(lyric.AsSpan(), buffer);
+        return mora.SequenceEqual(lyric) ? lyric : mora.ToString();
+    }
+
+    public static ReadOnlySpan<char> ToMora(ReadOnlySpan<char> lyric, Span<char> buffer)
+    {
+        var half = buffer.Length / 2;
+        var normalized = AliasNormalizer.Normalize(lyric, buffer[..half]);
         var separator = normalized.LastIndexOf(AliasSeparator);
-        var hiragana = ToHiragana(separator >= 0 ? normalized[(separator + 1)..] : normalized);
-        if (Table.ContainsKey(hiragana))
+        var tail = separator >= 0 ? normalized[(separator + 1)..] : normalized;
+        var hiragana = ToHiragana(tail, buffer[half..]);
+
+        if (TableLookup.ContainsKey(hiragana))
             return hiragana;
 
-        return Kana.TryGetValue(hiragana, out var mapped) ? mapped : hiragana;
+        return KanaLookup.TryGetValue(hiragana, out var mapped) ? mapped : hiragana;
     }
 
     static Dictionary<string, string> BuildKana()
@@ -100,49 +124,93 @@ internal static class KanaRomanization
 
     public static string? GetVowel(string mora)
     {
-        if (!TryGetRomaji(mora, out var romaji))
-            return null;
-        if (romaji == "n")
-            return "n";
+        Span<char> buffer = stackalloc char[StackTextLength];
+        var vowel = GetVowel(mora.AsSpan(), buffer);
+        return vowel.IsEmpty ? null : vowel.ToString();
+    }
 
-        var last = romaji[^1];
-        return Array.IndexOf(Vowels, last) >= 0 ? last.ToString() : null;
+    public static ReadOnlySpan<char> GetVowel(ReadOnlySpan<char> mora, Span<char> buffer)
+    {
+        if (!TryGetRomaji(mora, buffer, out var romaji))
+            return default;
+        if (romaji == SyllabicNasal)
+            return SyllabicNasal;
+
+        var last = romaji.Length - 1;
+        return Array.IndexOf(Vowels, romaji[last]) >= 0 ? romaji.AsSpan(last) : default;
     }
 
     public static string? GetConsonant(string mora)
     {
-        if (!TryGetRomaji(mora, out var romaji))
-            return null;
-        if (romaji == "n")
-            return "n";
+        Span<char> buffer = stackalloc char[StackTextLength];
+        var consonant = GetConsonant(mora.AsSpan(), buffer);
+        return consonant.IsEmpty ? null : consonant.ToString();
+    }
 
-        var last = romaji[^1];
-        if (Array.IndexOf(Vowels, last) < 0)
-            return null;
+    public static ReadOnlySpan<char> GetConsonant(ReadOnlySpan<char> mora, Span<char> buffer)
+    {
+        if (!TryGetRomaji(mora, buffer, out var romaji))
+            return default;
+        if (romaji == SyllabicNasal)
+            return SyllabicNasal;
 
-        var consonant = romaji[..^1];
-        return consonant.Length == 0 ? null : consonant;
+        var last = romaji.Length - 1;
+        if (Array.IndexOf(Vowels, romaji[last]) < 0)
+            return default;
+
+        return last == 0 ? default : romaji.AsSpan(0, last);
     }
 
     public static string ToHiragana(string text)
     {
-        Span<char> buffer = text.Length <= 64 ? stackalloc char[text.Length] : new char[text.Length];
-        for (var i = 0; i < text.Length; i++)
-        {
-            var c = text[i];
-            buffer[i] = c is >= 'ァ' and <= 'ヶ' ? (char)(c - 0x60) : c;
-        }
-        return new string(buffer);
+        Span<char> buffer = stackalloc char[StackTextLength];
+        var hiragana = ToHiragana(text.AsSpan(), buffer);
+        return hiragana.SequenceEqual(text) ? text : hiragana.ToString();
     }
+
+    public static ReadOnlySpan<char> ToHiragana(ReadOnlySpan<char> text, Span<char> buffer)
+        => Shift(text, buffer, 'ァ', 'ヶ', -0x60);
 
     public static string ToKatakana(string text)
     {
-        Span<char> buffer = text.Length <= 64 ? stackalloc char[text.Length] : new char[text.Length];
+        Span<char> buffer = stackalloc char[StackTextLength];
+        var katakana = ToKatakana(text.AsSpan(), buffer);
+        return katakana.SequenceEqual(text) ? text : katakana.ToString();
+    }
+
+    public static ReadOnlySpan<char> ToKatakana(ReadOnlySpan<char> text, Span<char> buffer)
+        => Shift(text, buffer, 'ぁ', 'ゖ', 0x60);
+
+    static ReadOnlySpan<char> Shift(ReadOnlySpan<char> text, Span<char> buffer, char low, char high, int delta)
+    {
+        var first = -1;
         for (var i = 0; i < text.Length; i++)
         {
-            var c = text[i];
-            buffer[i] = c is >= 'ぁ' and <= 'ゖ' ? (char)(c + 0x60) : c;
+            if (text[i] < low || text[i] > high)
+                continue;
+            first = i;
+            break;
         }
-        return new string(buffer);
+
+        if (first < 0)
+            return text;
+        if (buffer.Length < text.Length)
+            return new string(ShiftToNew(text, low, high, delta));
+
+        text.CopyTo(buffer);
+        var target = buffer[..text.Length];
+        for (var i = first; i < target.Length; i++)
+            if (target[i] >= low && target[i] <= high)
+                target[i] = (char)(target[i] + delta);
+        return target;
+    }
+
+    static char[] ShiftToNew(ReadOnlySpan<char> text, char low, char high, int delta)
+    {
+        var copy = text.ToArray();
+        for (var i = 0; i < copy.Length; i++)
+            if (copy[i] >= low && copy[i] <= high)
+                copy[i] = (char)(copy[i] + delta);
+        return copy;
     }
 }
