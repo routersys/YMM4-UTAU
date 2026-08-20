@@ -57,13 +57,18 @@ public sealed class UstTests
     }
 
     [Theory]
-    [InlineData("a　か", "a か")]
-    [InlineData("a  か", "a か")]
-    [InlineData("が", "が")]
-    [InlineData("- あ", "- あ")]
+    [InlineData("a　か")]
+    [InlineData("a  か")]
+    [InlineData("が")]
+    [InlineData("- あ")]
+    [InlineData("-")]
+    public void ImportedLyricsKeepWhatTheFileSays(string written)
+        => Assert.Equal(written, SingleNote(written).Lyric);
+
+    [Theory]
     [InlineData("R", "R")]
-    [InlineData("-", "-")]
-    public void ImportedLyricsAreComposedAndSpacedConsistently(string written, string expected)
+    [InlineData("r", "R")]
+    public void ImportedRestsTakeTheCanonicalSpelling(string written, string expected)
         => Assert.Equal(expected, SingleNote(written).Lyric);
 
     [Fact]

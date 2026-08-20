@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text;
 using UTAU.Models;
 
 namespace UTAU.Notes;
@@ -221,35 +220,10 @@ internal static class UstImporter
             lyric = lyric[1..].Trim();
         }
 
-        return (NormalizeLyric(lyric), ignorePrefixMap, suppressAutoVcv);
-    }
-
-    static string NormalizeLyric(string lyric)
-    {
         if (lyric.Equals(UstKeys.RestLyric, StringComparison.OrdinalIgnoreCase))
-            return UTAUNote.RestLyric;
+            lyric = UTAUNote.RestLyric;
 
-        var normalized = lyric.Normalize(NormalizationForm.FormC);
-        var builder = new StringBuilder(normalized.Length);
-        var pendingSpace = false;
-
-        foreach (var c in normalized)
-        {
-            if (char.IsWhiteSpace(c))
-            {
-                pendingSpace = builder.Length > 0;
-                continue;
-            }
-
-            if (pendingSpace)
-            {
-                builder.Append(' ');
-                pendingSpace = false;
-            }
-            builder.Append(c);
-        }
-
-        return builder.ToString();
+        return (lyric, ignorePrefixMap, suppressAutoVcv);
     }
 
     static (double Milliseconds, double Cents) ParsePitchBendStart(string? text)
