@@ -36,43 +36,52 @@
                     <RowDefinition Height="14"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal">
-                    <Button Width="26" Height="26" Command="{Binding ZoomOutCommand}" ToolTip="{x:Static root:Texts.ZoomOut}"
-                            Content="{DynamicResource {x:Static icons:IconKeys.MagnifyMinusOutline}}"/>
-                    <Button Width="26" Height="26" Command="{Binding ZoomInCommand}" ToolTip="{x:Static root:Texts.ZoomIn}"
-                            Content="{DynamicResource {x:Static icons:IconKeys.MagnifyPlusOutline}}"/>
-                    <Button Width="26" Height="26" Command="{Binding ZoomVerticalOutCommand}" ToolTip="{x:Static root:Texts.ZoomVerticalOut}"
-                            Content="{DynamicResource {x:Static icons:IconKeys.ArrowCollapseVertical}}"/>
-                    <Button Width="26" Height="26" Command="{Binding ZoomVerticalInCommand}" ToolTip="{x:Static root:Texts.ZoomVerticalIn}"
-                            Content="{DynamicResource {x:Static icons:IconKeys.ArrowExpandVertical}}"/>
-                    <Button Width="26" Height="26" Command="{Binding FitCommand}" ToolTip="{x:Static root:Texts.FitToWindow}"
-                            Content="{DynamicResource {x:Static icons:IconKeys.FitToScreenOutline}}"/>
-                    <Button Width="26" Height="26" Command="{Binding InsertRestCommand}" ToolTip="{x:Static root:Texts.InsertRest}"
-                            Content="{DynamicResource {x:Static icons:IconKeys.Plus}}"/>
-                    <Button Width="26" Height="26" Command="{Binding RemoveNoteCommand}" ToolTip="{x:Static root:Texts.RemoveNote}"
-                            Content="{DynamicResource {x:Static icons:IconKeys.Delete}}"/>
-                    <Button Width="26" Height="26" Command="{Binding SelectAllCommand}" ToolTip="{x:Static root:Texts.SelectAllNotes}"
-                            Content="{DynamicResource {x:Static icons:IconKeys.SelectAll}}"/>
-                    <TextBlock Text="{x:Static root:Texts.SnapLabel}" VerticalAlignment="Center" Margin="6,0,3,0"/>
-                    <ComboBox Width="88" Height="26" VerticalContentAlignment="Center"
-                              ItemsSource="{Binding SnapDivisions}"
-                              SelectedItem="{Binding SnapDivision}"
-                              DisplayMemberPath="Name"/>
-                    <TextBlock Text="{x:Static root:Texts.ExpressionLabel}" VerticalAlignment="Center" Margin="12,0,3,0"/>
-                    <ComboBox Width="110" Height="26" VerticalContentAlignment="Center"
-                              ItemsSource="{Binding Expressions}"
-                              SelectedItem="{Binding SelectedExpression}"
-                              DisplayMemberPath="Name"/>
-                    <Button Width="26" Height="26" Command="{Binding ResetExpressionCommand}" ToolTip="{x:Static root:Texts.ResetExpression}"
-                            Content="{DynamicResource {x:Static icons:IconKeys.Restore}}"/>
-                    <TextBlock Text="{Binding SelectionText}" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.75"/>
-                    <TextBlock Text="{Binding GuideText}" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.75"/>
-                    <TextBlock Text="{Binding ImportMessage}" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.75"
-                               TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Text="{Binding RenderMessage}" VerticalAlignment="Center" Margin="12,0,0,0"
-                               Foreground="{DynamicResource {x:Static theme:YMM4Colors.WarningBannerForegroundBrushKey}}"
-                               TextTrimming="CharacterEllipsis"/>
-                </StackPanel>
+                <Grid Grid.Row="0" Grid.ColumnSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <Button Width="26" Height="26" Command="{Binding ZoomOutCommand}" ToolTip="{x:Static root:Texts.ZoomOut}"
+                                Content="{DynamicResource {x:Static icons:IconKeys.MagnifyMinusOutline}}"/>
+                        <Button Width="26" Height="26" Command="{Binding ZoomInCommand}" ToolTip="{x:Static root:Texts.ZoomIn}"
+                                Content="{DynamicResource {x:Static icons:IconKeys.MagnifyPlusOutline}}"/>
+                        <Button Width="26" Height="26" Command="{Binding ZoomVerticalOutCommand}" ToolTip="{x:Static root:Texts.ZoomVerticalOut}"
+                                Content="{DynamicResource {x:Static icons:IconKeys.ArrowCollapseVertical}}"/>
+                        <Button Width="26" Height="26" Command="{Binding ZoomVerticalInCommand}" ToolTip="{x:Static root:Texts.ZoomVerticalIn}"
+                                Content="{DynamicResource {x:Static icons:IconKeys.ArrowExpandVertical}}"/>
+                        <Button Width="26" Height="26" Command="{Binding FitCommand}" ToolTip="{x:Static root:Texts.FitToWindow}"
+                                Content="{DynamicResource {x:Static icons:IconKeys.FitToScreenOutline}}"/>
+                        <Button Width="26" Height="26" Command="{Binding InsertRestCommand}" ToolTip="{x:Static root:Texts.InsertRest}"
+                                Content="{DynamicResource {x:Static icons:IconKeys.Plus}}"/>
+                        <Button Width="26" Height="26" Command="{Binding RemoveNoteCommand}" ToolTip="{x:Static root:Texts.RemoveNote}"
+                                Content="{DynamicResource {x:Static icons:IconKeys.Delete}}"/>
+                        <Button Width="26" Height="26" Command="{Binding SelectAllCommand}" ToolTip="{x:Static root:Texts.SelectAllNotes}"
+                                Content="{DynamicResource {x:Static icons:IconKeys.SelectAll}}"/>
+                        <TextBlock Text="{x:Static root:Texts.SnapLabel}" VerticalAlignment="Center" Margin="6,0,3,0"/>
+                        <ComboBox Width="88" Height="26" VerticalContentAlignment="Center"
+                                  ItemsSource="{Binding SnapDivisions}"
+                                  SelectedItem="{Binding SnapDivision}"
+                                  DisplayMemberPath="Name"/>
+                        <TextBlock Text="{x:Static root:Texts.ExpressionLabel}" VerticalAlignment="Center" Margin="12,0,3,0"/>
+                        <ComboBox Width="110" Height="26" VerticalContentAlignment="Center"
+                                  ItemsSource="{Binding Expressions}"
+                                  SelectedItem="{Binding SelectedExpression}"
+                                  DisplayMemberPath="Name"/>
+                        <Button Width="26" Height="26" Command="{Binding ResetExpressionCommand}" ToolTip="{x:Static root:Texts.ResetExpression}"
+                                Content="{DynamicResource {x:Static icons:IconKeys.Restore}}"/>
+                        <TextBlock Text="{Binding SelectionText}" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.75"/>
+                        <TextBlock Text="{Binding GuideText}" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.75"/>
+                    </StackPanel>
+
+                    <DockPanel Grid.Column="1">
+                        <TextBlock DockPanel.Dock="Right" Text="{Binding RenderMessage}" VerticalAlignment="Center" Margin="12,0,0,0"
+                                   Foreground="{DynamicResource {x:Static theme:YMM4Colors.WarningBannerForegroundBrushKey}}"
+                                   TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Text="{Binding ImportMessage}" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.75"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </DockPanel>
+                </Grid>
 
                 <ScrollViewer x:Name="VerticalScroller" Grid.Row="1" Grid.Column="0"
                               VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
