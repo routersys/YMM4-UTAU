@@ -122,7 +122,7 @@ jobs:
           git add -A
           $pending = git diff --cached --name-only
           if ($pending) {
-            git commit -m "バージョンを$tagへ合わせる" --quiet
+            git commit -m "バージョンを${tag}へ合わせる" --quiet
             git push origin HEAD:main
             Write-Host "main へ訂正を反映しました"
           } else {
