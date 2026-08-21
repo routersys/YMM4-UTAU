@@ -50,6 +50,88 @@ jobs:
           echo "TAG=$tag" >> $env:GITHUB_OUTPUT
           echo "VERSION=$($tag.TrimStart('v'))" >> $env:GITHUB_OUTPUT
 
+      - name: バージョン記載の照合と訂正
+        shell: pwsh
+        run: |
+          function Read-TextKeepingBom {
+            param([string]$Path)
+            $bytes = [System.IO.File]::ReadAllBytes($Path)
+            $hasBom = $bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF
+            $offset = 0
+            if ($hasBom) { $offset = 3 }
+            return @{
+              Text = [System.Text.Encoding]::UTF8.GetString($bytes, $offset, $bytes.Length - $offset)
+              HasBom = $hasBom
+            }
+          }
+
+          function Write-TextKeepingBom {
+            param([string]$Path, [string]$Text, [bool]$HasBom)
+            $body = [System.Text.Encoding]::UTF8.GetBytes($Text)
+            if ($HasBom) { $body = [byte[]](0xEF, 0xBB, 0xBF) + $body }
+            [System.IO.File]::WriteAllBytes($Path, $body)
+          }
+
+          function Repair-VersionFiles {
+            param([string]$Root, [string]$Version, [string]$Tag)
+            $changed = @()
+
+            $csprojPath = Join-Path $Root "UTAU/UTAU.csproj"
+            $csproj = Read-TextKeepingBom -Path $csprojPath
+            $wantedCsproj = "<Version>$Version</Version>"
+            if (-not $csproj.Text.Contains($wantedCsproj)) {
+              $updated = $csproj.Text -replace '<Version>[^<]*</Version>', $wantedCsproj
+              if (-not $updated.Contains($wantedCsproj)) { throw "UTAU.csproj に <Version> が見つかりませんでした" }
+              Write-TextKeepingBom -Path $csprojPath -Text $updated -HasBom $csproj.HasBom
+              $changed += "UTAU/UTAU.csproj"
+            }
+
+            $readmePath = Join-Path $Root ".github/Plugin_Readme.txt"
+            $readme = Read-TextKeepingBom -Path $readmePath
+            $wantedHeading = " UTAU for YMM4 $Tag"
+            if (-not $readme.Text.Contains($wantedHeading)) {
+              $updated = $readme.Text -replace '(?m)^( UTAU for YMM4 )v[0-9][^\r\n]*', "`${1}$Tag"
+              if (-not $updated.Contains($wantedHeading)) { throw "Plugin_Readme.txt の見出しが見つかりませんでした" }
+              Write-TextKeepingBom -Path $readmePath -Text $updated -HasBom $readme.HasBom
+              $changed += ".github/Plugin_Readme.txt"
+            }
+
+            return $changed
+          }
+
+          $tag = "${{ steps.version.outputs.TAG }}"
+          $version = "${{ steps.version.outputs.VERSION }}"
+          $changed = Repair-VersionFiles -Root "." -Version $version -Tag $tag
+
+          if ($changed.Count -eq 0) {
+            Write-Host "バージョン記載は $tag と一致しています"
+            exit 0
+          }
+
+          Write-Host "タグと合わない記載を訂正しました: $($changed -join ', ')"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main --quiet
+
+          $sync = Join-Path $env:RUNNER_TEMP "version-sync"
+          git worktree add $sync origin/main --quiet
+          Repair-VersionFiles -Root $sync -Version $version -Tag $tag | Out-Null
+
+          Push-Location $sync
+          git add -A
+          $pending = git diff --cached --name-only
+          if ($pending) {
+            git commit -m "バージョンを$tagへ合わせる" --quiet
+            git push origin HEAD:main
+            Write-Host "main へ訂正を反映しました"
+          } else {
+            Write-Host "main は既に $tag と一致しています"
+          }
+          Pop-Location
+
+          git worktree remove $sync --force
+
       - name: resx ファイルの生成（初回ビルド）
         shell: pwsh
         run: |
@@ -101,12 +183,10 @@ jobs:
           Copy-Item ".github/Plugin_Readme.txt" "$stageRoot/Readme.txt"
 
           $readme = Get-Content "$stageRoot/Readme.txt" -Raw
-          $stamped = $readme -replace '(?m)^( UTAU for YMM4 )v[0-9][^\r\n]*', "`${1}$version"
-          if (-not $stamped.Contains(" UTAU for YMM4 $version")) {
-            Write-Error "Readme.txt の見出しへ $version を書き込めませんでした"
+          if (-not $readme.Contains(" UTAU for YMM4 $version")) {
+            Write-Error "同梱する Readme.txt の見出しが $version と一致しません"
             exit 1
           }
-          Set-Content "$stageRoot/Readme.txt" -Value $stamped -NoNewline
 
           Compress-Archive -Path "stage/*" -DestinationPath $pkgName -CompressionLevel Optimal
           echo "PKG_NAME=$pkgName" >> $env:GITHUB_OUTPUT
