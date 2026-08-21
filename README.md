@@ -11,6 +11,8 @@ YukkuriMovieMaker4（YMM4）上で動作する、UTAU 音源から歌声を合�
 単独音・連続音・CVVC のいずれの音源にも対応し、UST ファイルの読み込みにも対応します。
 セリフのかなから組み立てたノートは、ピアノロールのノートエディターで編集できます。
 
+![Image](https://github.com/routersys/YMM4-UTAU/blob/main/docs/UTAU.png)
+
 ---
 
 ## 目次
