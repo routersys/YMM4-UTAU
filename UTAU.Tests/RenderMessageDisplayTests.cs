@@ -68,10 +68,10 @@ public sealed class RenderMessageDisplayTests
         return host;
     }
 
-    static TextBlock WarningBlock(Border host)
+    static ScrollingText WarningBlock(Border host)
         => Descend(host)
             .OfType<DockPanel>()
-            .SelectMany(x => x.Children.OfType<TextBlock>())
+            .SelectMany(x => x.Children.OfType<ScrollingText>())
             .First(x => DockPanel.GetDock(x) == Dock.Right);
 
     [Fact]

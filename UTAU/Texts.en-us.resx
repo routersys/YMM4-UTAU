@@ -204,8 +204,8 @@
 <data name="UstLegacyPitchIgnored" xml:space="preserve"><value>The legacy pitch data was not imported</value></data>
 <data name="UstRestTrimmedFormat" xml:space="preserve"><value>Trimmed {0} ticks of leading and trailing rests</value></data>
 <data name="UstPhraseTotalFormat" xml:space="preserve"><value>{0} phrases in total</value></data>
-<data name="UstPhraseRangeFormat" xml:space="preserve"><value>Loaded {1} phrases starting at phrase {0}</value></data>
-<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>Starts {0} ticks into the original</value></data>
+<data name="UstPhraseRangeFormat" xml:space="preserve"><value>{1} of {2} phrases from {0}</value></data>
+<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>from tick {0} of the original</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>Tempo</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>0 follows the tempo of the score. A value changes the tempo from this note onward.</value></data>
 </root>

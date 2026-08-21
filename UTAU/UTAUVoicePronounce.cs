@@ -135,19 +135,17 @@ internal sealed class UTAUVoicePronounce : UndoRedoable, IVoicePronounce
 
     static string BuildImportMessage(UstImportResult imported, UstPhraseRange range)
     {
-        var parts = new List<string>
-        {
-            string.Format(Texts.UstImportedFormat, imported.Notes.Count),
-            string.Format(Texts.UstPhraseTotalFormat, imported.TotalPhrases),
-        };
+        var parts = new List<string> { string.Format(Texts.UstImportedFormat, imported.Notes.Count) };
 
-        if (!range.CoversEverything)
+        if (range.CoversEverything)
+            parts.Add(string.Format(Texts.UstPhraseTotalFormat, imported.TotalPhrases));
+        else
         {
             var taken = range.Count > 0 ? range.Count : imported.TotalPhrases - range.Start + 1;
-            parts.Add(string.Format(Texts.UstPhraseRangeFormat, range.Start, Math.Max(taken, 0)));
+            parts.Add(string.Format(Texts.UstPhraseRangeFormat, range.Start, Math.Max(taken, 0), imported.TotalPhrases));
         }
 
-        if (imported.StartTicks > 0)
+        if (!range.CoversEverything && imported.StartTicks > 0)
             parts.Add(string.Format(Texts.UstPhraseOffsetFormat, imported.StartTicks));
         if (imported.TrimmedRestTicks > 0)
             parts.Add(string.Format(Texts.UstRestTrimmedFormat, imported.TrimmedRestTicks));

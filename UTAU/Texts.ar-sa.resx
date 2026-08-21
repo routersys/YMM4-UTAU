@@ -204,8 +204,8 @@
 <data name="UstLegacyPitchIgnored" xml:space="preserve"><value>لم يتم استيراد بيانات الدرجة القديمة</value></data>
 <data name="UstRestTrimmedFormat" xml:space="preserve"><value>تمت إزالة {0} تِك من السكتات في البداية والنهاية</value></data>
 <data name="UstPhraseTotalFormat" xml:space="preserve"><value>{0} عبارة إجمالاً</value></data>
-<data name="UstPhraseRangeFormat" xml:space="preserve"><value>تم تحميل {1} عبارة بدءاً من العبارة {0}</value></data>
-<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>يبدأ عند التِك {0} من الأصل</value></data>
+<data name="UstPhraseRangeFormat" xml:space="preserve"><value>{1} من {2} عبارة بدءاً من {0}</value></data>
+<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>من التِك {0} في الأصل</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>الإيقاع</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>القيمة 0 تتبع إيقاع النوتة الموسيقية. وإدخال قيمة يغيّر الإيقاع بدءاً من هذه النوتة.</value></data>
 </root>

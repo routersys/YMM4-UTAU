@@ -204,8 +204,8 @@
 <data name="UstLegacyPitchIgnored" xml:space="preserve"><value>旧式の音程は取り込めません</value></data>
 <data name="UstRestTrimmedFormat" xml:space="preserve"><value>前後の休符 {0} ティックを除きました</value></data>
 <data name="UstPhraseTotalFormat" xml:space="preserve"><value>全 {0} フレーズ</value></data>
-<data name="UstPhraseRangeFormat" xml:space="preserve"><value>フレーズ {0} から {1} 個を読み込みました</value></data>
-<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>元の {0} ティック目から始まります</value></data>
+<data name="UstPhraseRangeFormat" xml:space="preserve"><value>全 {2} フレーズ中 {0} から {1} 個</value></data>
+<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>元の {0} ティック目から</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>テンポ</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>0でこの譜面のテンポに従います。値を入れるとこのノートから先のテンポが変わります。</value></data>
 </root>

@@ -204,8 +204,8 @@
 <data name="UstLegacyPitchIgnored" xml:space="preserve"><value>未导入旧式音高数据</value></data>
 <data name="UstRestTrimmedFormat" xml:space="preserve"><value>已去除首尾休止符 {0} 刻</value></data>
 <data name="UstPhraseTotalFormat" xml:space="preserve"><value>共 {0} 个乐句</value></data>
-<data name="UstPhraseRangeFormat" xml:space="preserve"><value>从第 {0} 个乐句起载入了 {1} 个</value></data>
-<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>从原曲第 {0} 刻开始</value></data>
+<data name="UstPhraseRangeFormat" xml:space="preserve"><value>共 {2} 个乐句中自第 {0} 个起 {1} 个</value></data>
+<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>自原曲第 {0} 刻</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>速度</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>0 表示沿用乐谱的速度。填入数值则从该音符起改变速度。</value></data>
 </root>

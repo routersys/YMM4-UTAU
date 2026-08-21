@@ -204,8 +204,8 @@
 <data name="UstLegacyPitchIgnored" xml:space="preserve"><value>Los datos de tono heredados no se importaron</value></data>
 <data name="UstRestTrimmedFormat" xml:space="preserve"><value>Se recortaron {0} tics de silencios inicial y final</value></data>
 <data name="UstPhraseTotalFormat" xml:space="preserve"><value>{0} frases en total</value></data>
-<data name="UstPhraseRangeFormat" xml:space="preserve"><value>Se cargaron {1} frases desde la frase {0}</value></data>
-<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>Empieza en el tic {0} del original</value></data>
+<data name="UstPhraseRangeFormat" xml:space="preserve"><value>{1} de {2} frases desde la {0}</value></data>
+<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>desde el tic {0} del original</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>Tempo</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>0 sigue el tempo de la partitura. Un valor cambia el tempo a partir de esta nota.</value></data>
 </root>

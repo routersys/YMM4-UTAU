@@ -150,7 +150,8 @@ public sealed class UstPhraseRangeTests : IDisposable
         Assert.Equal(["か", "あ"], second.Notes.Select(x => x.Lyric));
         Assert.Equal(UstPhraseRange.All, whole.ImportedRange);
         Assert.Equal(new UstPhraseRange(2, 1), second.ImportedRange);
-        Assert.Contains(string.Format(Texts.UstPhraseTotalFormat, Phrases.Length), second.ImportMessage);
+        Assert.Contains(string.Format(Texts.UstPhraseRangeFormat, 2, 1, Phrases.Length), second.ImportMessage);
+        Assert.Contains(string.Format(Texts.UstPhraseTotalFormat, Phrases.Length), whole.ImportMessage);
         Assert.Contains(string.Format(Texts.UstPhraseOffsetFormat, 2160), second.ImportMessage);
     }
 

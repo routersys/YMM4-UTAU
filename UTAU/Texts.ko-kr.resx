@@ -204,8 +204,8 @@
 <data name="UstLegacyPitchIgnored" xml:space="preserve"><value>구형 음정 자료는 가져오지 않았습니다</value></data>
 <data name="UstRestTrimmedFormat" xml:space="preserve"><value>앞뒤 쉼표 {0}틱을 제거했습니다</value></data>
 <data name="UstPhraseTotalFormat" xml:space="preserve"><value>전체 {0} 프레이즈</value></data>
-<data name="UstPhraseRangeFormat" xml:space="preserve"><value>프레이즈 {0}부터 {1}개를 불러왔습니다</value></data>
-<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>원곡의 {0}틱부터 시작합니다</value></data>
+<data name="UstPhraseRangeFormat" xml:space="preserve"><value>전체 {2} 프레이즈 중 {0}부터 {1}개</value></data>
+<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>원곡 {0}틱부터</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>템포</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>0이면 악보의 템포를 따릅니다. 값을 넣으면 이 노트부터 템포가 바뀝니다.</value></data>
 </root>

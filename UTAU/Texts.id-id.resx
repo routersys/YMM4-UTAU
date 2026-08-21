@@ -204,8 +204,8 @@
 <data name="UstLegacyPitchIgnored" xml:space="preserve"><value>Data nada lawas tidak diimpor</value></data>
 <data name="UstRestTrimmedFormat" xml:space="preserve"><value>Memangkas {0} tik istirahat di awal dan akhir</value></data>
 <data name="UstPhraseTotalFormat" xml:space="preserve"><value>Total {0} frasa</value></data>
-<data name="UstPhraseRangeFormat" xml:space="preserve"><value>Memuat {1} frasa mulai dari frasa {0}</value></data>
-<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>Dimulai pada tik {0} dari aslinya</value></data>
+<data name="UstPhraseRangeFormat" xml:space="preserve"><value>{1} dari {2} frasa mulai {0}</value></data>
+<data name="UstPhraseOffsetFormat" xml:space="preserve"><value>dari tik {0} aslinya</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>Tempo</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>0 mengikuti tempo partitur. Sebuah nilai mengubah tempo mulai dari not ini.</value></data>
 </root>
