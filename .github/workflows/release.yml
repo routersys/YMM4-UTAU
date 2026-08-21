@@ -100,6 +100,14 @@ jobs:
           Copy-Item ".github/LICENSE/*.txt"     "$stageRoot/LICENSE/"
           Copy-Item ".github/Plugin_Readme.txt" "$stageRoot/Readme.txt"
 
+          $readme = Get-Content "$stageRoot/Readme.txt" -Raw
+          $stamped = $readme -replace '(?m)^( UTAU for YMM4 )v[0-9][^\r\n]*', "`${1}$version"
+          if (-not $stamped.Contains(" UTAU for YMM4 $version")) {
+            Write-Error "Readme.txt の見出しへ $version を書き込めませんでした"
+            exit 1
+          }
+          Set-Content "$stageRoot/Readme.txt" -Value $stamped -NoNewline
+
           Compress-Archive -Path "stage/*" -DestinationPath $pkgName -CompressionLevel Optimal
           echo "PKG_NAME=$pkgName" >> $env:GITHUB_OUTPUT
 
