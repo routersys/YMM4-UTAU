@@ -97,7 +97,7 @@ internal sealed class PitchTrack
         for (var n = 0; n < notes.Count; n++)
         {
             var note = notes[n];
-            if (note.Note.PitchPoints.Count < 2 || note.Note.LengthTicks <= 0)
+            if (note.Note.PitchPoints.Count == 0 || note.Note.LengthTicks <= 0)
                 continue;
 
             var scale = note.LengthMilliseconds / note.Note.LengthTicks;
@@ -105,7 +105,9 @@ internal sealed class PitchTrack
             foreach (var point in note.Note.PitchPoints)
                 points.Add((note.StartMilliseconds + point.Ticks * scale, note.Cents + point.Cents, point.Shape));
 
-            if (points[0].X > note.StartMilliseconds)
+            if (n == 0 && points[0].X > startMilliseconds)
+                points.Insert(0, (startMilliseconds, points[0].Y, points[0].Shape));
+            else if (points[0].X > note.StartMilliseconds)
                 points.Insert(0, (note.StartMilliseconds, points[0].Y, points[0].Shape));
             if (points[^1].X < note.EndMilliseconds)
                 points.Add((note.EndMilliseconds, points[^1].Y, points[^1].Shape));
