@@ -314,6 +314,12 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
         Array.Clear(voicedWeight, 0, frameCount);
         Array.Clear(logF0Sum, 0, frameCount);
 
+        var track = PitchTrack.Create(
+            [.. segment.TimingIndices.Select(x => timings[x])],
+            offset + segment.StartFrame * framePeriod,
+            framePeriod,
+            frameCount);
+
         foreach (var index in segment.TimingIndices)
         {
             var source = BuildSource(requests[index], arena);
@@ -323,6 +329,7 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
             AccumulateUnit(
                 timings[index],
                 source,
+                track,
                 offset,
                 framePeriod,
                 segment.StartFrame,
@@ -359,6 +366,7 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
     void AccumulateUnit(
         UnitTiming timing,
         UnitSource source,
+        PitchTrack track,
         double offset,
         double framePeriod,
         int segmentStartFrame,
@@ -420,11 +428,7 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
             if (sourceF0 <= 0.0)
                 continue;
 
-            var progress = unit.NoteLengthMilliseconds > 0.0
-                ? (absolute - unit.NoteStartMilliseconds) / unit.NoteLengthMilliseconds
-                : 0.0;
-            var cents = note.EvaluatePitchOffsetCents(progress, unit.NoteLengthMilliseconds);
-            var targetF0 = MusicalTone.FrequencyOf(unit.Tone + cents / 100.0);
+            var targetF0 = MusicalTone.FrequencyOf(track.CentsAt(frame) / 100.0);
             var ratio = source.MeanF0 > 0.0 ? sourceF0 / source.MeanF0 : 1.0;
             var value = targetF0 * Math.Pow(ratio, modulation);
             if (!double.IsFinite(value) || value <= 0.0)

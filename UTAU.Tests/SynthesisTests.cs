@@ -494,3 +494,53 @@ public sealed class AnalysisCacheTests
         Assert.Equal(0, cache.UsedBytes);
     }
 }
+
+public sealed class PitchTrackTests
+{
+    static PhonemeUnit Unit(double start, double length, int tone, double preutterance, double overlap)
+        => new(
+            new UTAUNote { Lyric = "a", Tone = tone },
+            new OtoEntry(@"C:ank", "a.wav", "a", 0.0, 0.0, 0.0, preutterance, overlap),
+            "a",
+            start,
+            length,
+            start,
+            length,
+            tone);
+
+    static PitchTrack Track(params PhonemeUnit[] units)
+        => PitchTrack.Create(UnitTimingBuilder.Build(units), 0.0, 5.0, 80);
+
+    [Fact]
+    public void ThePitchStepsAtTheNoteBoundary()
+    {
+        var track = Track(Unit(0.0, 200.0, 60, 0.0, 0.0), Unit(200.0, 200.0, 72, 80.0, 40.0));
+
+        Assert.Equal(6000.0, track.CentsAt(39), 9);
+        Assert.Equal(7200.0, track.CentsAt(40), 9);
+        for (var frame = 0; frame < 80; frame++)
+            Assert.True(track.CentsAt(frame) is 6000.0 or 7200.0);
+    }
+
+    [Fact]
+    public void TheOverlapKeepsThePitchOfThePreviousNote()
+    {
+        var track = Track(Unit(0.0, 200.0, 60, 0.0, 0.0), Unit(200.0, 200.0, 72, 80.0, 40.0));
+
+        Assert.Equal(6000.0, track.CentsAt(24), 9);
+    }
+
+    [Fact]
+    public void APortamentoReachesAcrossThePreviousNote()
+    {
+        var second = Unit(200.0, 200.0, 72, 80.0, 40.0);
+        second.Note.LengthTicks = 240;
+        second.Note.PitchPoints.Add(new PitchPoint(-120, -1200.0));
+        second.Note.PitchPoints.Add(new PitchPoint(0, 0.0));
+        var track = Track(Unit(0.0, 200.0, 60, 0.0, 0.0), second);
+
+        Assert.Equal(6000.0, track.CentsAt(20), 9);
+        Assert.Equal(6600.0, track.CentsAt(30), 9);
+        Assert.Equal(7200.0, track.CentsAt(40), 9);
+    }
+}
