@@ -389,6 +389,29 @@ public sealed class UstTests
     }
 
     [Fact]
+    public void ANoteLongerThanTheNoteLimitKeepsTheTimeline()
+    {
+        var result = Import(Document(
+            "Tempo=120.00",
+            ["Length=32640", "Lyric=a", "NoteNum=60"],
+            ["Length=480", "Lyric=i", "NoteNum=62"]));
+
+        Assert.Equal([30720, 1920, 480], result.Notes.Select(x => x.LengthTicks).ToArray());
+    }
+
+    [Fact]
+    public void ARestLongerThanTheNoteLimitKeepsTheTimeline()
+    {
+        var result = Import(Document(
+            "Tempo=120.00",
+            Sung(),
+            ["Length=32640", "Lyric=R", "NoteNum=60"],
+            Sung("Lyric=i")));
+
+        Assert.Equal([480, 30720, 1920, 480], result.Notes.Select(x => x.LengthTicks).ToArray());
+    }
+
+    [Fact]
     public void ADurationWithoutADeltaFollowsTheScoreLength()
     {
         var text = "[#SETTING]\r\nTempo=120.00\r\n"

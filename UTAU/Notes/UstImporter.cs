@@ -36,6 +36,7 @@ internal sealed record UstImportResult(
 internal static class UstImporter
 {
     public const double MaximumDeclaredTempo = 1000.0;
+    public const int MaximumSectionTicks = TimeBase.TicksPerWholeNote * 1024;
     public const double CentsPerPitchUnit = 10.0;
     public const int EnvelopeFieldCount = 7;
     const double TempoEpsilon = 1e-9;
@@ -60,7 +61,7 @@ internal static class UstImporter
             var delta = ParseInteger(section.Find(UstKeys.Delta));
 
             var hasSpacing = delta is not null && duration is not null && length is not null;
-            var noteLength = (hasSpacing ? duration : length) ?? 0;
+            var noteLength = Math.Min((hasSpacing ? duration : length) ?? 0, MaximumSectionTicks);
             if (noteLength <= 0)
                 continue;
 
@@ -75,12 +76,14 @@ internal static class UstImporter
             if (isTempoChange)
                 currentTempo = ClampTempo(sectionTempo!.Value);
 
-            var note = CreateNote(section, noteLength, new TimeBase(currentTempo, 1.0));
+            var headLength = HeadLengthTicks(noteLength);
+            var note = CreateNote(section, headLength, new TimeBase(currentTempo, 1.0));
             if (isTempoChange)
                 note.TempoOverride = currentTempo;
             if (note.PitchPoints.Count == 0 && HasLegacyPitch(section))
                 legacyPitchNoteCount++;
             notes.Add(note);
+            AddRest(notes, noteLength - headLength, note.Tone);
 
             position = start;
             end = start + noteLength;
@@ -248,7 +251,7 @@ internal static class UstImporter
     {
         while (lengthTicks >= UTAUNote.MinimumLengthTicks)
         {
-            var chunk = Math.Min(lengthTicks, UTAUNote.MaximumLengthTicks);
+            var chunk = HeadLengthTicks(lengthTicks);
             notes.Add(new UTAUNote
             {
                 Lyric = UTAUNote.RestLyric,
@@ -257,6 +260,17 @@ internal static class UstImporter
             });
             lengthTicks -= chunk;
         }
+    }
+
+    static int HeadLengthTicks(int lengthTicks)
+    {
+        if (lengthTicks <= UTAUNote.MaximumLengthTicks)
+            return lengthTicks;
+
+        var remainder = lengthTicks - UTAUNote.MaximumLengthTicks;
+        return remainder >= UTAUNote.MinimumLengthTicks
+            ? UTAUNote.MaximumLengthTicks
+            : UTAUNote.MaximumLengthTicks - (UTAUNote.MinimumLengthTicks - remainder);
     }
 
     static (int Leading, int Total) TrimSurroundingRests(List<UTAUNote> notes)
