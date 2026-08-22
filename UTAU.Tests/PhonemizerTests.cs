@@ -554,6 +554,27 @@ public sealed class UnitTimingBuilderTests
     }
 
     [Fact]
+    public void TheConsonantVelocityScalesThePreutterance()
+    {
+        var unit = CreateUnit(100.0, 200.0, 40.0, 20.0);
+        unit.Note.Velocity = 200.0;
+        var timing = Assert.Single(UnitTimingBuilder.Build([unit]));
+
+        Assert.Equal(80.0, timing.AudioStartMilliseconds, 9);
+    }
+
+    [Fact]
+    public void AnOverriddenPreutteranceIgnoresTheConsonantVelocity()
+    {
+        var unit = CreateUnit(100.0, 200.0, 40.0, 20.0);
+        unit.Note.PreutteranceOverride = 10.0;
+        unit.Note.Velocity = 200.0;
+        var timing = Assert.Single(UnitTimingBuilder.Build([unit]));
+
+        Assert.Equal(90.0, timing.AudioStartMilliseconds, 9);
+    }
+
+    [Fact]
     public void EmptyInputProducesNoTimings()
         => Assert.Empty(UnitTimingBuilder.Build([]));
 }

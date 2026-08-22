@@ -46,8 +46,9 @@ internal static class UnitTimingBuilder
 
         for (var i = 0; i < units.Count; i++)
         {
-            var preutterance = units[i].Preutterance;
-            var overlap = units[i].Overlap;
+            var consonantScale = TimeMap.VelocityToConsonantScale(units[i].Note.Velocity);
+            var preutterance = units[i].HasPreutteranceOverride ? units[i].Preutterance : units[i].Preutterance * consonantScale;
+            var overlap = units[i].HasOverlapOverride ? units[i].Overlap : units[i].Overlap * consonantScale;
             var preceding = FindPrecedingVoiced(units, i);
 
             if (preceding >= 0)
