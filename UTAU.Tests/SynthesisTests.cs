@@ -531,6 +531,20 @@ public sealed class PitchTrackTests
     }
 
     [Fact]
+    public void APhraseOpeningNoteExtendsItsFirstPointBackToItsAudioStart()
+    {
+        var second = Unit(300.0, 200.0, 72, 80.0, 40.0);
+        second.Note.LengthTicks = 240;
+        second.Note.PitchPoints.Add(new PitchPoint(-50, 500.0));
+        second.Note.PitchPoints.Add(new PitchPoint(0, 0.0));
+        var track = Track(Unit(0.0, 200.0, 60, 0.0, 0.0), second);
+
+        Assert.Equal(7200.0, track.CentsAt(43), 9);
+        Assert.Equal(7700.0, track.CentsAt(44), 9);
+        Assert.Equal(7200.0, track.CentsAt(60), 9);
+    }
+
+    [Fact]
     public void APortamentoReachesAcrossThePreviousNote()
     {
         var second = Unit(200.0, 200.0, 72, 80.0, 40.0);

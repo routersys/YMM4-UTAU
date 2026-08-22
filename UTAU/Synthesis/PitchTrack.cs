@@ -4,7 +4,7 @@ namespace UTAU.Synthesis;
 
 internal sealed class PitchTrack
 {
-    readonly record struct TrackNote(UTAUNote Note, double StartMilliseconds, double LengthMilliseconds, int Tone)
+    readonly record struct TrackNote(UTAUNote Note, double StartMilliseconds, double LengthMilliseconds, int Tone, double AudioStartMilliseconds)
     {
         public double EndMilliseconds => StartMilliseconds + LengthMilliseconds;
 
@@ -41,7 +41,7 @@ internal sealed class PitchTrack
             var unit = timing.Unit;
             if (unit.Note.IsRest)
                 continue;
-            notes.Add(new TrackNote(unit.Note, unit.NoteStartMilliseconds, unit.NoteLengthMilliseconds, unit.Tone));
+            notes.Add(new TrackNote(unit.Note, unit.NoteStartMilliseconds, unit.NoteLengthMilliseconds, unit.Tone, timing.AudioStartMilliseconds));
         }
 
         notes.Sort((left, right) => left.StartMilliseconds.CompareTo(right.StartMilliseconds));
@@ -49,8 +49,14 @@ internal sealed class PitchTrack
         var distinct = new List<TrackNote>(notes.Count);
         foreach (var note in notes)
         {
-            if (distinct.Count > 0 && distinct[^1] == note)
+            if (distinct.Count > 0 && distinct[^1].StartMilliseconds == note.StartMilliseconds && ReferenceEquals(distinct[^1].Note, note.Note))
+            {
+                distinct[^1] = distinct[^1] with
+                {
+                    AudioStartMilliseconds = Math.Min(distinct[^1].AudioStartMilliseconds, note.AudioStartMilliseconds),
+                };
                 continue;
+            }
             distinct.Add(note);
         }
         return distinct;
@@ -105,10 +111,12 @@ internal sealed class PitchTrack
             foreach (var point in note.Note.PitchPoints)
                 points.Add((note.StartMilliseconds + point.Ticks * scale, note.Cents + point.Cents, point.Shape));
 
-            if (n == 0 && points[0].X > startMilliseconds)
-                points.Insert(0, (startMilliseconds, points[0].Y, points[0].Shape));
-            else if (points[0].X > note.StartMilliseconds)
-                points.Insert(0, (note.StartMilliseconds, points[0].Y, points[0].Shape));
+            var opensPhrase = n == 0 || notes[n - 1].EndMilliseconds < note.StartMilliseconds;
+            var lead = opensPhrase
+                ? Math.Max(startMilliseconds, note.AudioStartMilliseconds)
+                : note.StartMilliseconds;
+            if (points[0].X > lead)
+                points.Insert(0, (lead, points[0].Y, points[0].Shape));
             if (points[^1].X < note.EndMilliseconds)
                 points.Add((note.EndMilliseconds, points[^1].Y, points[^1].Shape));
 
