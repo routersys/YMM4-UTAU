@@ -4,7 +4,6 @@ using System.Windows.Media;
 using UTAU.Notes;
 using UTAU.ViewModels;
 using UTAU.Views;
-using YukkuriMovieMaker.Controls;
 
 namespace UTAU.Tests;
 
@@ -38,12 +37,11 @@ public sealed class NoteEditorMeasuredLayoutTests
         return result;
     }
 
-    static (NoteEditor Editor, NoteEditorViewModel ViewModel, Border Host) Build()
+    static (NoteEditorSurface Editor, NoteEditorViewModel ViewModel, Border Host) Build()
     {
-        var editor = new NoteEditor();
-        var button = (PopupButton)editor.Content;
-        var root = (Grid)button.PopupContent!;
-        button.PopupContent = null;
+        var editor = new NoteEditorSurface();
+        var root = (Grid)editor.Content!;
+        editor.Content = null;
 
         var pronounce = new UTAUVoicePronounce();
         for (var index = 0; index < NoteCount; index++)
@@ -102,7 +100,7 @@ public sealed class NoteEditorMeasuredLayoutTests
         return false;
     }
 
-    static ItemsControl KeyboardColumn(NoteEditor editor, NoteEditorViewModel viewModel)
+    static ItemsControl KeyboardColumn(NoteEditorSurface editor, NoteEditorViewModel viewModel)
         => Descend(editor.VerticalScroller)
             .OfType<ItemsControl>()
             .First(x => ReferenceEquals(x.ItemsSource, viewModel.Keyboard) && !IsUnder(x, editor.RollCanvas));

@@ -5,7 +5,6 @@ using System.Windows.Threading;
 using UTAU.Notes;
 using UTAU.ViewModels;
 using UTAU.Views;
-using YukkuriMovieMaker.Controls;
 
 namespace UTAU.Tests;
 
@@ -55,10 +54,9 @@ public sealed class RenderMessageDisplayTests
 
     static Border Build(NoteEditorViewModel viewModel)
     {
-        var editor = new NoteEditor();
-        var button = (PopupButton)editor.Content;
-        var root = (Grid)button.PopupContent!;
-        button.PopupContent = null;
+        var editor = new NoteEditorSurface();
+        var root = (Grid)editor.Content!;
+        editor.Content = null;
         root.DataContext = viewModel;
 
         var host = new Border { Width = PopupWidth, Height = PopupHeight, Child = root };

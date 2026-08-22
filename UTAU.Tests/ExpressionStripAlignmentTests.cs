@@ -4,7 +4,6 @@ using System.Windows.Media;
 using UTAU.Notes;
 using UTAU.ViewModels;
 using UTAU.Views;
-using YukkuriMovieMaker.Controls;
 
 namespace UTAU.Tests;
 
@@ -37,12 +36,11 @@ public sealed class ExpressionStripAlignmentTests
         return result;
     }
 
-    static (NoteEditor Editor, NoteEditorViewModel ViewModel, Border Host) Build(int noteCount)
+    static (NoteEditorSurface Editor, NoteEditorViewModel ViewModel, Border Host) Build(int noteCount)
     {
-        var editor = new NoteEditor();
-        var button = (PopupButton)editor.Content;
-        var root = (Grid)button.PopupContent!;
-        button.PopupContent = null;
+        var editor = new NoteEditorSurface();
+        var root = (Grid)editor.Content!;
+        editor.Content = null;
 
         var pronounce = new UTAUVoicePronounce();
         for (var index = 0; index < noteCount; index++)

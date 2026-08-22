@@ -4,7 +4,6 @@ using System.Windows.Media;
 using UTAU.Notes;
 using UTAU.ViewModels;
 using UTAU.Views;
-using YukkuriMovieMaker.Controls;
 
 namespace UTAU.Tests;
 
@@ -104,10 +103,9 @@ public sealed class ScrollingTextTests
     {
         var found = RunSta(() =>
         {
-            var editor = new NoteEditor();
-            var button = (PopupButton)editor.Content;
-            var root = (Grid)button.PopupContent!;
-            button.PopupContent = null;
+            var editor = new NoteEditorSurface();
+            var root = (Grid)editor.Content!;
+            editor.Content = null;
 
             var pronounce = new UTAUVoicePronounce { ImportMessage = Long, RenderMessage = Long };
             pronounce.Notes.Add(new UTAUNote { Lyric = "あ" });
