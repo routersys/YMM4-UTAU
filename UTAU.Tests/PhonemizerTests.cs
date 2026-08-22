@@ -520,6 +520,22 @@ public sealed class UnitTimingBuilderTests
     }
 
     [Fact]
+    public void ALimitedPreutteranceSkipsIntoTheSample()
+    {
+        var timings = UnitTimingBuilder.Build([CreateUnit(0.0, 20.0, 0.0, 0.0), CreateUnit(20.0, 200.0, 80.0, 40.0)]);
+        var timing = timings[1];
+        var map = TimeMap.Create(0.0, 200.0, 400.0, timing.RenderLengthMilliseconds + timing.SkipMilliseconds, 100.0, StretchMode.Stretch);
+        var atNoteStart = timing.Unit.StartMilliseconds - timing.AudioStartMilliseconds + timing.SkipMilliseconds;
+
+        Assert.Equal(65.0, timing.SkipMilliseconds, 9);
+        Assert.Equal(80.0, map.Map(atNoteStart), 9);
+    }
+
+    [Fact]
+    public void AnUnlimitedPreutteranceSkipsNothing()
+        => Assert.Equal(0.0, Assert.Single(UnitTimingBuilder.Build([CreateUnit(100.0, 200.0, 40.0, 20.0)])).SkipMilliseconds, 9);
+
+    [Fact]
     public void SilentUnitsAreNotRendered()
     {
         var rest = new PhonemeUnit(new UTAUNote { Lyric = UTAUNote.RestLyric }, null, "R", 0.0, 100.0, 0.0, 100.0, 60);

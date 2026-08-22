@@ -8,7 +8,8 @@ internal readonly record struct UnitTiming(
     double AudioStartMilliseconds,
     double RenderLengthMilliseconds,
     double FadeInMilliseconds,
-    double FadeOutMilliseconds)
+    double FadeOutMilliseconds,
+    double SkipMilliseconds)
 {
     public double AudioEndMilliseconds => AudioStartMilliseconds + RenderLengthMilliseconds;
 
@@ -43,12 +44,14 @@ internal static class UnitTimingBuilder
         var preutterances = new double[units.Count];
         var overlaps = new double[units.Count];
         var adjacent = new bool[units.Count];
+        var skips = new double[units.Count];
 
         for (var i = 0; i < units.Count; i++)
         {
             var consonantScale = TimeMap.VelocityToConsonantScale(units[i].Note.Velocity);
             var preutterance = units[i].HasPreutteranceOverride ? units[i].Preutterance : units[i].Preutterance * consonantScale;
             var overlap = units[i].HasOverlapOverride ? units[i].Overlap : units[i].Overlap * consonantScale;
+            var requested = preutterance;
             var preceding = FindPrecedingVoiced(units, i);
 
             if (preceding >= 0)
@@ -88,6 +91,7 @@ internal static class UnitTimingBuilder
 
             preutterances[i] = Math.Max(preutterance, 0.0);
             overlaps[i] = overlap;
+            skips[i] = Math.Max(requested - preutterances[i], 0.0);
         }
 
         for (var i = 0; i < units.Count; i++)
@@ -107,7 +111,7 @@ internal static class UnitTimingBuilder
             var fadeOut = next >= 0 && adjacent[next] && overlaps[next] > 0.0 ? overlaps[next] : unit.Note.FadeOutMilliseconds;
             (fadeIn, fadeOut) = LimitFades(fadeIn, fadeOut, renderLength);
 
-            timings.Add(new UnitTiming(unit, audioStart, renderLength, fadeIn, fadeOut));
+            timings.Add(new UnitTiming(unit, audioStart, renderLength, fadeIn, fadeOut, skips[i]));
         }
 
         return timings;

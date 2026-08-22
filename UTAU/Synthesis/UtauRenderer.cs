@@ -231,6 +231,7 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
                 timing.RenderLengthMilliseconds,
                 timing.FadeInMilliseconds,
                 timing.FadeOutMilliseconds,
+                timing.SkipMilliseconds,
                 unit.NoteStartMilliseconds - origin,
                 unit.NoteLengthMilliseconds,
                 unit.Tone,
@@ -380,7 +381,7 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
         var baseFormantRatio = settings.FormantRatio;
         var hasFormantCurve = curves.HasFormant;
         var hasBreathinessCurve = curves.HasBreathiness;
-        var map = TimeMap.Create(source.RegionStart, source.ConsonantEnd, source.RegionEnd, timing.RenderLengthMilliseconds, note.Velocity, settings.StretchMode);
+        var map = TimeMap.Create(source.RegionStart, source.ConsonantEnd, source.RegionEnd, timing.RenderLengthMilliseconds + timing.SkipMilliseconds, note.Velocity, settings.StretchMode);
         var modulation = Math.Clamp(note.Modulation, -200.0, 200.0) / 100.0;
 
         for (var frame = startFrame; frame <= endFrame; frame++)
@@ -391,7 +392,7 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
             if (weight <= 0.0)
                 continue;
 
-            var sourceMilliseconds = map.Map(elapsed);
+            var sourceMilliseconds = map.Map(elapsed + timing.SkipMilliseconds);
             var frameIndex = source.Features.GetFrameIndex(sourceMilliseconds);
             SampleFeatures(source.Features, frameIndex, frameSpectrum, frameAperiodicity, out var sourceF0);
 

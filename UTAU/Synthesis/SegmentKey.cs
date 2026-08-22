@@ -38,6 +38,7 @@ internal readonly record struct UnitKey(
     double RenderLengthMilliseconds,
     double FadeInMilliseconds,
     double FadeOutMilliseconds,
+    double SkipMilliseconds,
     double NoteStartMilliseconds,
     double NoteLengthMilliseconds,
     int Tone,
@@ -54,6 +55,7 @@ internal readonly record struct UnitKey(
             && RenderLengthMilliseconds.Equals(other.RenderLengthMilliseconds)
             && FadeInMilliseconds.Equals(other.FadeInMilliseconds)
             && FadeOutMilliseconds.Equals(other.FadeOutMilliseconds)
+            && SkipMilliseconds.Equals(other.SkipMilliseconds)
             && NoteStartMilliseconds.Equals(other.NoteStartMilliseconds)
             && NoteLengthMilliseconds.Equals(other.NoteLengthMilliseconds)
             && Tone == other.Tone
@@ -72,6 +74,7 @@ internal readonly record struct UnitKey(
         hash.Add(RenderLengthMilliseconds);
         hash.Add(FadeInMilliseconds);
         hash.Add(FadeOutMilliseconds);
+        hash.Add(SkipMilliseconds);
         hash.Add(NoteStartMilliseconds);
         hash.Add(NoteLengthMilliseconds);
         hash.Add(Tone);
