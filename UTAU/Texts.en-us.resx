@@ -217,4 +217,10 @@
 <data name="UstPhraseOffsetFormat" xml:space="preserve"><value>from tick {0} of the original</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>Tempo</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>0 follows the tempo of the score. A value changes the tempo from this note onward.</value></data>
+<data name="EditLyrics" xml:space="preserve"><value>Edit the lyrics together</value></data>
+<data name="LyricsBulkEditHint" xml:space="preserve"><value>Words are separated by spaces and line breaks. Kanji and kana are taken one character at a time, and a part enclosed in quotation marks becomes a single note.</value></data>
+<data name="LyricCountFormat" xml:space="preserve"><value>{0} / {1}</value></data>
+<data name="ButtonApply" xml:space="preserve"><value>Apply</value></data>
+<data name="ButtonCancel" xml:space="preserve"><value>Cancel</value></data>
+<data name="ButtonReset" xml:space="preserve"><value>Revert</value></data>
 </root>

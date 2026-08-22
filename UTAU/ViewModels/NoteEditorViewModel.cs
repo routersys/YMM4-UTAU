@@ -102,6 +102,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         ResetNoteCommand = new ActionCommand(_ => selectedNotes.Count > 0, _ => ResetNote());
         CopyNotesCommand = new ActionCommand(_ => selectedNotes.Count > 0, _ => CopyNotes());
         PasteNotesCommand = new ActionCommand(_ => copiedNotes.Count > 0, _ => PasteNotes());
+        EditLyricsCommand = new ActionCommand(_ => selectedNotes.Count > 0, _ => LyricsEditRequested?.Invoke(this, EventArgs.Empty));
         AddPitchPointCommand = new ActionCommand(_ => SelectedNote is not null, _ => AddPitchPoint());
         RemovePitchPointCommand = new ActionCommand(_ => SelectedPitchPoint is not null, _ => RemoveSelectedPitchPoint());
         ResetPitchCommand = new ActionCommand(_ => SelectedNote is not null, _ => ResetPitch());
@@ -145,6 +146,10 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public ICommand CopyNotesCommand { get; }
 
     public ICommand PasteNotesCommand { get; }
+
+    public ICommand EditLyricsCommand { get; }
+
+    public event EventHandler? LyricsEditRequested;
 
     public string ImportMessage => pronounce.ImportMessage;
 
@@ -1292,6 +1297,26 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
         Select(Notes[Math.Min(index, Notes.Count - 1)]);
         InvalidateLayout();
+    }
+
+    public string ReadSelectedLyrics()
+        => LyricSplitter.Join(selectedNotes.OrderBy(Notes.IndexOf).Select(x => x.Note.Lyric));
+
+    public int ApplyLyrics(IReadOnlyList<string> lyrics)
+    {
+        ArgumentNullException.ThrowIfNull(lyrics);
+        var targets = selectedNotes.OrderBy(Notes.IndexOf).ToArray();
+        var count = Math.Min(lyrics.Count, targets.Length);
+        if (count == 0)
+            return 0;
+
+        Batch(() =>
+        {
+            for (var index = 0; index < count; index++)
+                targets[index].Note.Lyric = lyrics[index];
+        });
+
+        return count;
     }
 
     void Transpose(int semitones)

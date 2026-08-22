@@ -157,3 +157,9 @@ UstPhraseRangeFormat,,全 {2} フレーズ中 {0} から {1} 個,{1} of {2} phra
 UstPhraseOffsetFormat,,元の {0} ティック目から,from tick {0} of the original,自原曲第 {0} 刻,自原曲第 {0} 刻,원곡 {0}틱부터,desde el tic {0} del original,من التِك {0} في الأصل,dari tik {0} aslinya
 NoteTempo,,テンポ,Tempo,速度,速度,템포,Tempo,الإيقاع,Tempo
 NoteTempoDescription,,0でこの譜面のテンポに従います。値を入れるとこのノートから先のテンポが変わります。,0 follows the tempo of the score. A value changes the tempo from this note onward.,0 表示沿用乐谱的速度。填入数值则从该音符起改变速度。,0 表示沿用樂譜的速度。填入數值則從該音符起改變速度。,0이면 악보의 템포를 따릅니다. 값을 넣으면 이 노트부터 템포가 바뀝니다.,0 sigue el tempo de la partitura. Un valor cambia el tempo a partir de esta nota.,القيمة 0 تتبع إيقاع النوتة الموسيقية. وإدخال قيمة يغيّر الإيقاع بدءاً من هذه النوتة.,0 mengikuti tempo partitur. Sebuah nilai mengubah tempo mulai dari not ini.
+EditLyrics,,歌詞をまとめて編集,Edit the lyrics together,批量编辑歌词,批次編輯歌詞,가사 일괄 편집,Editar las letras en conjunto,تحرير الكلمات دفعة واحدة,Sunting lirik sekaligus
+LyricsBulkEditHint,,空白と改行で区切ります。漢字とかなは1文字ずつ、引用符で囲んだ部分はまとめて1つのノートになります。,"Words are separated by spaces and line breaks. Kanji and kana are taken one character at a time, and a part enclosed in quotation marks becomes a single note.",以空格与换行分隔。汉字与假名逐字分开，用引号括起的部分作为一个音符。,以空格與換行分隔。漢字與假名逐字分開，用引號括起的部分作為一個音符。,"공백과 줄바꿈으로 나눕니다. 한자와 가나는 한 글자씩, 따옴표로 묶은 부분은 하나의 노트가 됩니다.",Las palabras se separan con espacios y saltos de línea. Los kanji y los kana se toman de uno en uno y la parte entre comillas forma una sola nota.,تُفصل الكلمات بالمسافات وفواصل الأسطر. تُؤخذ الكانجي والكانا حرفاً حرفاً، ويصبح الجزء المحاط بعلامتي اقتباس نوتة واحدة.,"Kata dipisahkan dengan spasi dan ganti baris. Kanji dan kana diambil satu per satu, dan bagian dalam tanda kutip menjadi satu not."
+LyricCountFormat,,{0} / {1},{0} / {1},{0} / {1},{0} / {1},{0} / {1},{0} / {1},{0} / {1},{0} / {1}
+ButtonApply,,適用,Apply,应用,套用,적용,Aplicar,تطبيق,Terapkan
+ButtonCancel,,取り消し,Cancel,取消,取消,취소,Cancelar,إلغاء,Batal
+ButtonReset,,元に戻す,Revert,还原,還原,되돌리기,Revertir,استرجاع,Kembalikan

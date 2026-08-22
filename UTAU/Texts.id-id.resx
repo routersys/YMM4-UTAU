@@ -217,4 +217,10 @@
 <data name="UstPhraseOffsetFormat" xml:space="preserve"><value>dari tik {0} aslinya</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>Tempo</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>0 mengikuti tempo partitur. Sebuah nilai mengubah tempo mulai dari not ini.</value></data>
+<data name="EditLyrics" xml:space="preserve"><value>Sunting lirik sekaligus</value></data>
+<data name="LyricsBulkEditHint" xml:space="preserve"><value>Kata dipisahkan dengan spasi dan ganti baris. Kanji dan kana diambil satu per satu, dan bagian dalam tanda kutip menjadi satu not.</value></data>
+<data name="LyricCountFormat" xml:space="preserve"><value>{0} / {1}</value></data>
+<data name="ButtonApply" xml:space="preserve"><value>Terapkan</value></data>
+<data name="ButtonCancel" xml:space="preserve"><value>Batal</value></data>
+<data name="ButtonReset" xml:space="preserve"><value>Kembalikan</value></data>
 </root>

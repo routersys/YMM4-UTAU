@@ -31,6 +31,7 @@ public partial class NoteEditorSurface : UserControl
     Point panOrigin;
     double panHorizontalOffset;
     double panVerticalOffset;
+    NoteEditorViewModel? attached;
 
     public NoteEditorSurface()
     {
@@ -42,9 +43,33 @@ public partial class NoteEditorSurface : UserControl
 
     void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
+        if (attached is not null)
+            attached.LyricsEditRequested -= OnLyricsEditRequested;
+
+        attached = DataContext as NoteEditorViewModel;
+
+        if (attached is not null)
+            attached.LyricsEditRequested += OnLyricsEditRequested;
+
         if (RollCanvas.ContextMenu is { } menu)
             menu.DataContext = DataContext;
     }
+
+    void OnLyricsEditRequested(object? sender, EventArgs e)
+    {
+        if (ViewModel is not { } viewModel || viewModel.SelectedCount == 0)
+            return;
+
+        var dialog = new LyricsBulkEditWindow(new LyricsBulkEditViewModel(viewModel.ReadSelectedLyrics(), viewModel.SelectedCount));
+        if (OwnerWindow() is { } owner && !ReferenceEquals(owner, dialog))
+            dialog.Owner = owner;
+        if (dialog.ShowDialog() == true)
+            viewModel.ApplyLyrics(dialog.ViewModel.Lyrics);
+    }
+
+    static Window? OwnerWindow()
+        => Application.Current?.Windows.OfType<Window>().FirstOrDefault(x => x.IsActive)
+            ?? Application.Current?.MainWindow;
 
     NoteEditorViewModel? ViewModel => DataContext as NoteEditorViewModel;
 

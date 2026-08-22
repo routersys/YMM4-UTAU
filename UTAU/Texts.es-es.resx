@@ -217,4 +217,10 @@
 <data name="UstPhraseOffsetFormat" xml:space="preserve"><value>desde el tic {0} del original</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>Tempo</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>0 sigue el tempo de la partitura. Un valor cambia el tempo a partir de esta nota.</value></data>
+<data name="EditLyrics" xml:space="preserve"><value>Editar las letras en conjunto</value></data>
+<data name="LyricsBulkEditHint" xml:space="preserve"><value>Las palabras se separan con espacios y saltos de línea. Los kanji y los kana se toman de uno en uno y la parte entre comillas forma una sola nota.</value></data>
+<data name="LyricCountFormat" xml:space="preserve"><value>{0} / {1}</value></data>
+<data name="ButtonApply" xml:space="preserve"><value>Aplicar</value></data>
+<data name="ButtonCancel" xml:space="preserve"><value>Cancelar</value></data>
+<data name="ButtonReset" xml:space="preserve"><value>Revertir</value></data>
 </root>

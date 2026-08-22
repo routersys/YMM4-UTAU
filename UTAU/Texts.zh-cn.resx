@@ -217,4 +217,10 @@
 <data name="UstPhraseOffsetFormat" xml:space="preserve"><value>自原曲第 {0} 刻</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>速度</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>0 表示沿用乐谱的速度。填入数值则从该音符起改变速度。</value></data>
+<data name="EditLyrics" xml:space="preserve"><value>批量编辑歌词</value></data>
+<data name="LyricsBulkEditHint" xml:space="preserve"><value>以空格与换行分隔。汉字与假名逐字分开，用引号括起的部分作为一个音符。</value></data>
+<data name="LyricCountFormat" xml:space="preserve"><value>{0} / {1}</value></data>
+<data name="ButtonApply" xml:space="preserve"><value>应用</value></data>
+<data name="ButtonCancel" xml:space="preserve"><value>取消</value></data>
+<data name="ButtonReset" xml:space="preserve"><value>还原</value></data>
 </root>

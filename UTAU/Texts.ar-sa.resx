@@ -217,4 +217,10 @@
 <data name="UstPhraseOffsetFormat" xml:space="preserve"><value>من التِك {0} في الأصل</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>الإيقاع</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>القيمة 0 تتبع إيقاع النوتة الموسيقية. وإدخال قيمة يغيّر الإيقاع بدءاً من هذه النوتة.</value></data>
+<data name="EditLyrics" xml:space="preserve"><value>تحرير الكلمات دفعة واحدة</value></data>
+<data name="LyricsBulkEditHint" xml:space="preserve"><value>تُفصل الكلمات بالمسافات وفواصل الأسطر. تُؤخذ الكانجي والكانا حرفاً حرفاً، ويصبح الجزء المحاط بعلامتي اقتباس نوتة واحدة.</value></data>
+<data name="LyricCountFormat" xml:space="preserve"><value>{0} / {1}</value></data>
+<data name="ButtonApply" xml:space="preserve"><value>تطبيق</value></data>
+<data name="ButtonCancel" xml:space="preserve"><value>إلغاء</value></data>
+<data name="ButtonReset" xml:space="preserve"><value>استرجاع</value></data>
 </root>

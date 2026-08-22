@@ -217,4 +217,10 @@
 <data name="UstPhraseOffsetFormat" xml:space="preserve"><value>元の {0} ティック目から</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>テンポ</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>0でこの譜面のテンポに従います。値を入れるとこのノートから先のテンポが変わります。</value></data>
+<data name="EditLyrics" xml:space="preserve"><value>歌詞をまとめて編集</value></data>
+<data name="LyricsBulkEditHint" xml:space="preserve"><value>空白と改行で区切ります。漢字とかなは1文字ずつ、引用符で囲んだ部分はまとめて1つのノートになります。</value></data>
+<data name="LyricCountFormat" xml:space="preserve"><value>{0} / {1}</value></data>
+<data name="ButtonApply" xml:space="preserve"><value>適用</value></data>
+<data name="ButtonCancel" xml:space="preserve"><value>取り消し</value></data>
+<data name="ButtonReset" xml:space="preserve"><value>元に戻す</value></data>
 </root>

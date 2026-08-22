@@ -217,4 +217,10 @@
 <data name="UstPhraseOffsetFormat" xml:space="preserve"><value>원곡 {0}틱부터</value></data>
 <data name="NoteTempo" xml:space="preserve"><value>템포</value></data>
 <data name="NoteTempoDescription" xml:space="preserve"><value>0이면 악보의 템포를 따릅니다. 값을 넣으면 이 노트부터 템포가 바뀝니다.</value></data>
+<data name="EditLyrics" xml:space="preserve"><value>가사 일괄 편집</value></data>
+<data name="LyricsBulkEditHint" xml:space="preserve"><value>공백과 줄바꿈으로 나눕니다. 한자와 가나는 한 글자씩, 따옴표로 묶은 부분은 하나의 노트가 됩니다.</value></data>
+<data name="LyricCountFormat" xml:space="preserve"><value>{0} / {1}</value></data>
+<data name="ButtonApply" xml:space="preserve"><value>적용</value></data>
+<data name="ButtonCancel" xml:space="preserve"><value>취소</value></data>
+<data name="ButtonReset" xml:space="preserve"><value>되돌리기</value></data>
 </root>

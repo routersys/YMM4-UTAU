@@ -143,6 +143,8 @@
                                     <MenuItem Header="{x:Static root:Texts.ResetTiming}" Command="{Binding ResetTimingCommand}"/>
                                     <MenuItem Header="{x:Static root:Texts.ResetNote}" Command="{Binding ResetNoteCommand}"/>
                                 </MenuItem>
+                                <Separator/>
+                                <MenuItem Header="{x:Static root:Texts.EditLyrics}" Command="{Binding EditLyricsCommand}"/>
                             </ContextMenu>
                         </Canvas.ContextMenu>
                         <ItemsControl ItemsSource="{Binding Keyboard}">

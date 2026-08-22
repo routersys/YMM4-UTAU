@@ -94,6 +94,7 @@ public sealed class NoteContextMenuTests
                 Texts.OctaveDown,
                 Texts.QuantizeLength,
                 Texts.ResetGroup,
+                Texts.EditLyrics,
             ],
             headers);
     }
@@ -104,7 +105,8 @@ public sealed class NoteContextMenuTests
         var headers = RunSta(() =>
         {
             var (surface, _) = Build(60, 62);
-            var group = surface.RollCanvas.ContextMenu!.Items.OfType<MenuItem>().Last();
+            var group = surface.RollCanvas.ContextMenu!.Items.OfType<MenuItem>()
+                .First(x => (string)x.Header == Texts.ResetGroup);
             return group.Items.OfType<MenuItem>().Select(x => (string)x.Header).ToArray();
         });
 
@@ -140,7 +142,8 @@ public sealed class NoteContextMenuTests
                 && ReferenceEquals(items[3].Command, viewModel.OctaveUpCommand)
                 && ReferenceEquals(items[4].Command, viewModel.OctaveDownCommand)
                 && ReferenceEquals(items[5].Command, viewModel.QuantizeLengthCommand)
-                && ReferenceEquals(items[6].Items.OfType<MenuItem>().Last().Command, viewModel.ResetNoteCommand);
+                && ReferenceEquals(items[6].Items.OfType<MenuItem>().Last().Command, viewModel.ResetNoteCommand)
+                && ReferenceEquals(items[7].Command, viewModel.EditLyricsCommand);
         });
 
         Assert.True(same);
