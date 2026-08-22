@@ -1,3 +1,4 @@
+using UTAU.Notes;
 using UTAU.Phonemes;
 
 namespace UTAU.Synthesis;
@@ -33,32 +34,59 @@ internal readonly record struct UnitTiming(
 
 internal static class UnitTimingBuilder
 {
+    const double AdjacentHeadShare = 0.5;
+    const double PlosiveHeadShare = 0.9;
+
     public static IReadOnlyList<UnitTiming> Build(IReadOnlyList<PhonemeUnit> units)
     {
         var timings = new List<UnitTiming>(units.Count);
         var preutterances = new double[units.Count];
         var overlaps = new double[units.Count];
+        var adjacent = new bool[units.Count];
 
         for (var i = 0; i < units.Count; i++)
         {
             var preutterance = units[i].Preutterance;
             var overlap = units[i].Overlap;
-            var head = preutterance - overlap;
-            var available = i == 0 ? 0.0 : units[i - 1].LengthMilliseconds;
+            var preceding = FindPrecedingVoiced(units, i);
 
-            if (i > 0 && head > available && head > 0.0)
+            if (preceding >= 0)
             {
-                var ratio = available / head;
-                preutterance *= ratio;
-                overlap *= ratio;
-            }
-            else if (i == 0 && head < 0.0)
-            {
-                overlap = preutterance;
+                var precedingLength = units[preceding].LengthMilliseconds;
+                var gap = units[i].StartMilliseconds - units[preceding].EndMilliseconds;
+                var limit = preutterance;
+                adjacent[i] = gap <= 0.0;
+
+                if (adjacent[i])
+                {
+                    var head = preutterance - overlap;
+                    if (overlap > 0.0)
+                    {
+                        if (head > precedingLength * AdjacentHeadShare)
+                            limit = precedingLength * AdjacentHeadShare / head * preutterance;
+                    }
+                    else
+                        limit = Math.Min(limit, precedingLength * PlosiveHeadShare);
+
+                    limit = Math.Min(limit, precedingLength);
+                    if (preutterances[preceding] < UTAUNote.DefaultFadeInMilliseconds)
+                        limit = Math.Min(limit, precedingLength + preutterances[preceding] - UTAUNote.DefaultFadeInMilliseconds);
+                }
+                else if (gap < preutterance)
+                    limit = gap;
+
+                if (preutterance > limit)
+                {
+                    overlap *= preutterance > 0.0 ? limit / preutterance : 0.0;
+                    preutterance = limit;
+                }
+
+                if (overlap < 0.0)
+                    overlap = Math.Max(overlap, Math.Min(0.0, UTAUNote.DefaultFadeOutMilliseconds - precedingLength + preutterance));
             }
 
-            preutterances[i] = preutterance;
-            overlaps[i] = Math.Max(overlap, 0.0);
+            preutterances[i] = Math.Max(preutterance, 0.0);
+            overlaps[i] = overlap;
         }
 
         for (var i = 0; i < units.Count; i++)
@@ -74,9 +102,8 @@ internal static class UnitTimingBuilder
                 : units[next].StartMilliseconds - preutterances[next] + overlaps[next] - audioStart;
             renderLength = Math.Max(renderLength, RenderSettings.MinimumUnitLengthMilliseconds);
 
-            var previous = FindPreviousVoiced(units, i);
-            var fadeIn = previous >= 0 && overlaps[i] > 0.0 ? overlaps[i] : unit.Note.FadeInMilliseconds;
-            var fadeOut = next >= 0 && overlaps[next] > 0.0 ? overlaps[next] : unit.Note.FadeOutMilliseconds;
+            var fadeIn = adjacent[i] && overlaps[i] > 0.0 ? overlaps[i] : unit.Note.FadeInMilliseconds;
+            var fadeOut = next >= 0 && adjacent[next] && overlaps[next] > 0.0 ? overlaps[next] : unit.Note.FadeOutMilliseconds;
             (fadeIn, fadeOut) = LimitFades(fadeIn, fadeOut, renderLength);
 
             timings.Add(new UnitTiming(unit, audioStart, renderLength, fadeIn, fadeOut));
@@ -103,9 +130,13 @@ internal static class UnitTimingBuilder
         return next < units.Count && !units[next].IsSilent ? next : -1;
     }
 
-    static int FindPreviousVoiced(IReadOnlyList<PhonemeUnit> units, int index)
+    static int FindPrecedingVoiced(IReadOnlyList<PhonemeUnit> units, int index)
     {
-        var previous = index - 1;
-        return previous >= 0 && !units[previous].IsSilent ? previous : -1;
+        for (var preceding = index - 1; preceding >= 0; preceding--)
+        {
+            if (!units[preceding].IsSilent)
+                return preceding;
+        }
+        return -1;
     }
 }

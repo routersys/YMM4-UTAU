@@ -475,8 +475,24 @@ public sealed class UnitTimingBuilderTests
     public void PreutteranceIsScaledDownWhenThePreviousNoteIsTooShort()
     {
         var timings = UnitTimingBuilder.Build([CreateUnit(0.0, 20.0, 0.0, 0.0), CreateUnit(20.0, 200.0, 80.0, 40.0)]);
-        Assert.Equal(-20.0, timings[1].AudioStartMilliseconds, 9);
-        Assert.Equal(20.0, timings[1].FadeInMilliseconds, 9);
+        Assert.Equal(5.0, timings[1].AudioStartMilliseconds, 9);
+        Assert.Equal(7.5, timings[1].FadeInMilliseconds, 9);
+    }
+
+    [Fact]
+    public void APlosiveKeepsOneTenthOfThePreviousNote()
+    {
+        var timings = UnitTimingBuilder.Build([CreateUnit(0.0, 100.0, 0.0, 0.0), CreateUnit(100.0, 200.0, 200.0, -10.0)]);
+        Assert.Equal(10.0, timings[1].AudioStartMilliseconds, 9);
+        Assert.Equal(UTAUNote.DefaultFadeInMilliseconds, timings[1].FadeInMilliseconds, 9);
+    }
+
+    [Fact]
+    public void ARestLimitsThePreutteranceToTheGap()
+    {
+        var rest = new PhonemeUnit(new UTAUNote { Lyric = UTAUNote.RestLyric }, null, "R", 100.0, 30.0, 100.0, 30.0, 60);
+        var timings = UnitTimingBuilder.Build([CreateUnit(0.0, 100.0, 0.0, 0.0), rest, CreateUnit(130.0, 200.0, 80.0, 40.0)]);
+        Assert.Equal(100.0, timings[1].AudioStartMilliseconds, 9);
     }
 
     [Fact]
