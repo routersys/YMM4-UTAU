@@ -404,7 +404,7 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
             var baseIndex = (long)frame * spectrumSize;
             for (var k = 0; k < spectrumSize; k++)
             {
-                spectrogram[baseIndex + k] += weight * warpedSpectrum[k];
+                spectrogram[baseIndex + k] += weight * SpectrumTransform.ToAmplitude(warpedSpectrum[k]);
                 aperiodicity[baseIndex + k] += weight * frameAperiodicity[k];
             }
             weightSum[frame] += weight;
@@ -455,7 +455,7 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
 
             for (var k = 0; k < spectrumSize; k++)
             {
-                spectrogram[baseIndex + k] = Math.Max(spectrogram[baseIndex + k], SpectrumTransform.MinimumPower);
+                spectrogram[baseIndex + k] = Math.Max(SpectrumTransform.ToPower(spectrogram[baseIndex + k]), SpectrumTransform.MinimumPower);
                 aperiodicity[baseIndex + k] = SpectrumTransform.Clamp(aperiodicity[baseIndex + k] / total);
             }
 

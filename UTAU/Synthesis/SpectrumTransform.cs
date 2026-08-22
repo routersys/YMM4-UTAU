@@ -68,6 +68,10 @@ internal static class SpectrumTransform
         }
     }
 
+    public static double ToAmplitude(double power) => Math.Sqrt(power);
+
+    public static double ToPower(double amplitude) => amplitude * amplitude;
+
     public static double Clamp(double aperiodicity)
         => double.IsNaN(aperiodicity)
             ? MaximumAperiodicity

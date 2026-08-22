@@ -89,6 +89,24 @@ public sealed class TimeMapTests
 
 public sealed class SpectrumTransformTests
 {
+    [Fact]
+    public void AMixingWeightAndAGainScaleThePowerAlike()
+    {
+        var scaled = SpectrumTransform.ToPower(0.25 * SpectrumTransform.ToAmplitude(4.0));
+        var gained = new[] { 4.0 };
+        SpectrumTransform.ApplyGain(gained, 0.25);
+
+        Assert.Equal(gained[0], scaled, 12);
+    }
+
+    [Fact]
+    public void MixingWeightsThatSumToOneKeepTheLevel()
+    {
+        var sum = 0.4 * SpectrumTransform.ToAmplitude(9.0) + 0.6 * SpectrumTransform.ToAmplitude(9.0);
+
+        Assert.Equal(9.0, SpectrumTransform.ToPower(sum), 12);
+    }
+
     static double[] CreatePeak(int size, int index)
     {
         var spectrum = new double[size];
