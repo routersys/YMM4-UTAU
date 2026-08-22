@@ -32,6 +32,9 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public const double MinimumFitQuarterNoteWidth = 24.0;
     public const double MinimumFitPixelsPerTick = MinimumFitQuarterNoteWidth / TimeBase.TicksPerQuarterNote;
     public const double MinimumFitSemitoneHeight = 10.0;
+    public const int OctaveSemitones = 12;
+
+    static readonly List<UTAUNote> copiedNotes = [];
 
     readonly UTAUVoicePronounce pronounce;
     readonly Dispatcher dispatcher;
@@ -91,6 +94,14 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         InsertRestCommand = new ActionCommand(_ => selectedNotes.Count > 0, _ => InsertRest());
         RemoveNoteCommand = new ActionCommand(_ => selectedNotes.Count > 0 && Notes.Count > selectedNotes.Count, _ => RemoveSelected());
         SelectAllCommand = new ActionCommand(_ => Notes.Count > 0, _ => SelectAll());
+        OctaveUpCommand = new ActionCommand(_ => selectedNotes.Count > 0, _ => Transpose(OctaveSemitones));
+        OctaveDownCommand = new ActionCommand(_ => selectedNotes.Count > 0, _ => Transpose(-OctaveSemitones));
+        QuantizeLengthCommand = new ActionCommand(_ => selectedNotes.Count > 0 && !SnapDivision.IsFree, _ => QuantizeLength());
+        ResetVibratoCommand = new ActionCommand(_ => selectedNotes.Count > 0, _ => ResetVibrato());
+        ResetTimingCommand = new ActionCommand(_ => selectedNotes.Count > 0, _ => ResetTiming());
+        ResetNoteCommand = new ActionCommand(_ => selectedNotes.Count > 0, _ => ResetNote());
+        CopyNotesCommand = new ActionCommand(_ => selectedNotes.Count > 0, _ => CopyNotes());
+        PasteNotesCommand = new ActionCommand(_ => copiedNotes.Count > 0, _ => PasteNotes());
         AddPitchPointCommand = new ActionCommand(_ => SelectedNote is not null, _ => AddPitchPoint());
         RemovePitchPointCommand = new ActionCommand(_ => SelectedPitchPoint is not null, _ => RemoveSelectedPitchPoint());
         ResetPitchCommand = new ActionCommand(_ => SelectedNote is not null, _ => ResetPitch());
@@ -118,6 +129,22 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     public ICommand RemoveNoteCommand { get; }
 
     public ICommand SelectAllCommand { get; }
+
+    public ICommand OctaveUpCommand { get; }
+
+    public ICommand OctaveDownCommand { get; }
+
+    public ICommand QuantizeLengthCommand { get; }
+
+    public ICommand ResetVibratoCommand { get; }
+
+    public ICommand ResetTimingCommand { get; }
+
+    public ICommand ResetNoteCommand { get; }
+
+    public ICommand CopyNotesCommand { get; }
+
+    public ICommand PasteNotesCommand { get; }
 
     public string ImportMessage => pronounce.ImportMessage;
 
@@ -1264,6 +1291,132 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         }
 
         Select(Notes[Math.Min(index, Notes.Count - 1)]);
+        InvalidateLayout();
+    }
+
+    void Transpose(int semitones)
+    {
+        if (selectedNotes.Count == 0)
+            return;
+
+        var shift = Math.Clamp(
+            semitones,
+            -selectedNotes.Min(x => x.Note.Tone),
+            127 - selectedNotes.Max(x => x.Note.Tone));
+        if (shift == 0)
+            return;
+
+        Batch(
+            () =>
+            {
+                foreach (var note in selectedNotes)
+                    note.Tone += shift;
+            },
+            InvalidateTones);
+    }
+
+    void QuantizeLength()
+    {
+        if (selectedNotes.Count == 0 || SnapDivision.IsFree)
+            return;
+
+        Batch(() =>
+        {
+            foreach (var note in selectedNotes)
+                note.LengthTicks = SnapLength(note.Note.LengthTicks);
+        });
+    }
+
+    void ResetVibrato()
+    {
+        if (selectedNotes.Count == 0)
+            return;
+
+        var defaults = new VibratoSettings();
+        Batch(() =>
+        {
+            foreach (var note in selectedNotes)
+                defaults.CopyTo(note.Note.Vibrato);
+        });
+    }
+
+    void ResetTiming()
+    {
+        if (selectedNotes.Count == 0)
+            return;
+
+        Batch(() =>
+        {
+            foreach (var note in selectedNotes)
+                ResetTiming(note.Note);
+        });
+    }
+
+    void ResetNote()
+    {
+        if (selectedNotes.Count == 0)
+            return;
+
+        var defaults = new VibratoSettings();
+        Batch(() =>
+        {
+            foreach (var note in selectedNotes)
+            {
+                var target = note.Note;
+                target.TempoOverride = UTAUNote.FollowScoreValue;
+                target.Velocity = UTAUNote.DefaultVelocity;
+                target.Intensity = UTAUNote.DefaultIntensity;
+                target.Modulation = UTAUNote.DefaultModulation;
+                ResetTiming(target);
+                defaults.CopyTo(target.Vibrato);
+                for (var index = target.PitchPoints.Count - 1; index >= 0; index--)
+                    target.PitchPoints.RemoveAt(index);
+            }
+        });
+
+        SelectedPitchPoint = null;
+    }
+
+    static void ResetTiming(UTAUNote note)
+    {
+        note.PreutteranceOverride = UTAUNote.FollowOtoValue;
+        note.OverlapOverride = UTAUNote.FollowOtoValue;
+        note.StartPointMilliseconds = UTAUNote.DefaultStartPointMilliseconds;
+        note.FadeInMilliseconds = UTAUNote.DefaultFadeInMilliseconds;
+        note.FadeOutMilliseconds = UTAUNote.DefaultFadeOutMilliseconds;
+    }
+
+    void CopyNotes()
+    {
+        if (selectedNotes.Count == 0)
+            return;
+
+        copiedNotes.Clear();
+        foreach (var note in selectedNotes.OrderBy(Notes.IndexOf))
+            copiedNotes.Add(note.Note.Clone());
+    }
+
+    void PasteNotes()
+    {
+        if (copiedNotes.Count == 0)
+            return;
+
+        var index = selectedNotes.Count == 0 ? Notes.Count - 1 : selectedNotes.Max(Notes.IndexOf);
+        var pasted = new List<NoteViewModel>(copiedNotes.Count);
+        foreach (var copied in copiedNotes)
+        {
+            index++;
+            var note = copied.Clone();
+            source.Insert(index, note);
+            var viewModel = new NoteViewModel(note, this);
+            Notes.Insert(index, viewModel);
+            pasted.Add(viewModel);
+        }
+
+        ClearSelection();
+        foreach (var note in pasted)
+            AddToSelection(note);
+        SetPrimary(pasted[0]);
         InvalidateLayout();
     }
 

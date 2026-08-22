@@ -15,6 +15,10 @@ internal sealed class UTAUNote : UndoRedoable
     public const int MaximumLengthTicks = TimeBase.TicksPerWholeNote * 16;
     public const double DefaultFadeInMilliseconds = 5.0;
     public const double DefaultFadeOutMilliseconds = 35.0;
+    public const double DefaultVelocity = 100.0;
+    public const double DefaultIntensity = 100.0;
+    public const double DefaultModulation = 0.0;
+    public const double DefaultStartPointMilliseconds = 0.0;
     public const double FollowOtoValue = 0.0;
     public const double FollowScoreValue = 0.0;
     public const string RestLyric = "R";
@@ -24,10 +28,10 @@ internal sealed class UTAUNote : UndoRedoable
     bool suppressAutoVcv;
     int tone = MusicalTone.MiddleC.NoteNumber;
     int lengthTicks = DefaultLengthTicks;
-    double velocity = 100.0;
-    double intensity = 100.0;
-    double modulation;
-    double startPointMilliseconds;
+    double velocity = DefaultVelocity;
+    double intensity = DefaultIntensity;
+    double modulation = DefaultModulation;
+    double startPointMilliseconds = DefaultStartPointMilliseconds;
     double tempoOverride;
     double preutteranceOverride;
     double overlapOverride;
@@ -103,7 +107,7 @@ internal sealed class UTAUNote : UndoRedoable
     [Display(GroupName = nameof(Texts.NoteGroupExpression), Name = nameof(Texts.NoteVelocity), Description = nameof(Texts.NoteVelocityDescription), ResourceType = typeof(Texts))]
     [TextBoxSlider("F0", "", 0.0, 200.0, Delay = -1)]
     [Range(0.0, 200.0)]
-    [DefaultValue(100.0)]
+    [DefaultValue(DefaultVelocity)]
     public double Velocity
     {
         get => velocity;
@@ -113,7 +117,7 @@ internal sealed class UTAUNote : UndoRedoable
     [Display(GroupName = nameof(Texts.NoteGroupExpression), Name = nameof(Texts.NoteIntensity), ResourceType = typeof(Texts))]
     [TextBoxSlider("F0", "%", 0.0, 200.0, Delay = -1)]
     [Range(0.0, 200.0)]
-    [DefaultValue(100.0)]
+    [DefaultValue(DefaultIntensity)]
     public double Intensity
     {
         get => intensity;
@@ -123,7 +127,7 @@ internal sealed class UTAUNote : UndoRedoable
     [Display(GroupName = nameof(Texts.NoteGroupExpression), Name = nameof(Texts.NoteModulation), Description = nameof(Texts.ParameterModulationDescription), ResourceType = typeof(Texts))]
     [TextBoxSlider("F0", "%", -200.0, 200.0, Delay = -1)]
     [Range(-200.0, 200.0)]
-    [DefaultValue(0.0)]
+    [DefaultValue(DefaultModulation)]
     public double Modulation
     {
         get => modulation;
@@ -153,7 +157,7 @@ internal sealed class UTAUNote : UndoRedoable
     [Display(GroupName = nameof(Texts.NoteGroupTiming), Name = nameof(Texts.NoteStartPoint), Description = nameof(Texts.NoteStartPointDescription), ResourceType = typeof(Texts))]
     [TextBoxSlider("F0", "ms", 0.0, 500.0, Delay = -1)]
     [Range(0.0, 5000.0)]
-    [DefaultValue(0.0)]
+    [DefaultValue(DefaultStartPointMilliseconds)]
     public double StartPointMilliseconds
     {
         get => startPointMilliseconds;
