@@ -124,6 +124,28 @@ public sealed class UtauRendererTests : IDisposable
 
     static double Peak(double[] samples) => samples.Length == 0 ? 0.0 : samples.Max(Math.Abs);
 
+    VoiceBank BankAtLevel(string name, double level)
+    {
+        var path = Path.Combine(directory, name);
+        Directory.CreateDirectory(path);
+        TestVoiceBank.WriteText(path, VoiceBankLoader.CharacterFileName, "name=試験音源\r\n");
+        TestVoiceBank.WriteText(path, VoiceBankLoader.OtoFileName, "a.wav=あ,50,80,-500,100,40");
+        TestVoiceBank.WriteSample(path, "a.wav", [.. TestVoiceBank.CreateVowel().Select(x => x * level)]);
+        return VoiceBankLoader.Load(name, path);
+    }
+
+    const double QuietLevel = 0.25;
+    const double PeakCompression = 0.86;
+
+    [Fact]
+    public void AQuietSampleIsLiftedTowardTheSamePeak()
+    {
+        var loud = Peak(Render(BankAtLevel("loud", 1.0), "<!C4:1/4>あ").Samples);
+        var quiet = Peak(Render(BankAtLevel("quiet", QuietLevel), "<!C4:1/4>あ").Samples);
+
+        Assert.Equal(Math.Pow(QuietLevel, 1.0 - PeakCompression), quiet / loud, 2);
+    }
+
     static double MeasureFundamental(RenderResult result)
     {
         using var arena = new WorldArena();

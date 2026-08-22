@@ -15,7 +15,8 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
         double RegionStart,
         double RegionEnd,
         double ConsonantEnd,
-        double MeanF0);
+        double MeanF0,
+        double AutoGain);
 
     sealed record Segment(int StartFrame, int FrameCount, IReadOnlyList<int> TimingIndices);
 
@@ -36,7 +37,9 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
         int EndSample,
         double RegionStart,
         double RegionEnd,
-        double ConsonantEnd);
+        double ConsonantEnd,
+        double SourcePeak,
+        double RegionPeak);
 
     sealed class RenderState : IDisposable
     {
@@ -73,6 +76,10 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
     const long MaximumFrameElements = 1L << 24;
     const double FrameCountEpsilon = 1e-9;
     const int SegmentGapFrames = 10;
+    const double PeakCompressionPercent = 86.0;
+    const double PeakTarget = 0.5;
+    const double VoicedRatioBias = 5.0;
+    const double VoicedRatioSlope = 10.0;
 
     readonly Dictionary<string, AudioSample> loadedSamples = new(StringComparer.OrdinalIgnoreCase);
 
@@ -369,7 +376,7 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
         var note = unit.Note;
         var startFrame = Math.Max((int)Math.Floor((timing.AudioStartMilliseconds - offset) / framePeriod) - segmentStartFrame, 0);
         var endFrame = Math.Min((int)Math.Ceiling((timing.AudioEndMilliseconds - offset) / framePeriod) - segmentStartFrame, frameCount - 1);
-        var gain = settings.Gain * Math.Clamp(note.Intensity, 0.0, 200.0) / 100.0;
+        var gain = settings.Gain * Math.Clamp(note.Intensity, 0.0, 200.0) / 100.0 * source.AutoGain;
         var baseFormantRatio = settings.FormantRatio;
         var hasFormantCurve = curves.HasFormant;
         var hasBreathinessCurve = curves.HasBreathiness;
@@ -534,7 +541,19 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
             endSample,
             regionStart,
             regionEnd,
-            consonantEnd);
+            consonantEnd,
+            Peak(sample.Samples, 0, sample.Samples.Length),
+            Peak(sample.Samples, sample.MillisecondsToSamples(regionStart), sample.MillisecondsToSamples(regionEnd)));
+    }
+
+    static double Peak(ReadOnlySpan<double> samples, int from, int to)
+    {
+        from = Math.Clamp(from, 0, samples.Length);
+        to = Math.Clamp(to, from, samples.Length);
+        var peak = 0.0;
+        for (var i = from; i < to; i++)
+            peak = Math.Max(peak, Math.Abs(samples[i]));
+        return peak;
     }
 
     void AnalyzeInParallel(IReadOnlyList<AnalysisRequest?> requests)
@@ -582,7 +601,35 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
             value.RegionStart,
             value.RegionEnd,
             value.ConsonantEnd,
-            ComputeMeanF0(features, value.RegionStart, value.RegionEnd));
+            ComputeMeanF0(features, value.RegionStart, value.RegionEnd),
+            ComputeAutoGain(
+                value.SourcePeak,
+                value.RegionPeak,
+                ComputeVoicedRatio(features, value.RegionStart, value.RegionEnd)));
+    }
+
+    static double ComputeVoicedRatio(WorldFeatures features, double regionStart, double regionEnd)
+    {
+        var voiced = 0;
+        var count = 0;
+        var first = Math.Max((int)Math.Floor(features.GetFrameIndex(regionStart)), 0);
+        var last = Math.Min((int)Math.Ceiling(features.GetFrameIndex(regionEnd)), features.FrameCount - 1);
+
+        for (var i = first; i <= last; i++)
+        {
+            count++;
+            if (features.F0[i] > 0.0)
+                voiced++;
+        }
+
+        return count == 0 ? 0.0 : (double)voiced / count;
+    }
+
+    static double ComputeAutoGain(double sourcePeak, double regionPeak, double voicedRatio)
+    {
+        var weight = 1.0 / (1.0 + Math.Exp(VoicedRatioBias - VoicedRatioSlope * voicedRatio));
+        var peak = regionPeak * weight + sourcePeak * (1.0 - weight);
+        return peak <= 0.0 ? 1.0 : Math.Pow(PeakTarget / peak, PeakCompressionPercent / 100.0);
     }
 
     static double ComputeMeanF0(WorldFeatures features, double regionStart, double regionEnd)
