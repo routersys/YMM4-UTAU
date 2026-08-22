@@ -198,6 +198,15 @@
 <data name="PitchPointCentsDescription" xml:space="preserve"><value>相对音符音高的偏移。100 音分为半音。</value></data>
 <data name="SelectAllNotes" xml:space="preserve"><value>选择所有音符</value></data>
 <data name="SelectionCountFormat" xml:space="preserve"><value>已选择 {0} 个音符</value></data>
+<data name="NoteContextCopy" xml:space="preserve"><value>复制音符</value></data>
+<data name="NoteContextPaste" xml:space="preserve"><value>粘贴音符</value></data>
+<data name="OctaveUp" xml:space="preserve"><value>升高八度</value></data>
+<data name="OctaveDown" xml:space="preserve"><value>降低八度</value></data>
+<data name="QuantizeLength" xml:space="preserve"><value>将长度对齐到吸附</value></data>
+<data name="ResetGroup" xml:space="preserve"><value>重置</value></data>
+<data name="ResetVibrato" xml:space="preserve"><value>重置颤音</value></data>
+<data name="ResetTiming" xml:space="preserve"><value>重置发声时间</value></data>
+<data name="ResetNote" xml:space="preserve"><value>将音符重置为默认值</value></data>
 <data name="UstImportedFormat" xml:space="preserve"><value>已载入 {0} 个音符</value></data>
 <data name="UstImportFailed" xml:space="preserve"><value>无法读取 UST 文件</value></data>
 <data name="UstImportEmpty" xml:space="preserve"><value>文件中没有可载入的音符</value></data>

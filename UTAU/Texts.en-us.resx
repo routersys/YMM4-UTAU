@@ -198,6 +198,15 @@
 <data name="PitchPointCentsDescription" xml:space="preserve"><value>The offset from the pitch of the note. 100 cents is a semitone.</value></data>
 <data name="SelectAllNotes" xml:space="preserve"><value>Select all the notes</value></data>
 <data name="SelectionCountFormat" xml:space="preserve"><value>{0} notes selected</value></data>
+<data name="NoteContextCopy" xml:space="preserve"><value>Copy the notes</value></data>
+<data name="NoteContextPaste" xml:space="preserve"><value>Paste the notes</value></data>
+<data name="OctaveUp" xml:space="preserve"><value>Move an octave up</value></data>
+<data name="OctaveDown" xml:space="preserve"><value>Move an octave down</value></data>
+<data name="QuantizeLength" xml:space="preserve"><value>Round the lengths to the snap</value></data>
+<data name="ResetGroup" xml:space="preserve"><value>Reset</value></data>
+<data name="ResetVibrato" xml:space="preserve"><value>Reset the vibrato</value></data>
+<data name="ResetTiming" xml:space="preserve"><value>Reset the timing</value></data>
+<data name="ResetNote" xml:space="preserve"><value>Reset the notes to the defaults</value></data>
 <data name="UstImportedFormat" xml:space="preserve"><value>Loaded {0} notes</value></data>
 <data name="UstImportFailed" xml:space="preserve"><value>The UST file could not be read</value></data>
 <data name="UstImportEmpty" xml:space="preserve"><value>The file has no notes to load</value></data>

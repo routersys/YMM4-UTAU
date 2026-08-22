@@ -138,6 +138,15 @@ PitchPointTimeDescription,,ノートの先頭からの位置です。480ティ�
 PitchPointCentsDescription,,ノートの音程からのずれです。100セントが半音です。,The offset from the pitch of the note. 100 cents is a semitone.,相对音符音高的偏移。100 音分为半音。,相對音符音高的偏移。100 音分為半音。,노트 음정으로부터의 차이입니다. 100센트가 반음입니다.,El desvío respecto al tono de la nota. 100 centésimas equivalen a un semitono.,الانحراف عن درجة النوتة. 100 سنت تساوي نصف نغمة.,Selisih dari nada not. 100 sen sama dengan satu seminada.
 SelectAllNotes,,すべてのノートを選択,Select all the notes,选择所有音符,選擇所有音符,모든 노트 선택,Seleccionar todas las notas,تحديد كل النوتات,Pilih semua not
 SelectionCountFormat,,{0} 個を選択中,{0} notes selected,已选择 {0} 个音符,已選擇 {0} 個音符,{0}개 선택 중,{0} notas seleccionadas,تم تحديد {0} نوتة,{0} not terpilih
+NoteContextCopy,,ノートをコピー,Copy the notes,复制音符,複製音符,노트 복사,Copiar las notas,نسخ النوتات,Salin not
+NoteContextPaste,,ノートを貼り付け,Paste the notes,粘贴音符,貼上音符,노트 붙여넣기,Pegar las notas,لصق النوتات,Tempel not
+OctaveUp,,オクターブ上げる,Move an octave up,升高八度,升高八度,한 옥타브 올리기,Subir una octava,رفع أوكتاف,Naikkan satu oktaf
+OctaveDown,,オクターブ下げる,Move an octave down,降低八度,降低八度,한 옥타브 내리기,Bajar una octava,خفض أوكتاف,Turunkan satu oktaf
+QuantizeLength,,長さを吸着に合わせる,Round the lengths to the snap,将长度对齐到吸附,將長度對齊到吸附,길이를 스냅에 맞추기,Ajustar las duraciones al ajuste,محاذاة الأطوال إلى المحاذاة,Bulatkan panjang ke pengancingan
+ResetGroup,,戻す,Reset,重置,重設,되돌리기,Restablecer,إعادة الضبط,Setel ulang
+ResetVibrato,,ビブラートを戻す,Reset the vibrato,重置颤音,重設顫音,비브라토 되돌리기,Restablecer el vibrato,إعادة ضبط الفيبراتو,Setel ulang vibrato
+ResetTiming,,発声タイミングを戻す,Reset the timing,重置发声时间,重設發聲時間,발성 타이밍 되돌리기,Restablecer los tiempos,إعادة ضبط التوقيت,Setel ulang pewaktuan
+ResetNote,,ノートを既定に戻す,Reset the notes to the defaults,将音符重置为默认值,將音符重設為預設值,노트를 기본값으로 되돌리기,Restablecer las notas a los valores predeterminados,إعادة ضبط النوتات إلى الافتراضي,Setel ulang not ke bawaan
 UstImportedFormat,,{0} 個のノートを読み込みました,Loaded {0} notes,已载入 {0} 个音符,已載入 {0} 個音符,노트 {0}개를 불러왔습니다,Se cargaron {0} notas,تم تحميل {0} نوتة,Memuat {0} not
 UstImportFailed,,USTを読み込めませんでした,The UST file could not be read,无法读取 UST 文件,無法讀取 UST 檔案,UST를 읽지 못했습니다,No se pudo leer el archivo UST,تعذّر قراءة ملف UST,Berkas UST tidak dapat dibaca
 UstImportEmpty,,読み込めるノートがありません,The file has no notes to load,文件中没有可载入的音符,檔案中沒有可載入的音符,불러올 노트가 없습니다,El archivo no tiene notas que cargar,لا توجد نوتات لتحميلها في الملف,Berkas tidak memiliki not untuk dimuat

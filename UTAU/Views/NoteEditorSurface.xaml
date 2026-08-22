@@ -126,6 +126,25 @@
                             MouseDown="RollCanvas_MouseDown"
                             MouseUp="RollCanvas_MouseUp"
                             PreviewMouseWheel="RollCanvas_PreviewMouseWheel">
+                        <Canvas.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="{x:Static root:Texts.NoteContextCopy}" Command="{Binding CopyNotesCommand}"/>
+                                <MenuItem Header="{x:Static root:Texts.NoteContextPaste}" Command="{Binding PasteNotesCommand}"/>
+                                <Separator/>
+                                <MenuItem Header="{x:Static root:Texts.SelectAllNotes}" Command="{Binding SelectAllCommand}"/>
+                                <Separator/>
+                                <MenuItem Header="{x:Static root:Texts.OctaveUp}" Command="{Binding OctaveUpCommand}"/>
+                                <MenuItem Header="{x:Static root:Texts.OctaveDown}" Command="{Binding OctaveDownCommand}"/>
+                                <MenuItem Header="{x:Static root:Texts.QuantizeLength}" Command="{Binding QuantizeLengthCommand}"/>
+                                <Separator/>
+                                <MenuItem Header="{x:Static root:Texts.ResetGroup}">
+                                    <MenuItem Header="{x:Static root:Texts.ResetPitch}" Command="{Binding ResetPitchCommand}"/>
+                                    <MenuItem Header="{x:Static root:Texts.ResetVibrato}" Command="{Binding ResetVibratoCommand}"/>
+                                    <MenuItem Header="{x:Static root:Texts.ResetTiming}" Command="{Binding ResetTimingCommand}"/>
+                                    <MenuItem Header="{x:Static root:Texts.ResetNote}" Command="{Binding ResetNoteCommand}"/>
+                                </MenuItem>
+                            </ContextMenu>
+                        </Canvas.ContextMenu>
                         <ItemsControl ItemsSource="{Binding Keyboard}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -193,6 +212,7 @@
                                 <DataTemplate>
                                     <Grid Width="{Binding Width}" Height="{Binding Height}"
                                           MouseLeftButtonDown="Note_MouseLeftButtonDown"
+                                          MouseRightButtonDown="Note_MouseRightButtonDown"
                                           ToolTip="{Binding ToneName}">
                                         <Border BorderThickness="1">
                                             <Border.Style>

@@ -198,6 +198,15 @@
 <data name="PitchPointCentsDescription" xml:space="preserve"><value>Selisih dari nada not. 100 sen sama dengan satu seminada.</value></data>
 <data name="SelectAllNotes" xml:space="preserve"><value>Pilih semua not</value></data>
 <data name="SelectionCountFormat" xml:space="preserve"><value>{0} not terpilih</value></data>
+<data name="NoteContextCopy" xml:space="preserve"><value>Salin not</value></data>
+<data name="NoteContextPaste" xml:space="preserve"><value>Tempel not</value></data>
+<data name="OctaveUp" xml:space="preserve"><value>Naikkan satu oktaf</value></data>
+<data name="OctaveDown" xml:space="preserve"><value>Turunkan satu oktaf</value></data>
+<data name="QuantizeLength" xml:space="preserve"><value>Bulatkan panjang ke pengancingan</value></data>
+<data name="ResetGroup" xml:space="preserve"><value>Setel ulang</value></data>
+<data name="ResetVibrato" xml:space="preserve"><value>Setel ulang vibrato</value></data>
+<data name="ResetTiming" xml:space="preserve"><value>Setel ulang pewaktuan</value></data>
+<data name="ResetNote" xml:space="preserve"><value>Setel ulang not ke bawaan</value></data>
 <data name="UstImportedFormat" xml:space="preserve"><value>Memuat {0} not</value></data>
 <data name="UstImportFailed" xml:space="preserve"><value>Berkas UST tidak dapat dibaca</value></data>
 <data name="UstImportEmpty" xml:space="preserve"><value>Berkas tidak memiliki not untuk dimuat</value></data>

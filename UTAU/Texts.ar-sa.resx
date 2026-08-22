@@ -198,6 +198,15 @@
 <data name="PitchPointCentsDescription" xml:space="preserve"><value>الانحراف عن درجة النوتة. 100 سنت تساوي نصف نغمة.</value></data>
 <data name="SelectAllNotes" xml:space="preserve"><value>تحديد كل النوتات</value></data>
 <data name="SelectionCountFormat" xml:space="preserve"><value>تم تحديد {0} نوتة</value></data>
+<data name="NoteContextCopy" xml:space="preserve"><value>نسخ النوتات</value></data>
+<data name="NoteContextPaste" xml:space="preserve"><value>لصق النوتات</value></data>
+<data name="OctaveUp" xml:space="preserve"><value>رفع أوكتاف</value></data>
+<data name="OctaveDown" xml:space="preserve"><value>خفض أوكتاف</value></data>
+<data name="QuantizeLength" xml:space="preserve"><value>محاذاة الأطوال إلى المحاذاة</value></data>
+<data name="ResetGroup" xml:space="preserve"><value>إعادة الضبط</value></data>
+<data name="ResetVibrato" xml:space="preserve"><value>إعادة ضبط الفيبراتو</value></data>
+<data name="ResetTiming" xml:space="preserve"><value>إعادة ضبط التوقيت</value></data>
+<data name="ResetNote" xml:space="preserve"><value>إعادة ضبط النوتات إلى الافتراضي</value></data>
 <data name="UstImportedFormat" xml:space="preserve"><value>تم تحميل {0} نوتة</value></data>
 <data name="UstImportFailed" xml:space="preserve"><value>تعذّر قراءة ملف UST</value></data>
 <data name="UstImportEmpty" xml:space="preserve"><value>لا توجد نوتات لتحميلها في الملف</value></data>

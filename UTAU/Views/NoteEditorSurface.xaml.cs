@@ -36,6 +36,14 @@ public partial class NoteEditorSurface : UserControl
     {
         InitializeComponent();
         Loaded += (_, _) => RequestFit();
+        DataContextChanged += OnDataContextChanged;
+        OnDataContextChanged(this, default);
+    }
+
+    void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (RollCanvas.ContextMenu is { } menu)
+            menu.DataContext = DataContext;
     }
 
     NoteEditorViewModel? ViewModel => DataContext as NoteEditorViewModel;
@@ -181,6 +189,15 @@ public partial class NoteEditorSurface : UserControl
 
         viewModel.MakePrimary(note);
         BeginDrag(note, DragMode.Tone, e);
+    }
+
+    void Note_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is not FrameworkElement { DataContext: NoteViewModel note } || ViewModel is not { } viewModel)
+            return;
+
+        if (!note.IsSelected)
+            viewModel.Select(note);
     }
 
     void NoteResize_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

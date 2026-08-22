@@ -198,6 +198,15 @@
 <data name="PitchPointCentsDescription" xml:space="preserve"><value>ノートの音程からのずれです。100セントが半音です。</value></data>
 <data name="SelectAllNotes" xml:space="preserve"><value>すべてのノートを選択</value></data>
 <data name="SelectionCountFormat" xml:space="preserve"><value>{0} 個を選択中</value></data>
+<data name="NoteContextCopy" xml:space="preserve"><value>ノートをコピー</value></data>
+<data name="NoteContextPaste" xml:space="preserve"><value>ノートを貼り付け</value></data>
+<data name="OctaveUp" xml:space="preserve"><value>オクターブ上げる</value></data>
+<data name="OctaveDown" xml:space="preserve"><value>オクターブ下げる</value></data>
+<data name="QuantizeLength" xml:space="preserve"><value>長さを吸着に合わせる</value></data>
+<data name="ResetGroup" xml:space="preserve"><value>戻す</value></data>
+<data name="ResetVibrato" xml:space="preserve"><value>ビブラートを戻す</value></data>
+<data name="ResetTiming" xml:space="preserve"><value>発声タイミングを戻す</value></data>
+<data name="ResetNote" xml:space="preserve"><value>ノートを既定に戻す</value></data>
 <data name="UstImportedFormat" xml:space="preserve"><value>{0} 個のノートを読み込みました</value></data>
 <data name="UstImportFailed" xml:space="preserve"><value>USTを読み込めませんでした</value></data>
 <data name="UstImportEmpty" xml:space="preserve"><value>読み込めるノートがありません</value></data>
