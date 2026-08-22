@@ -53,6 +53,7 @@ internal static class UstImporter
         var legacyPitchNoteCount = 0;
         var position = 0;
         var end = 0;
+        var emitted = 0;
 
         foreach (var section in document.NoteSections)
         {
@@ -68,7 +69,7 @@ internal static class UstImporter
             var start = hasSpacing ? Math.Max(position + delta!.Value, end) : end;
 
             var previousTone = notes.Count == 0 ? MusicalTone.MiddleC.NoteNumber : notes[^1].Tone;
-            AddRest(notes, start - end, previousTone);
+            emitted += AddRest(notes, start - emitted, previousTone);
 
             var sectionTempo = ParseNumber(section.Find(UstKeys.Tempo));
             var isTempoChange = IsUsableTempo(sectionTempo)
@@ -76,14 +77,14 @@ internal static class UstImporter
             if (isTempoChange)
                 currentTempo = ClampTempo(sectionTempo!.Value);
 
-            var headLength = HeadLengthTicks(noteLength);
-            var note = CreateNote(section, headLength, new TimeBase(currentTempo, 1.0));
+            var note = CreateNote(section, HeadLengthTicks(start + noteLength - emitted), new TimeBase(currentTempo, 1.0));
             if (isTempoChange)
                 note.TempoOverride = currentTempo;
             if (note.PitchPoints.Count == 0 && HasLegacyPitch(section))
                 legacyPitchNoteCount++;
             notes.Add(note);
-            AddRest(notes, noteLength - headLength, note.Tone);
+            emitted += note.LengthTicks;
+            emitted += AddRest(notes, start + noteLength - emitted, note.Tone);
 
             position = start;
             end = start + noteLength;
@@ -247,8 +248,9 @@ internal static class UstImporter
             || section.Find(UstKeys.LegacyPitches) is not null
             || section.Find(UstKeys.LegacyPitchesTypo) is not null;
 
-    static void AddRest(List<UTAUNote> notes, int lengthTicks, int tone)
+    static int AddRest(List<UTAUNote> notes, int lengthTicks, int tone)
     {
+        var emitted = 0;
         while (lengthTicks >= UTAUNote.MinimumLengthTicks)
         {
             var chunk = HeadLengthTicks(lengthTicks);
@@ -259,7 +261,9 @@ internal static class UstImporter
                 LengthTicks = chunk,
             });
             lengthTicks -= chunk;
+            emitted += chunk;
         }
+        return emitted;
     }
 
     static int HeadLengthTicks(int lengthTicks)

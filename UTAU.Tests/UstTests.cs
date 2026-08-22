@@ -412,6 +412,20 @@ public sealed class UstTests
     }
 
     [Fact]
+    public void ARestShorterThanTheNoteLimitDoesNotPileUpDelay()
+    {
+        var result = Import(Document(
+            "Tempo=120.00",
+            Sung(),
+            ["Length=10", "Lyric=R", "NoteNum=60"],
+            Sung("Lyric=i"),
+            ["Length=10", "Lyric=R", "NoteNum=60"],
+            Sung("Lyric=u")));
+
+        Assert.Equal([480, 15, 475, 15, 475], result.Notes.Select(x => x.LengthTicks).ToArray());
+    }
+
+    [Fact]
     public void ADurationWithoutADeltaFollowsTheScoreLength()
     {
         var text = "[#SETTING]\r\nTempo=120.00\r\n"
