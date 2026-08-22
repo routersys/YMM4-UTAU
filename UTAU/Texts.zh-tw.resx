@@ -223,4 +223,5 @@
 <data name="ButtonApply" xml:space="preserve"><value>套用</value></data>
 <data name="ButtonCancel" xml:space="preserve"><value>取消</value></data>
 <data name="ButtonReset" xml:space="preserve"><value>還原</value></data>
+<data name="DetachEditor" xml:space="preserve"><value>在獨立視窗中編輯</value></data>
 </root>

@@ -1,0 +1,17 @@
+<Window x:Class="UTAU.Views.NoteEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:root="clr-namespace:UTAU"
+        xmlns:vm="clr-namespace:UTAU.ViewModels"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type={x:Type vm:NoteEditorViewModel}}"
+        Title="{x:Static root:Texts.EditNotes}"
+        Width="1180" Height="640" MinWidth="640" MinHeight="360"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+    <Window.Style>
+        <Style TargetType="{x:Type Window}" BasedOn="{StaticResource {x:Type Window}}"/>
+    </Window.Style>
+    <ContentControl x:Name="SurfaceHost"/>
+</Window>

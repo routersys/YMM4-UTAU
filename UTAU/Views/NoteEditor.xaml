@@ -8,7 +8,8 @@
              xmlns:c="clr-namespace:YukkuriMovieMaker.Controls;assembly=YukkuriMovieMaker.Controls"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type={x:Type vm:NoteEditorViewModel}}">
-    <c:PopupButton Content="{x:Static root:Texts.EditNotes}"
+    <c:PopupButton x:Name="PopupHost"
+                   Content="{x:Static root:Texts.EditNotes}"
                    PopupWidth="980"
                    PopupHeight="480"
                    ResizeMode="Both"

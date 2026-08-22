@@ -223,4 +223,5 @@
 <data name="ButtonApply" xml:space="preserve"><value>Aplicar</value></data>
 <data name="ButtonCancel" xml:space="preserve"><value>Cancelar</value></data>
 <data name="ButtonReset" xml:space="preserve"><value>Revertir</value></data>
+<data name="DetachEditor" xml:space="preserve"><value>Editar en una ventana aparte</value></data>
 </root>

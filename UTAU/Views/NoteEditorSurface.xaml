@@ -145,6 +145,8 @@
                                 </MenuItem>
                                 <Separator/>
                                 <MenuItem Header="{x:Static root:Texts.EditLyrics}" Command="{Binding EditLyricsCommand}"/>
+                                <MenuItem Header="{x:Static root:Texts.DetachEditor}" Command="{Binding DetachCommand}"
+                                          Visibility="{Binding CanDetach, Converter={StaticResource BooleanToVisibility}}"/>
                             </ContextMenu>
                         </Canvas.ContextMenu>
                         <ItemsControl ItemsSource="{Binding Keyboard}">

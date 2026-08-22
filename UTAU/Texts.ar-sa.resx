@@ -223,4 +223,5 @@
 <data name="ButtonApply" xml:space="preserve"><value>تطبيق</value></data>
 <data name="ButtonCancel" xml:space="preserve"><value>إلغاء</value></data>
 <data name="ButtonReset" xml:space="preserve"><value>استرجاع</value></data>
+<data name="DetachEditor" xml:space="preserve"><value>التحرير في نافذة منفصلة</value></data>
 </root>

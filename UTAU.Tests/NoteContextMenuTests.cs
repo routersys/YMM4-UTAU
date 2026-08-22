@@ -95,6 +95,7 @@ public sealed class NoteContextMenuTests
                 Texts.QuantizeLength,
                 Texts.ResetGroup,
                 Texts.EditLyrics,
+                Texts.DetachEditor,
             ],
             headers);
     }
@@ -143,7 +144,8 @@ public sealed class NoteContextMenuTests
                 && ReferenceEquals(items[4].Command, viewModel.OctaveDownCommand)
                 && ReferenceEquals(items[5].Command, viewModel.QuantizeLengthCommand)
                 && ReferenceEquals(items[6].Items.OfType<MenuItem>().Last().Command, viewModel.ResetNoteCommand)
-                && ReferenceEquals(items[7].Command, viewModel.EditLyricsCommand);
+                && ReferenceEquals(items[7].Command, viewModel.EditLyricsCommand)
+                && ReferenceEquals(items[8].Command, viewModel.DetachCommand);
         });
 
         Assert.True(same);

@@ -223,4 +223,5 @@
 <data name="ButtonApply" xml:space="preserve"><value>適用</value></data>
 <data name="ButtonCancel" xml:space="preserve"><value>取り消し</value></data>
 <data name="ButtonReset" xml:space="preserve"><value>元に戻す</value></data>
+<data name="DetachEditor" xml:space="preserve"><value>別ウィンドウで編集</value></data>
 </root>

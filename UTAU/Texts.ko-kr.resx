@@ -223,4 +223,5 @@
 <data name="ButtonApply" xml:space="preserve"><value>적용</value></data>
 <data name="ButtonCancel" xml:space="preserve"><value>취소</value></data>
 <data name="ButtonReset" xml:space="preserve"><value>되돌리기</value></data>
+<data name="DetachEditor" xml:space="preserve"><value>별도 창에서 편집</value></data>
 </root>

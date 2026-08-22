@@ -54,6 +54,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     Rect selectionBox;
     bool isSelectionBoxVisible;
     bool isBatching;
+    bool isDetached;
     ObservableCollection<PitchPoint>? observedPitchPoints;
     PitchPoint? selectedPitchPoint;
     PointCollection pitchCurve = [];
@@ -103,6 +104,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         CopyNotesCommand = new ActionCommand(_ => selectedNotes.Count > 0, _ => CopyNotes());
         PasteNotesCommand = new ActionCommand(_ => copiedNotes.Count > 0, _ => PasteNotes());
         EditLyricsCommand = new ActionCommand(_ => selectedNotes.Count > 0, _ => LyricsEditRequested?.Invoke(this, EventArgs.Empty));
+        DetachCommand = new ActionCommand(_ => CanDetach, _ => DetachRequested?.Invoke(this, EventArgs.Empty));
         AddPitchPointCommand = new ActionCommand(_ => SelectedNote is not null, _ => AddPitchPoint());
         RemovePitchPointCommand = new ActionCommand(_ => SelectedPitchPoint is not null, _ => RemoveSelectedPitchPoint());
         ResetPitchCommand = new ActionCommand(_ => SelectedNote is not null, _ => ResetPitch());
@@ -149,7 +151,23 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     public ICommand EditLyricsCommand { get; }
 
+    public ICommand DetachCommand { get; }
+
+    public bool IsDetached
+    {
+        get => isDetached;
+        set
+        {
+            if (Set(ref isDetached, value))
+                OnPropertyChanged(nameof(CanDetach));
+        }
+    }
+
+    public bool CanDetach => !isDetached;
+
     public event EventHandler? LyricsEditRequested;
+
+    public event EventHandler? DetachRequested;
 
     public string ImportMessage => pronounce.ImportMessage;
 

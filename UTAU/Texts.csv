@@ -163,3 +163,4 @@ LyricCountFormat,,{0} / {1},{0} / {1},{0} / {1},{0} / {1},{0} / {1},{0} / {1},{0
 ButtonApply,,適用,Apply,应用,套用,적용,Aplicar,تطبيق,Terapkan
 ButtonCancel,,取り消し,Cancel,取消,取消,취소,Cancelar,إلغاء,Batal
 ButtonReset,,元に戻す,Revert,还原,還原,되돌리기,Revertir,استرجاع,Kembalikan
+DetachEditor,,別ウィンドウで編集,Edit in a separate window,在独立窗口中编辑,在獨立視窗中編輯,별도 창에서 편집,Editar en una ventana aparte,التحرير في نافذة منفصلة,Sunting di jendela terpisah
