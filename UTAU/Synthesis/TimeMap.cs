@@ -21,17 +21,14 @@ internal readonly record struct TimeMap(
         StretchMode stretchMode)
     {
         var scale = VelocityToConsonantScale(velocity);
-        var consonantSourceLength = Math.Max(consonantEnd - regionStart, 0.0);
-        var consonantOutputLength = Math.Min(consonantSourceLength * scale, Math.Max(outputLength, 0.0));
-        if (consonantSourceLength > 0.0 && consonantOutputLength > 0.0)
-            scale = consonantOutputLength / consonantSourceLength;
+        var consonantOutputLength = Math.Max(consonantEnd - regionStart, 0.0) * scale;
 
         return new TimeMap(
             regionStart,
             consonantEnd,
             regionEnd,
             consonantOutputLength,
-            Math.Max(outputLength - consonantOutputLength, 0.0),
+            Math.Max(Math.Max(outputLength, 0.0) - consonantOutputLength, 0.0),
             scale,
             stretchMode);
     }
@@ -53,8 +50,10 @@ internal readonly record struct TimeMap(
         var elapsed = outputMilliseconds - ConsonantOutputLength;
         if (StretchMode == StretchMode.Stretch)
         {
-            var progress = SustainOutputLength > 0.0 ? Math.Clamp(elapsed / SustainOutputLength, 0.0, 1.0) : 0.0;
-            return ConsonantEnd + sustainSourceLength * progress;
+            var speed = SustainOutputLength > 0.0
+                ? Math.Clamp(sustainSourceLength / SustainOutputLength, 0.0, 1.0)
+                : 0.0;
+            return Math.Min(ConsonantEnd + elapsed * speed, RegionEnd);
         }
 
         var period = sustainSourceLength * 2.0;

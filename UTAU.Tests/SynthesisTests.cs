@@ -60,19 +60,26 @@ public sealed class TimeMapTests
     }
 
     [Fact]
-    public void StretchModeAlsoCompresses()
+    public void StretchModeNeverRunsFasterThanTheSource()
     {
         var map = TimeMap.Create(0.0, 0.0, 400.0, 100.0, 100.0, StretchMode.Stretch);
-        Assert.Equal(200.0, map.Map(50.0), 9);
-        Assert.Equal(400.0, map.Map(100.0), 9);
+        Assert.Equal(50.0, map.Map(50.0), 9);
+        Assert.Equal(100.0, map.Map(100.0), 9);
     }
 
     [Fact]
-    public void ConsonantIsCompressedWhenTheOutputIsShorterThanTheConsonant()
+    public void ConsonantKeepsItsSpeedWhenTheOutputIsShorter()
     {
         var map = TimeMap.Create(0.0, 200.0, 400.0, 50.0, 100.0, StretchMode.Loop);
-        Assert.Equal(50.0, map.ConsonantOutputLength, 9);
-        Assert.Equal(200.0, map.Map(50.0), 9);
+        Assert.Equal(200.0, map.ConsonantOutputLength, 9);
+        Assert.Equal(50.0, map.Map(50.0), 9);
+    }
+
+    [Fact]
+    public void TheConsonantVelocityScalesTheConsonantOutput()
+    {
+        Assert.Equal(100.0, TimeMap.Create(0.0, 200.0, 400.0, 1000.0, 200.0, StretchMode.Loop).ConsonantOutputLength, 9);
+        Assert.Equal(400.0, TimeMap.Create(0.0, 200.0, 400.0, 1000.0, 0.0, StretchMode.Loop).ConsonantOutputLength, 9);
     }
 
     [Fact]
