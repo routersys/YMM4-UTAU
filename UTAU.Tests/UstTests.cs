@@ -389,6 +389,16 @@ public sealed class UstTests
     }
 
     [Fact]
+    public void ADurationWithoutADeltaFollowsTheScoreLength()
+    {
+        var text = "[#SETTING]\r\nTempo=120.00\r\n"
+            + "[#0000]\r\nDuration=240\r\nLength=480\r\nLyric=a\r\nNoteNum=60\r\n";
+        var result = Import(text);
+
+        Assert.Equal(480, Assert.Single(result.Notes).LengthTicks);
+    }
+
+    [Fact]
     public void TheSettingTempoIsUsed()
     {
         Assert.Equal(144.0, Import(Document("Tempo=144.00", Sung())).Tempo, 9);

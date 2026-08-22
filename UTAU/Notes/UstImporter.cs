@@ -59,13 +59,12 @@ internal static class UstImporter
             var duration = ParseInteger(section.Find(UstKeys.Duration));
             var delta = ParseInteger(section.Find(UstKeys.Delta));
 
-            var noteLength = duration ?? length ?? 0;
+            var hasSpacing = delta is not null && duration is not null && length is not null;
+            var noteLength = (hasSpacing ? duration : length) ?? 0;
             if (noteLength <= 0)
                 continue;
 
-            var start = delta is not null && duration is not null && length is not null
-                ? Math.Max(position + delta.Value, end)
-                : end;
+            var start = hasSpacing ? Math.Max(position + delta!.Value, end) : end;
 
             var previousTone = notes.Count == 0 ? MusicalTone.MiddleC.NoteNumber : notes[^1].Tone;
             AddRest(notes, start - end, previousTone);
