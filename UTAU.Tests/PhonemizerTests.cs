@@ -496,6 +496,30 @@ public sealed class UnitTimingBuilderTests
     }
 
     [Fact]
+    public void ANegativeOverlapLeavesAGapBeforeTheNextUnit()
+    {
+        var timings = UnitTimingBuilder.Build([CreateUnit(0.0, 200.0, 0.0, 0.0), CreateUnit(200.0, 200.0, 60.0, -10.0)]);
+        Assert.Equal(130.0, timings[0].AudioEndMilliseconds, 9);
+        Assert.Equal(140.0, timings[1].AudioStartMilliseconds, 9);
+    }
+
+    [Fact]
+    public void ANegativeOverlapIsLimitedByTheDefaultRelease()
+    {
+        var timings = UnitTimingBuilder.Build([CreateUnit(0.0, 100.0, 0.0, 0.0), CreateUnit(100.0, 200.0, 20.0, -60.0)]);
+        Assert.Equal(35.0, timings[0].AudioEndMilliseconds, 9);
+        Assert.Equal(80.0, timings[1].AudioStartMilliseconds, 9);
+    }
+
+    [Fact]
+    public void ThePreutteranceNeverExceedsThePreviousNote()
+    {
+        var timings = UnitTimingBuilder.Build([CreateUnit(0.0, 30.0, 10.0, 0.0), CreateUnit(30.0, 200.0, 100.0, 80.0)]);
+        Assert.Equal(0.0, timings[1].AudioStartMilliseconds, 9);
+        Assert.Equal(24.0, timings[1].FadeInMilliseconds, 9);
+    }
+
+    [Fact]
     public void SilentUnitsAreNotRendered()
     {
         var rest = new PhonemeUnit(new UTAUNote { Lyric = UTAUNote.RestLyric }, null, "R", 0.0, 100.0, 0.0, 100.0, 60);
