@@ -157,6 +157,21 @@ public sealed class NoteBatchEditTests
     }
 
     [Fact]
+    public void TheFreeSnapLeavesEveryValidLengthWhereItIs()
+    {
+        var viewModel = CreateViewModel(60);
+        viewModel.SnapDivision = NoteDivision.Free;
+
+        foreach (var length in new[]
+        {
+            UTAUNote.MinimumLengthTicks, 16, 47, 130, 479, 480, 481, 1919, UTAUNote.MaximumLengthTicks,
+        })
+        {
+            Assert.Equal(length, viewModel.SnapLength(length));
+        }
+    }
+
+    [Fact]
     public void UndoingAQuantizeBringsEveryLengthBack()
     {
         var pronounce = new UTAUVoicePronounce();
@@ -317,6 +332,19 @@ public sealed class NoteBatchEditTests
 
         Assert.Equal([60, 60, 62, 64], viewModel.Notes.Select(x => x.Note.Tone));
         Assert.Equal([60, 60, 62, 64], pronounce.Notes.Select(x => x.Tone));
+    }
+
+    [Fact]
+    public void CopyingTakesTheNotesInScoreOrderNotInTheOrderTheyWereClicked()
+    {
+        var viewModel = CreateViewModel(60, 62, 64);
+        viewModel.Select(viewModel.Notes[2]);
+        viewModel.ToggleSelection(viewModel.Notes[0]);
+
+        viewModel.CopyNotesCommand.Execute(null);
+        viewModel.PasteNotesCommand.Execute(null);
+
+        Assert.Equal([60, 62, 64, 60, 64], viewModel.Notes.Select(x => x.Note.Tone));
     }
 
     [Fact]

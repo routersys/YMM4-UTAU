@@ -98,6 +98,31 @@ public sealed class LyricsBulkEditTests
     }
 
     [Fact]
+    public void ApplyingFollowsScoreOrderNotTheOrderTheNotesWereClicked()
+    {
+        var viewModel = CreateViewModel("あ", "い", "う");
+        viewModel.Select(viewModel.Notes[2]);
+        viewModel.ToggleSelection(viewModel.Notes[0]);
+
+        viewModel.ApplyLyrics(LyricSplitter.Split("かき"));
+
+        Assert.Equal(["か", "い", "き"], viewModel.Notes.Select(x => x.Note.Lyric));
+    }
+
+    [Fact]
+    public void ReadingAndApplyingAgreeOnTheOrderOfAScatteredSelection()
+    {
+        var viewModel = CreateViewModel("あ", "い", "う", "え");
+        viewModel.Select(viewModel.Notes[3]);
+        viewModel.ToggleSelection(viewModel.Notes[0]);
+        viewModel.ToggleSelection(viewModel.Notes[2]);
+
+        viewModel.ApplyLyrics(LyricSplitter.Split(viewModel.ReadSelectedLyrics()));
+
+        Assert.Equal(["あ", "い", "う", "え"], viewModel.Notes.Select(x => x.Note.Lyric));
+    }
+
+    [Fact]
     public void ApplyingLeavesTheNotesOutsideTheSelectionAlone()
     {
         var viewModel = CreateViewModel("あ", "い", "う");
