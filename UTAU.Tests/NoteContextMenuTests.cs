@@ -5,6 +5,7 @@ using System.Windows.Media;
 using UTAU.Notes;
 using UTAU.ViewModels;
 using UTAU.Views;
+using YukkuriMovieMaker.Resources.Icons;
 
 namespace UTAU.Tests;
 
@@ -149,6 +150,68 @@ public sealed class NoteContextMenuTests
         });
 
         Assert.True(same);
+    }
+
+    static readonly (string Header, string Icon)[] ExpectedIcons =
+    [
+        (Texts.NoteContextCopy, IconKeys.ContentCopy),
+        (Texts.NoteContextPaste, IconKeys.ContentPaste),
+        (Texts.SelectAllNotes, IconKeys.SelectAll),
+        (Texts.OctaveUp, IconKeys.ArrowUp),
+        (Texts.OctaveDown, IconKeys.ArrowDown),
+        (Texts.QuantizeLength, IconKeys.Magnet),
+        (Texts.ResetGroup, IconKeys.Restore),
+        (Texts.ResetPitch, IconKeys.VectorCurve),
+        (Texts.ResetVibrato, IconKeys.SineWave),
+        (Texts.ResetTiming, IconKeys.TimerOutline),
+        (Texts.ResetNote, IconKeys.BackupRestore),
+        (Texts.EditLyrics, IconKeys.TextBoxEdit),
+        (Texts.DetachEditor, IconKeys.OpenInNew),
+    ];
+
+    static List<MenuItem> Entries(ItemsControl menu)
+    {
+        var entries = new List<MenuItem>();
+        foreach (var item in menu.Items.OfType<MenuItem>())
+        {
+            entries.Add(item);
+            entries.AddRange(Entries(item));
+        }
+
+        return entries;
+    }
+
+    [Fact]
+    public void EveryMenuEntryAsksForItsOwnIcon()
+    {
+        var asked = RunSta(() =>
+        {
+            var (surface, _) = Build(60, 62);
+            var menu = surface.RollCanvas.ContextMenu!;
+            foreach (var key in ExpectedIcons.Select(x => x.Icon).Distinct())
+                menu.Resources[key] = key;
+
+            return Entries(menu).Select(x => ((string)x.Header, x.Icon as string)).ToArray();
+        });
+
+        Assert.Equal(ExpectedIcons.Length, asked.Length);
+        Assert.Equal(ExpectedIcons, asked.Select(x => (x.Item1, x.Item2 ?? string.Empty)).ToArray());
+    }
+
+    [Fact]
+    public void NoMenuEntryIsLeftWithoutAnIcon()
+    {
+        var missing = RunSta(() =>
+        {
+            var (surface, _) = Build(60, 62);
+            var menu = surface.RollCanvas.ContextMenu!;
+            foreach (var key in ExpectedIcons.Select(x => x.Icon).Distinct())
+                menu.Resources[key] = key;
+
+            return Entries(menu).Where(x => x.Icon is null).Select(x => (string)x.Header).ToArray();
+        });
+
+        Assert.Empty(missing);
     }
 
     [Fact]

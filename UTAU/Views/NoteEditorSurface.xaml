@@ -128,24 +128,37 @@
                             PreviewMouseWheel="RollCanvas_PreviewMouseWheel">
                         <Canvas.ContextMenu>
                             <ContextMenu>
-                                <MenuItem Header="{x:Static root:Texts.NoteContextCopy}" Command="{Binding CopyNotesCommand}"/>
-                                <MenuItem Header="{x:Static root:Texts.NoteContextPaste}" Command="{Binding PasteNotesCommand}"/>
+                                <MenuItem Header="{x:Static root:Texts.NoteContextCopy}" Command="{Binding CopyNotesCommand}"
+                                          Icon="{DynamicResource {x:Static icons:IconKeys.ContentCopy}}"/>
+                                <MenuItem Header="{x:Static root:Texts.NoteContextPaste}" Command="{Binding PasteNotesCommand}"
+                                          Icon="{DynamicResource {x:Static icons:IconKeys.ContentPaste}}"/>
                                 <Separator/>
-                                <MenuItem Header="{x:Static root:Texts.SelectAllNotes}" Command="{Binding SelectAllCommand}"/>
+                                <MenuItem Header="{x:Static root:Texts.SelectAllNotes}" Command="{Binding SelectAllCommand}"
+                                          Icon="{DynamicResource {x:Static icons:IconKeys.SelectAll}}"/>
                                 <Separator/>
-                                <MenuItem Header="{x:Static root:Texts.OctaveUp}" Command="{Binding OctaveUpCommand}"/>
-                                <MenuItem Header="{x:Static root:Texts.OctaveDown}" Command="{Binding OctaveDownCommand}"/>
-                                <MenuItem Header="{x:Static root:Texts.QuantizeLength}" Command="{Binding QuantizeLengthCommand}"/>
+                                <MenuItem Header="{x:Static root:Texts.OctaveUp}" Command="{Binding OctaveUpCommand}"
+                                          Icon="{DynamicResource {x:Static icons:IconKeys.ArrowUp}}"/>
+                                <MenuItem Header="{x:Static root:Texts.OctaveDown}" Command="{Binding OctaveDownCommand}"
+                                          Icon="{DynamicResource {x:Static icons:IconKeys.ArrowDown}}"/>
+                                <MenuItem Header="{x:Static root:Texts.QuantizeLength}" Command="{Binding QuantizeLengthCommand}"
+                                          Icon="{DynamicResource {x:Static icons:IconKeys.Magnet}}"/>
                                 <Separator/>
-                                <MenuItem Header="{x:Static root:Texts.ResetGroup}">
-                                    <MenuItem Header="{x:Static root:Texts.ResetPitch}" Command="{Binding ResetPitchCommand}"/>
-                                    <MenuItem Header="{x:Static root:Texts.ResetVibrato}" Command="{Binding ResetVibratoCommand}"/>
-                                    <MenuItem Header="{x:Static root:Texts.ResetTiming}" Command="{Binding ResetTimingCommand}"/>
-                                    <MenuItem Header="{x:Static root:Texts.ResetNote}" Command="{Binding ResetNoteCommand}"/>
+                                <MenuItem Header="{x:Static root:Texts.ResetGroup}"
+                                          Icon="{DynamicResource {x:Static icons:IconKeys.Restore}}">
+                                    <MenuItem Header="{x:Static root:Texts.ResetPitch}" Command="{Binding ResetPitchCommand}"
+                                              Icon="{DynamicResource {x:Static icons:IconKeys.VectorCurve}}"/>
+                                    <MenuItem Header="{x:Static root:Texts.ResetVibrato}" Command="{Binding ResetVibratoCommand}"
+                                              Icon="{DynamicResource {x:Static icons:IconKeys.SineWave}}"/>
+                                    <MenuItem Header="{x:Static root:Texts.ResetTiming}" Command="{Binding ResetTimingCommand}"
+                                              Icon="{DynamicResource {x:Static icons:IconKeys.TimerOutline}}"/>
+                                    <MenuItem Header="{x:Static root:Texts.ResetNote}" Command="{Binding ResetNoteCommand}"
+                                              Icon="{DynamicResource {x:Static icons:IconKeys.BackupRestore}}"/>
                                 </MenuItem>
                                 <Separator/>
-                                <MenuItem Header="{x:Static root:Texts.EditLyrics}" Command="{Binding EditLyricsCommand}"/>
+                                <MenuItem Header="{x:Static root:Texts.EditLyrics}" Command="{Binding EditLyricsCommand}"
+                                          Icon="{DynamicResource {x:Static icons:IconKeys.TextBoxEdit}}"/>
                                 <MenuItem Header="{x:Static root:Texts.DetachEditor}" Command="{Binding DetachCommand}"
+                                          Icon="{DynamicResource {x:Static icons:IconKeys.OpenInNew}}"
                                           Visibility="{Binding CanDetach, Converter={StaticResource BooleanToVisibility}}"/>
                             </ContextMenu>
                         </Canvas.ContextMenu>
