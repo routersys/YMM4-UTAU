@@ -57,6 +57,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     bool isDetached;
     bool isMutatingSource;
     bool layoutPending;
+    bool isDisposed;
     ObservableCollection<PitchPoint>? observedPitchPoints;
     PitchPoint? selectedPitchPoint;
     PointCollection pitchCurve = [];
@@ -376,14 +377,30 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     void OnSourceChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        if (isMutatingSource || !Resynchronise())
+        if (isMutatingSource)
             return;
 
+        if (dispatcher.CheckAccess())
+            AcceptSourceChange();
+        else
+            dispatcher.BeginInvoke(AcceptSourceChange);
+    }
+
+    void AcceptSourceChange()
+    {
+        if (isDisposed || !Resynchronise())
+            return;
+
+        RequestLayout();
+    }
+
+    void RequestLayout()
+    {
         if (layoutPending)
             return;
 
         layoutPending = true;
-        dispatcher.BeginInvoke(FlushLayout, DispatcherPriority.Render);
+        dispatcher.BeginInvoke(FlushLayout, DispatcherPriority.Normal);
     }
 
     void MutateSource(Action action)
@@ -402,11 +419,10 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         finally
         {
             isMutatingSource = false;
+            if (Resynchronise())
+                layoutPending = true;
+            FlushLayout();
         }
-
-        if (Resynchronise())
-            layoutPending = true;
-        FlushLayout();
     }
 
     bool Resynchronise()
@@ -420,7 +436,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     public void FlushLayout()
     {
-        if (!layoutPending)
+        if (isDisposed || !layoutPending)
             return;
 
         layoutPending = false;
@@ -432,19 +448,21 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         if (IsSynchronised())
             return false;
 
-        transformTargets.Clear();
-        transformOriginTones = [];
-        transformOriginLengths = [];
-
-        var reusable = new Dictionary<UTAUNote, NoteViewModel>(Notes.Count);
+        var orphans = new Dictionary<UTAUNote, NoteViewModel>(Notes.Count);
         foreach (var note in Notes)
-            reusable.TryAdd(note.Note, note);
+            orphans.TryAdd(note.Note, note);
 
         var rebuilt = new List<NoteViewModel>(source.Count);
         foreach (var note in source)
-            rebuilt.Add(reusable.Remove(note, out var viewModel) ? viewModel : new NoteViewModel(note, this));
+            rebuilt.Add(orphans.Remove(note, out var viewModel) ? viewModel : new NoteViewModel(note, this));
 
-        foreach (var orphan in reusable.Values)
+        for (var index = VisibleNotes.Count - 1; index >= 0; index--)
+        {
+            if (orphans.ContainsKey(VisibleNotes[index].Note))
+                VisibleNotes.RemoveAt(index);
+        }
+
+        foreach (var orphan in orphans.Values)
         {
             selectedNotes.Remove(orphan);
             orphan.IsSelected = false;
@@ -475,7 +493,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     void RepairSelection()
     {
-        if (selectedNote is not null && selectedNotes.Contains(selectedNote))
+        if (selectedNote is null ? selectedNotes.Count == 0 : selectedNotes.Contains(selectedNote))
             return;
 
         SetPrimary(selectedNotes.LastOrDefault());
@@ -1128,6 +1146,10 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     public void Dispose()
     {
+        if (isDisposed)
+            return;
+
+        isDisposed = true;
         pronounce.PropertyChanged -= OnPronouncePropertyChanged;
         ObservePitchPoints(null);
         layoutPending = false;

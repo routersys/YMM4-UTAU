@@ -343,6 +343,185 @@ public sealed class NoteCollectionSyncTests
         Assert.Equal(600, viewModel.TotalTicks);
     }
 
+    static void AssertSameShapeAsAFreshEditor(UTAUVoicePronounce pronounce, NoteEditorViewModel viewModel)
+    {
+        Pump();
+        using var fresh = new NoteEditorViewModel(pronounce);
+
+        Assert.Equal(fresh.Notes.Select(x => x.Note), viewModel.Notes.Select(x => x.Note));
+        Assert.Equal(fresh.Notes.Select(x => x.StartTicks), viewModel.Notes.Select(x => x.StartTicks));
+        Assert.Equal(fresh.VisibleNotes.Select(x => x.Note), viewModel.VisibleNotes.Select(x => x.Note));
+        Assert.Equal(fresh.TotalTicks, viewModel.TotalTicks);
+        Assert.Equal(fresh.MinimumTone, viewModel.MinimumTone);
+        Assert.Equal(fresh.MaximumTone, viewModel.MaximumTone);
+        Assert.Equal(fresh.CanvasWidth, viewModel.CanvasWidth);
+        Assert.Equal(fresh.CanvasHeight, viewModel.CanvasHeight);
+        Assert.Equal(fresh.Keyboard.Count, viewModel.Keyboard.Count);
+        Assert.Equal(fresh.TimeGridLines.Count, viewModel.TimeGridLines.Count);
+        Assert.Equal(fresh.PitchCurve.Count, viewModel.PitchCurve.Count);
+        Assert.Equal(fresh.ExpressionBars.Count, viewModel.ExpressionBars.Count);
+    }
+
+    [Fact]
+    public void AnyRunOfChangesLeavesTheEditorWhereAFreshOneWouldBe()
+    {
+        var random = new Random(20260823);
+        for (var trial = 0; trial < 200; trial++)
+        {
+            var (pronounce, viewModel) = Create(60, 62, 64, 65);
+            var steps = random.Next(1, 9);
+            for (var step = 0; step < steps; step++)
+            {
+                switch (random.Next(6))
+                {
+                    case 0:
+                        pronounce.Notes.Insert(
+                            random.Next(pronounce.Notes.Count + 1),
+                            new UTAUNote { Lyric = "か", Tone = 50 + random.Next(30), LengthTicks = 60 + random.Next(400) });
+                        break;
+                    case 1 when pronounce.Notes.Count > 1:
+                        pronounce.Notes.RemoveAt(random.Next(pronounce.Notes.Count));
+                        break;
+                    case 2 when pronounce.Notes.Count > 1:
+                        pronounce.Notes.Move(random.Next(pronounce.Notes.Count), random.Next(pronounce.Notes.Count));
+                        break;
+                    case 3:
+                        pronounce.Notes[random.Next(pronounce.Notes.Count)].LengthTicks = 60 + random.Next(400);
+                        break;
+                    case 4:
+                        viewModel.Select(viewModel.Notes[random.Next(viewModel.Notes.Count)]);
+                        viewModel.InsertRestCommand.Execute(null);
+                        break;
+                    default:
+                        if (viewModel.Notes.Count > 1)
+                        {
+                            viewModel.Select(viewModel.Notes[random.Next(viewModel.Notes.Count)]);
+                            viewModel.RemoveNoteCommand.Execute(null);
+                        }
+
+                        break;
+                }
+            }
+
+            AssertSameShapeAsAFreshEditor(pronounce, viewModel);
+            AssertMirrors(pronounce, viewModel);
+            viewModel.Dispose();
+        }
+    }
+
+    [Fact]
+    public void TheLayoutCatchesUpBeforeAnythingDrawsTheEditor()
+    {
+        var (pronounce, viewModel) = Create(60, 62, 64);
+        Pump();
+        var order = new List<string>();
+        viewModel.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(NoteEditorViewModel.TotalTicks))
+                order.Add("layout");
+        };
+
+        Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() => order.Add("draw")), DispatcherPriority.Render);
+        pronounce.Notes.RemoveAt(0);
+        Pump();
+
+        Assert.Equal(["layout", "draw"], order);
+    }
+
+    [Fact]
+    public void PastingIntoAnEditorThatWasEmptiedFromOutsideWorks()
+    {
+        var (pronounce, viewModel) = Create(60, 62);
+        viewModel.SelectAll();
+        viewModel.CopyNotesCommand.Execute(null);
+
+        pronounce.Notes.Clear();
+        viewModel.PasteNotesCommand.Execute(null);
+
+        Assert.Equal([60, 62], viewModel.Notes.Select(x => x.Note.Tone));
+        Assert.Equal(2, viewModel.SelectedCount);
+        AssertMirrors(pronounce, viewModel);
+    }
+
+    [Fact]
+    public void ADroppedNoteNeverStaysInTheDrawnList()
+    {
+        var (pronounce, viewModel) = Create(60, 62, 64);
+        Pump();
+        var dropped = viewModel.Notes[1];
+        Assert.Contains(dropped, viewModel.VisibleNotes);
+
+        pronounce.Notes.RemoveAt(1);
+
+        Assert.DoesNotContain(dropped, viewModel.VisibleNotes);
+        Assert.All(viewModel.VisibleNotes, x => Assert.Contains(x, viewModel.Notes));
+        AssertMirrors(pronounce, viewModel);
+    }
+
+    [Fact]
+    public void AChangeFromAnotherThreadIsBroughtBackToTheEditorThread()
+    {
+        var (pronounce, viewModel) = Create(60, 62);
+        Pump();
+
+        var thread = new Thread(() => pronounce.Notes.Add(new UTAUNote { Lyric = "か", Tone = 64 }));
+        thread.Start();
+        thread.Join();
+
+        Assert.Equal(2, viewModel.Notes.Count);
+
+        Pump();
+
+        Assert.Equal(3, viewModel.Notes.Count);
+        AssertMirrors(pronounce, viewModel);
+    }
+
+    [Fact]
+    public void AChangeThatArrivesAfterDisposalIsIgnored()
+    {
+        var (pronounce, viewModel) = Create(60, 62);
+        var thread = new Thread(() => pronounce.Notes.Add(new UTAUNote { Lyric = "か", Tone = 64 }));
+        thread.Start();
+        thread.Join();
+
+        viewModel.Dispose();
+        Pump();
+
+        Assert.Empty(viewModel.Notes);
+        Assert.Equal(3, pronounce.Notes.Count);
+    }
+
+    [Fact]
+    public void DisposingTwiceIsHarmless()
+    {
+        var (pronounce, viewModel) = Create(60, 62);
+
+        viewModel.Dispose();
+        viewModel.Dispose();
+
+        Assert.Empty(viewModel.Notes);
+        Assert.Equal(2, pronounce.Notes.Count);
+    }
+
+    [Fact]
+    public void ARedundantChangeCostsNoLayoutPass()
+    {
+        var (pronounce, viewModel) = Create(60, 62, 64);
+        Pump();
+        var passes = 0;
+        viewModel.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(NoteEditorViewModel.TotalTicks))
+                passes++;
+        };
+
+        pronounce.Notes.Move(1, 1);
+        Pump();
+
+        Assert.Equal(0, passes);
+        AssertMirrors(pronounce, viewModel);
+    }
+
     [Fact]
     public void RemovingManySelectedNotesResynchronisesOnlyOnce()
     {
