@@ -254,6 +254,31 @@ public sealed class NoteBatchEditTests
     }
 
     [Fact]
+    public void UndoingATimingResetBringsEveryValueBack()
+    {
+        var pronounce = new UTAUVoicePronounce();
+        var viewModel = CreateViewModel(pronounce, 60);
+        var note = viewModel.Notes[0].Note;
+        note.PreutteranceOverride = 120.0;
+        note.OverlapOverride = 60.0;
+        note.StartPointMilliseconds = 30.0;
+        note.FadeInMilliseconds = 90.0;
+        note.FadeOutMilliseconds = 90.0;
+        SelectAllOf(viewModel);
+
+        var recorder = new Recorder(pronounce);
+        viewModel.ResetTimingCommand.Execute(null);
+        Assert.Equal(5, recorder.Recorded);
+        recorder.UndoAll();
+
+        Assert.Equal(120.0, note.PreutteranceOverride);
+        Assert.Equal(60.0, note.OverlapOverride);
+        Assert.Equal(30.0, note.StartPointMilliseconds);
+        Assert.Equal(90.0, note.FadeInMilliseconds);
+        Assert.Equal(90.0, note.FadeOutMilliseconds);
+    }
+
+    [Fact]
     public void ResettingTheTimingLeavesTheLyricAndTheToneAndTheLength()
     {
         var viewModel = CreateViewModel(64);
