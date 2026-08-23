@@ -100,6 +100,29 @@ public sealed class NoteBatchEditTests
     }
 
     [Fact]
+    public void TheWholeShiftShrinksDownwardsAsWell()
+    {
+        var viewModel = CreateViewModel(9, 27);
+        SelectAllOf(viewModel);
+
+        viewModel.OctaveDownCommand.Execute(null);
+
+        Assert.Equal([0, 18], viewModel.Notes.Select(x => x.Note.Tone));
+        Assert.Equal(18, viewModel.Notes[1].Note.Tone - viewModel.Notes[0].Note.Tone);
+    }
+
+    [Fact]
+    public void ANoteAlreadyAtTheBottomOfTheRangeStopsTheWholeSelection()
+    {
+        var viewModel = CreateViewModel(0, 60);
+        SelectAllOf(viewModel);
+
+        viewModel.OctaveDownCommand.Execute(null);
+
+        Assert.Equal([0, 60], viewModel.Notes.Select(x => x.Note.Tone));
+    }
+
+    [Fact]
     public void UndoingAnOctaveBringsEveryToneBack()
     {
         var pronounce = new UTAUVoicePronounce();
