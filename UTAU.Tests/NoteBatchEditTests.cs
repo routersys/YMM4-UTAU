@@ -439,6 +439,21 @@ public sealed class NoteBatchEditTests
     }
 
     [Fact]
+    public void CopiedNotesReachAnotherEditor()
+    {
+        var origin = CreateViewModel(60, 62);
+        origin.SelectAll();
+        origin.CopyNotesCommand.Execute(null);
+
+        var other = CreateViewModel(64);
+        other.Select(other.Notes[0]);
+        other.PasteNotesCommand.Execute(null);
+
+        Assert.Equal([64, 60, 62], other.Notes.Select(x => x.Note.Tone));
+        Assert.Equal([60, 62], origin.Notes.Select(x => x.Note.Tone));
+    }
+
+    [Fact]
     public void PastingTwiceMakesTwoIndependentNotes()
     {
         var viewModel = CreateViewModel(60);
