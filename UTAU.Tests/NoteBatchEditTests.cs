@@ -5,6 +5,7 @@ using YukkuriMovieMaker.UndoRedo;
 
 namespace UTAU.Tests;
 
+[Collection("NoteClipboard")]
 public sealed class NoteBatchEditTests
 {
     sealed class Recorder

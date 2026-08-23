@@ -55,6 +55,8 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     bool isSelectionBoxVisible;
     bool isBatching;
     bool isDetached;
+    bool isMutatingSource;
+    bool layoutPending;
     ObservableCollection<PitchPoint>? observedPitchPoints;
     PitchPoint? selectedPitchPoint;
     PointCollection pitchCurve = [];
@@ -88,6 +90,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         source = pronounce.Notes;
         Notes = [.. source.Select(x => new NoteViewModel(x, this))];
         Notes.CollectionChanged += OnNotesChanged;
+        source.CollectionChanged += OnSourceChanged;
         ZoomInCommand = new ActionCommand(_ => pixelsPerTick < MaximumPixelsPerTick, _ => ZoomHorizontally(ZoomStep));
         ZoomOutCommand = new ActionCommand(_ => pixelsPerTick > MinimumPixelsPerTick, _ => ZoomHorizontally(1.0 / ZoomStep));
         ZoomVerticalInCommand = new ActionCommand(_ => semitoneHeight < MaximumSemitoneHeight, _ => ZoomVertically(ZoomStep));
@@ -353,6 +356,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
 
     public void SetViewport(double left, double width)
     {
+        FlushLayout();
         viewportLeft = left;
         viewportWidth = width;
         if (!MoveWindow())
@@ -368,6 +372,113 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     {
         visibleFirst = 0;
         visibleLast = -1;
+    }
+
+    void OnSourceChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (isMutatingSource || !Resynchronise())
+            return;
+
+        if (layoutPending)
+            return;
+
+        layoutPending = true;
+        dispatcher.BeginInvoke(FlushLayout, DispatcherPriority.Render);
+    }
+
+    void MutateSource(Action action)
+    {
+        if (isMutatingSource)
+        {
+            action();
+            return;
+        }
+
+        isMutatingSource = true;
+        try
+        {
+            action();
+        }
+        finally
+        {
+            isMutatingSource = false;
+        }
+
+        if (Resynchronise())
+            layoutPending = true;
+        FlushLayout();
+    }
+
+    bool Resynchronise()
+    {
+        if (!SyncNotes())
+            return false;
+
+        RepairSelection();
+        return true;
+    }
+
+    public void FlushLayout()
+    {
+        if (!layoutPending)
+            return;
+
+        layoutPending = false;
+        InvalidateLayout();
+    }
+
+    bool SyncNotes()
+    {
+        if (IsSynchronised())
+            return false;
+
+        transformTargets.Clear();
+        transformOriginTones = [];
+        transformOriginLengths = [];
+
+        var reusable = new Dictionary<UTAUNote, NoteViewModel>(Notes.Count);
+        foreach (var note in Notes)
+            reusable.TryAdd(note.Note, note);
+
+        var rebuilt = new List<NoteViewModel>(source.Count);
+        foreach (var note in source)
+            rebuilt.Add(reusable.Remove(note, out var viewModel) ? viewModel : new NoteViewModel(note, this));
+
+        foreach (var orphan in reusable.Values)
+        {
+            selectedNotes.Remove(orphan);
+            orphan.IsSelected = false;
+            orphan.IsPrimary = false;
+            orphan.Dispose();
+        }
+
+        Notes.Clear();
+        foreach (var viewModel in rebuilt)
+            Notes.Add(viewModel);
+
+        return true;
+    }
+
+    bool IsSynchronised()
+    {
+        if (Notes.Count != source.Count)
+            return false;
+
+        for (var index = 0; index < source.Count; index++)
+        {
+            if (!ReferenceEquals(Notes[index].Note, source[index]))
+                return false;
+        }
+
+        return true;
+    }
+
+    void RepairSelection()
+    {
+        if (selectedNote is not null && selectedNotes.Contains(selectedNote))
+            return;
+
+        SetPrimary(selectedNotes.LastOrDefault());
     }
 
     void ResetWindow()
@@ -1019,6 +1130,8 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
     {
         pronounce.PropertyChanged -= OnPronouncePropertyChanged;
         ObservePitchPoints(null);
+        layoutPending = false;
+        source.CollectionChanged -= OnSourceChanged;
         Notes.CollectionChanged -= OnNotesChanged;
         VisibleNotes.Clear();
         selectedNotes.Clear();
@@ -1292,9 +1405,7 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
             Tone = selectedNote?.Note.Tone ?? MusicalTone.MiddleC.NoteNumber,
             LengthTicks = SnapDivision.IsFree ? UTAUNote.DefaultLengthTicks : SnapDivision.Ticks,
         };
-        source.Insert(index + 1, rest);
-        Notes.Insert(index + 1, new NoteViewModel(rest, this));
-        InvalidateLayout();
+        MutateSource(() => source.Insert(index + 1, rest));
     }
 
     void RemoveSelected()
@@ -1306,15 +1417,13 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         var index = Notes.IndexOf(removing[0]);
         Select(null);
 
-        foreach (var note in removing)
+        MutateSource(() =>
         {
-            source.Remove(note.Note);
-            Notes.Remove(note);
-            note.Dispose();
-        }
+            foreach (var note in removing)
+                source.Remove(note.Note);
+        });
 
         Select(Notes[Math.Min(index, Notes.Count - 1)]);
-        InvalidateLayout();
     }
 
     public string ReadSelectedLyrics()
@@ -1444,23 +1553,21 @@ internal sealed class NoteEditorViewModel : Bindable, IDisposable
         if (copiedNotes.Count == 0)
             return;
 
-        var index = selectedNotes.Count == 0 ? Notes.Count - 1 : selectedNotes.Max(Notes.IndexOf);
-        var pasted = new List<NoteViewModel>(copiedNotes.Count);
-        foreach (var copied in copiedNotes)
+        var first = (selectedNotes.Count == 0 ? Notes.Count - 1 : selectedNotes.Max(Notes.IndexOf)) + 1;
+        MutateSource(() =>
         {
-            index++;
-            var note = copied.Clone();
-            source.Insert(index, note);
-            var viewModel = new NoteViewModel(note, this);
-            Notes.Insert(index, viewModel);
-            pasted.Add(viewModel);
-        }
+            var index = first;
+            foreach (var copied in copiedNotes)
+            {
+                source.Insert(index, copied.Clone());
+                index++;
+            }
+        });
 
         ClearSelection();
-        foreach (var note in pasted)
-            AddToSelection(note);
-        SetPrimary(pasted[0]);
-        InvalidateLayout();
+        for (var offset = 0; offset < copiedNotes.Count; offset++)
+            AddToSelection(Notes[first + offset]);
+        SetPrimary(Notes[first]);
     }
 
     void AddPitchPoint()
