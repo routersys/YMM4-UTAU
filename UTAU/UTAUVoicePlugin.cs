@@ -4,7 +4,7 @@ using YukkuriMovieMaker.Plugin.Voice;
 
 namespace UTAU;
 
-[PluginDetails(AuthorName = "routersys", ContentId = "")]
+[PluginDetails(AuthorName = "routersys", ContentId = "nc501723")]
 internal sealed class UTAUVoicePlugin : IVoicePlugin
 {
     public const string EngineName = "UTAU";
