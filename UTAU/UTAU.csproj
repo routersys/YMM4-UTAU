@@ -12,6 +12,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="ILRepack" Version="2.0.46" PrivateAssets="all" ExcludeAssets="all" GeneratePathProperty="true" />
+		<PackageReference Include="NAudio" Version="2.3.0" />
 		<PackageReference Include="WorldNet" Version="1.1.0" />
 	</ItemGroup>
 
@@ -22,18 +24,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Reference Include="NAudio">
-			<HintPath>$(YMM4DirPath)NAudio.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="NAudio.Core">
-			<HintPath>$(YMM4DirPath)NAudio.Core.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="NAudio.Midi">
-			<HintPath>$(YMM4DirPath)NAudio.Midi.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
 		<Reference Include="NCalc.Core">
 			<HintPath>$(YMM4DirPath)NCalc.Core.dll</HintPath>
 			<Private>false</Private>
@@ -92,8 +82,13 @@
 		<AdditionalFiles Include="**/*.csv" />
 	</ItemGroup>
 
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(SkipPluginDeploy)' != 'true'">
-		<Exec Command="mkdir &quot;$(YMM4DirPath)user\plugin\$(ProjectName)&quot; &gt; NUL 2&gt;&amp;1&#xD;&#xA;copy &quot;$(TargetPath)&quot; &quot;$(YMM4DirPath)user\plugin\$(ProjectName)\&quot;&#xD;&#xA;copy &quot;$(TargetDir)WorldNet.dll&quot; &quot;$(YMM4DirPath)user\plugin\$(ProjectName)\&quot;" />
+	<Target Name="MergePluginAssembly" AfterTargets="PostBuildEvent" Inputs="$(TargetPath);$(TargetDir)NAudio.dll;$(TargetDir)NAudio.Core.dll;$(TargetDir)NAudio.Asio.dll;$(TargetDir)NAudio.Midi.dll;$(TargetDir)NAudio.Wasapi.dll;$(TargetDir)NAudio.WinMM.dll" Outputs="$(TargetDir)plugin\$(TargetFileName)">
+		<MakeDir Directories="$(TargetDir)plugin" />
+		<Exec Command="&quot;$(PkgILRepack)\tools\ILRepack.exe&quot; /out:&quot;$(TargetDir)plugin\$(TargetFileName)&quot; /lib:&quot;$([System.IO.Path]::GetDirectoryName('$(TargetPath)'))&quot; /lib:&quot;$([System.IO.Path]::GetDirectoryName('$(YMM4DirPath)'))&quot; /internalize &quot;$(TargetPath)&quot; &quot;$(TargetDir)NAudio.dll&quot; &quot;$(TargetDir)NAudio.Core.dll&quot; &quot;$(TargetDir)NAudio.Asio.dll&quot; &quot;$(TargetDir)NAudio.Midi.dll&quot; &quot;$(TargetDir)NAudio.Wasapi.dll&quot; &quot;$(TargetDir)NAudio.WinMM.dll&quot;" />
+	</Target>
+
+	<Target Name="PostBuild" AfterTargets="MergePluginAssembly" Condition="'$(SkipPluginDeploy)' != 'true'">
+		<Exec Command="mkdir &quot;$(YMM4DirPath)user\plugin\$(ProjectName)&quot; &gt; NUL 2&gt;&amp;1&#xD;&#xA;copy &quot;$(TargetDir)plugin\$(TargetFileName)&quot; &quot;$(YMM4DirPath)user\plugin\$(ProjectName)\&quot;&#xD;&#xA;copy &quot;$(TargetDir)WorldNet.dll&quot; &quot;$(YMM4DirPath)user\plugin\$(ProjectName)\&quot;" />
 	</Target>
 
 </Project>

@@ -30,17 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="NAudio">
-      <HintPath>$(YMM4DirPath)NAudio.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio.Core">
-      <HintPath>$(YMM4DirPath)NAudio.Core.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(YMM4DirPath)Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Numerics.Tensors">
-      <HintPath>$(YMM4DirPath)System.Numerics.Tensors.dll</HintPath>
     </Reference>
     <Reference Include="YukkuriMovieMaker.Controls">
       <HintPath>$(YMM4DirPath)YukkuriMovieMaker.Controls.dll</HintPath>

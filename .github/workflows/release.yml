@@ -112,8 +112,8 @@ jobs:
           New-Item -ItemType Directory -Path $stageRoot -Force | Out-Null
           New-Item -ItemType Directory -Path "$stageRoot/LICENSE" -Force | Out-Null
 
-          foreach ($name in @("UTAU.dll", "WorldNet.dll")) {
-            $path = "$outDir/$name"
+          foreach ($path in @("$outDir/plugin/UTAU.dll", "$outDir/WorldNet.dll")) {
+            $name = Split-Path $path -Leaf
             if (-not (Test-Path $path)) {
               Write-Error "ビルド結果に $name が見つかりませんでした: $path"
               exit 1

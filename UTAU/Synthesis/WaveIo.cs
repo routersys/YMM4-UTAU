@@ -15,7 +15,7 @@ internal static class WaveIo
         var frames = new List<double>(Math.Max((int)(reader.Length / Math.Max(reader.WaveFormat.BlockAlign, 1)), 0));
 
         int read;
-        while ((read = reader.Read(buffer)) > 0)
+        while ((read = reader.Read(buffer, 0, buffer.Length)) > 0)
         {
             for (var i = 0; i + channels <= read; i += channels)
             {
