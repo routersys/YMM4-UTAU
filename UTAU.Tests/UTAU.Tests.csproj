@@ -39,6 +39,9 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(YMM4DirPath)Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="System.Numerics.Tensors">
+      <HintPath>$(YMM4DirPath)System.Numerics.Tensors.dll</HintPath>
+    </Reference>
     <Reference Include="YukkuriMovieMaker.Controls">
       <HintPath>$(YMM4DirPath)YukkuriMovieMaker.Controls.dll</HintPath>
     </Reference>
