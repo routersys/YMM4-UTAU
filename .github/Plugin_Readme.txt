@@ -125,10 +125,12 @@ WorldNet で分析して合成し直します。
   本プラグインは音声の分析と合成に WorldNet（MIT License）を同梱しています。
   WorldNet は M. Morise 氏の WORLD（修正 BSD License）を C# へ移植した物で、
   高速フーリエ変換には Takuya OOURA 氏の FFT パッケージを用いています。
+  音声ファイルの読み書きには NAudio（MIT License）を同梱しています。
   歌詞をまとめて編集するときの区切り方は OpenUtau（MIT License）の規約に
   合わせています。
   ライセンスの全文は同梱の LICENSE フォルダーに収録しています。
     WorldNet  : Copyright (c) 2026 routersys
+    NAudio    : Copyright (c) Mark Heath & Contributors
     WORLD     : Copyright (c) 2010 M. Morise
     Ooura FFT : Copyright Takuya OOURA, 1996-2001
     OpenUtau  : Copyright (c) 2014 StAkira

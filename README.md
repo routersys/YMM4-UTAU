@@ -287,6 +287,7 @@ YMM4 の設定画面の「音声」に「UTAU」として表示されます。
 | ソフトウェア | 用途 | ライセンス | 著作権表示 |
 |---|---|---|---|
 | [WorldNet](https://github.com/routersys/WorldNet) | 音声の分析と合成 | MIT License | Copyright (c) 2026 routersys |
+| [NAudio](https://github.com/naudio/NAudio) | 音声ファイルの読み書き | MIT License | Copyright (c) Mark Heath & Contributors |
 | [WORLD](https://github.com/mmorise/World) | WorldNet が移植した音声分析合成システム | 修正 BSD License | Copyright (c) 2010 M. Morise |
 | [Ooura FFT](https://www.kurims.kyoto-u.ac.jp/~ooura/fft.html) | WORLD が使う高速フーリエ変換 | 作者が定める条件 | Copyright Takuya OOURA, 1996-2001 |
 | [OpenUtau](https://github.com/stakira/OpenUtau) | 歌詞の区切り方の規約。試験には参照実装として原実装を転写しています | MIT License | Copyright (c) 2014 StAkira |
