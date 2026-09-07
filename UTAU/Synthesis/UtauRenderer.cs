@@ -669,6 +669,7 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
             }
             catch (Exception exception) when (exception is IOException or InvalidOperationException or FormatException or NotSupportedException or ArgumentException)
             {
+                UTAUTelemetry.Report(exception);
                 return null;
             }
         }
@@ -695,6 +696,7 @@ internal sealed class UtauRenderer(RenderSettings settings, RenderCurves curves,
             }
             catch (Exception exception) when (exception is IOException or InvalidOperationException or FormatException or NotSupportedException or ArgumentException)
             {
+                UTAUTelemetry.Report(exception);
             }
         }
 

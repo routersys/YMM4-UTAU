@@ -31,8 +31,10 @@ internal static class UTAUUpdateNotifier
             };
             await new Notifier(Owner, Repository, options).NotifyAsync().ConfigureAwait(false);
         }
-        catch
+        catch (Exception exception)
         {
+            if (exception is not UpdateCheckException)
+                UTAUTelemetry.Report(exception);
         }
     }
 

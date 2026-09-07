@@ -1,4 +1,3 @@
-using Telemetry;
 using UTAU.Models;
 using YukkuriMovieMaker.Plugin;
 using YukkuriMovieMaker.Plugin.Voice;
@@ -23,7 +22,7 @@ internal sealed class UTAUVoicePlugin : IVoicePlugin
 
     static IEnumerable<IVoiceSpeaker> GetVoices()
     {
-        TelemetryReporter.Start();
+        UTAUTelemetry.EnsureStartedOnce();
         UTAUUpdateNotifier.EnsureCheckedOnce();
 
         if (!VoiceBankRepository.IsLoaded)
@@ -41,7 +40,7 @@ internal sealed class UTAUVoicePlugin : IVoicePlugin
         }
         catch (Exception exception)
         {
-            TelemetryReporter.Report(exception);
+            UTAUTelemetry.Report(exception);
             throw;
         }
     }

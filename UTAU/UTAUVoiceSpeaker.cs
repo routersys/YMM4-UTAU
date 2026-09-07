@@ -1,4 +1,3 @@
-using Telemetry;
 using UTAU.Models;
 using UTAU.Notes;
 using UTAU.Phonemes;
@@ -56,7 +55,7 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
         }
         catch (Exception exception) when (exception is not InvalidOperationException)
         {
-            TelemetryReporter.Report(exception);
+            UTAUTelemetry.Report(exception);
             throw;
         }
     }

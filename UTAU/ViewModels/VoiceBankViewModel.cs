@@ -94,6 +94,7 @@ internal sealed class VoiceBankViewModel(VoiceBank bank)
         }
         catch (Exception exception) when (exception is NotSupportedException or IOException or UriFormatException or ArgumentException)
         {
+            UTAUTelemetry.Report(exception);
             return null;
         }
     }
