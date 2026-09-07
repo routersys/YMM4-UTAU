@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows.Input;
+using Telemetry;
 using UTAU.Models;
 using UTAU.Synthesis;
 using YukkuriMovieMaker.Commons;
@@ -78,6 +79,7 @@ internal sealed class UTAUSettingsViewModel : Bindable
         }
         catch (Exception exception)
         {
+            TelemetryReporter.Report(exception);
             StatusText = exception.Message;
         }
         finally

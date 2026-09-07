@@ -1,3 +1,4 @@
+using Telemetry;
 using UTAU.Models;
 using YukkuriMovieMaker.Plugin;
 using YukkuriMovieMaker.Plugin.Voice;
@@ -18,16 +19,30 @@ internal sealed class UTAUVoicePlugin : IVoicePlugin
 
     public bool IsVoicesCached => VoiceBankRepository.IsLoaded;
 
-    public Task UpdateVoicesAsync() => Task.Run(VoiceBankRepository.Reload);
+    public Task UpdateVoicesAsync() => Task.Run(Reload);
 
     static IEnumerable<IVoiceSpeaker> GetVoices()
     {
+        TelemetryReporter.Start();
         UTAUUpdateNotifier.EnsureCheckedOnce();
 
         if (!VoiceBankRepository.IsLoaded)
-            VoiceBankRepository.Reload();
+            Reload();
 
         foreach (var bank in VoiceBankRepository.Banks)
             yield return new UTAUVoiceSpeaker(bank);
+    }
+
+    static void Reload()
+    {
+        try
+        {
+            VoiceBankRepository.Reload();
+        }
+        catch (Exception exception)
+        {
+            TelemetryReporter.Report(exception);
+            throw;
+        }
     }
 }

@@ -1,3 +1,4 @@
+using Telemetry;
 using UTAU.Models;
 using UTAU.Notes;
 using UTAU.Phonemes;
@@ -48,6 +49,19 @@ internal sealed class UTAUVoiceSpeaker(VoiceBank bank) : IVoiceSpeaker
         => currentParameter is UTAUVoiceParameter ? currentParameter : CreateVoiceParameter();
 
     public async Task<IVoicePronounce?> CreateVoiceAsync(string text, IVoicePronounce? pronounce, IVoiceParameter? parameter, string filePath)
+    {
+        try
+        {
+            return await CreateAsync(text, pronounce, parameter, filePath).ConfigureAwait(false);
+        }
+        catch (Exception exception) when (exception is not InvalidOperationException)
+        {
+            TelemetryReporter.Report(exception);
+            throw;
+        }
+    }
+
+    async Task<IVoicePronounce?> CreateAsync(string text, IVoicePronounce? pronounce, IVoiceParameter? parameter, string filePath)
     {
         var param = parameter as UTAUVoiceParameter ?? new UTAUVoiceParameter();
         var isUst = UstSource.TryGetPath(text, out var ustPath);
